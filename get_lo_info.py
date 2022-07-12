@@ -10,6 +10,8 @@ entries to the Ldir dict based on which model run you are working on.
 Users should copy this to LO_user/get_lo_info.py, edit as needed, and make it into
 their own GitHub repo.
 
+KMH LO_user edits
+
 """
 import os
 from pathlib import Path
@@ -51,8 +53,8 @@ except KeyError:
 # print('HOME = ' + str(HOME))
 # print('HOSTNAME = ' + HOSTNAME)
 
-if str(HOME) == '/Users/pm8':
-    lo_env = 'pm_mac'
+if str(HOME) == '/Users/katehewett':
+    lo_env = 'kh_mac'
     which_matlab = '/Applications/MATLAB_R2020a.app/bin/matlab'
 
 elif (str(HOME) == '/home/parker') & ('perigee' in HOSTNAME):
