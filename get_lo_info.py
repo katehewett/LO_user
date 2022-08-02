@@ -85,7 +85,7 @@ elif (str(HOME) == '/mmfs1/home/pmacc'):
     local_user = 'pmacc'
 
 # kate
-elif (str(HOME) == '/Users/katehewett':
+elif (str(HOME) == '/Users/katehewett'):
     lo_env = 'kh_mac'
     which_matlab = '/Applications/MATLAB_R2020a.app/bin/matlab'
 
