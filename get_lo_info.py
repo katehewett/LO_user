@@ -121,7 +121,7 @@ Ldir0['roms_out3'] = roms_out3
 Ldir0['roms_out4'] = roms_out4
 Ldir0['which_matlab'] = which_matlab
 #
-Ldir0c'remote_user'] = remote_user
+Ldir0['remote_user'] = remote_user
 Ldir0['remote_machine'] = remote_machine
 Ldir0['remote_dir0'] = remote_dir0
 Ldir0['local_user'] = local_user
