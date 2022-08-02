@@ -53,24 +53,12 @@ except KeyError:
 print('HOME = ' + str(HOME))
 print('HOSTNAME = ' + HOSTNAME)
 
-if str(HOME) == '/Users/katehewett':
-    lo_env = 'kh_mac'
+# parker 
+if str(HOME) == '/Users/pm8':
+    lo_env = 'pm_mac'
     which_matlab = '/Applications/MATLAB_R2020a.app/bin/matlab'
-
-elif (str(HOME) == '/home/kmhewett') & ('apogee' in HOSTNAME):
-    lo_env = 'kh_apogee'
-    roms_out1 = Path('/pgdat1/kmhewett/LO_roms')
-    #roms_out2 = Path('/pgdat2/kmhewett/LO_roms')
-
-elif (str(HOME) == '/mmfs1/home/kmhewett'):
-    lo_env = 'kh_klone'
-    remote_user = 'kmhewett'
-    remote_machine = 'apogee.ocean.washington.edu'
-    remote_dir0 = '/dat1/kmhewett'
-    local_user = 'kmhewett'
     
-# parker
-elif (str(HOME) == '/home/parker') & ('perigee' in HOSTNAME):
+elif str(HOME) == '/home/parker') & ('perigee' in HOSTNAME):
     lo_env = 'pm_perigee'
     roms_out1 = Path('/agdat1/parker/LO_roms')
     roms_out2 = Path('/agdat2/parker/LO_roms')
@@ -96,6 +84,30 @@ elif (str(HOME) == '/mmfs1/home/pmacc'):
     remote_dir0 = '/dat1/parker'
     local_user = 'pmacc'
 
+# kate
+elif (str(HOME) == '/Users/katehewett':
+    lo_env = 'kh_mac'
+    which_matlab = '/Applications/MATLAB_R2020a.app/bin/matlab'
+
+elif str(HOME) == '/home/kmhewett') & ('perigee' in HOSTNAME):
+    lo_env = 'kh_perigee'
+    roms_out1 = Path('/agdat1/parker/LO_roms')
+    roms_out2 = Path('/agdat2/parker/LO_roms')
+    
+elif (str(HOME) == '/home/kmhewett') & ('apogee' in HOSTNAME):
+    lo_env = 'kh_apogee'
+    roms_out1 = Path('/pgdat1/parker/LO_roms')
+    roms_out2 = Path('/pgdat2/parker/LO_roms')
+
+elif (str(HOME) == '/mmfs1/home/kmhewett'):
+    lo_env = 'kh_klone'
+    remote_user = 'kmhewett'
+    remote_machine = 'apogee.ocean.washington.edu'
+    remote_dir0 = '/dat1/kmhewett'
+    local_user = 'kmhewett'
+    
+
+       
 Ldir0 = dict()
 Ldir0['lo_env'] = lo_env
 Ldir0['parent'] = parent
@@ -111,9 +123,11 @@ Ldir0['roms_out3'] = roms_out3
 Ldir0['roms_out4'] = roms_out4
 Ldir0['which_matlab'] = which_matlab
 #
-Ldir0['remote_user'] = remote_user
+Ldir0c'remote_user'] = remote_user
 Ldir0['remote_machine'] = remote_machine
 Ldir0['remote_dir0'] = remote_dir0
 Ldir0['local_user'] = local_user
+
+
 
 
