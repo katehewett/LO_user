@@ -68,10 +68,10 @@ def get_box(job, Lon, Lat):
     elif job == 'harcourt':
         aa = [-125.6, -124.2, 46.6, 47.2]
         vn_list = 'h,pm,pn,mask_rho,salt,temp,oxygen,zeta,u,v,w,Uwind,Vwind'
-    elif job == 'NHL1_45':
-        aa = [-124.0999985, -125.1166992,   45.65169907,   43.65169907]
-        vn_list = 'h,f,pm,pn,mask_rho,salt,temp,rho,oxygen,zeta,u,v,Uwind,Vwind' 
+    elif job == 'NHL1_65':
+        aa = [-124.0999985, -125.5999985,   45.65169907,   43.65169907]
+        vn_list = 'h,f,pm,pn,mask_rho,salt,temp,rho,oxygen,zeta,u,v' 
     elif job == 'NHL1_200':
         aa = [-124.0999985, -128.7720032,   45.65169907,   43.65169907]
-        vn_list = 'h,f,pm,pn,mask_rho,salt,temp,rho,oxygen,zeta,u,v,Uwind,Vwind'
+        vn_list = 'h,f,pm,pn,mask_rho,salt,temp,rho,oxygen,zeta,u,v'
     return aa, vn_list
