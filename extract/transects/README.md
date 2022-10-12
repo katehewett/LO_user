@@ -16,13 +16,18 @@ in tef, Parker has:
 
 `tef_fun.py` is an important module for this code. It includes `tef_fun.get_sect_df()` which returns a DataFrame of all the section names and their lon,lat endpoints.
 
-here... 'LO_user/extract/transects/' has NHL stations entered in transect_fun
+HERE... `LO_user/extract/transects/` :
+
+Transects are defined in `transect_fun.py` 
+
+`transect_fun.py` is an important module for this code (and is a revised version of `tef_fun.py`). It includes `transect_fun.get_sect_df()` which returns a DataFrame of all the section names and their lon,lat endpoints.
 
 ---
 #### EXTRACTION CODE
 
-`extract_transects.py` should(still testing?) create a NetCDF file for a section with arrays tracer values on the section, arranged as (t, z, x-or-y). Using command line arguments you can change the run, the day range, the sections to extract, and the variables extracted. Typically this will be done on a remote machine, like perigee, although the defaults are designed to work with model output I have saved on my mac.
+`extract_transects.py` (still testing?) should create a NetCDF file for a section with arrays tracer values on the section, arranged as (t, z, x-or-y). Using command line arguments you can change the run, the day range, the sections to extract, and the variables extracted.
 
+(TESTING // lines below from pmac scripts)
 **NOTE**: this code runs multiple subprocess instances of `extract_section_one_time.py`, (set by the Nproc command line argument which has a default value of 10). This significantly speeds things up, but it tends to occupy the machine, e.g. if you use -Nproc 20 on perigee you are using all the cores and may slow down other jobs.
 
 **NOTE**: this code also automatically runs the two subsequent steps, `process_sections.py` and `bulk_calc.py`.  These can also be run as stand-alone (use -test True when running `extract_sections.py`) to facilitate debugging.
@@ -36,7 +41,7 @@ The **command line arguments** are defined in `LO/lo_tools/lo_tools/extract_argf
 
 Input: ROMS history files over some date range, e.g. [*] = 2017.01.01_2017.12.31
 
-Output: LO_output/extract/[gtagex]/tef/extractions_[*]/[sect name].nc where:
+Output: LO_output/extract/[gtagex]/transects/extractions_[*]/[sect name].nc where:
 
 Variables in the NetCDF files:
 - salt is hourly salinity in each cell (t, z, x-or-y) [same for all other variables]
