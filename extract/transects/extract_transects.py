@@ -1,4 +1,8 @@
 """
+Edited version of TEF extract_sections.py to fit new extract_transects.py
+we dont have the bulk calc or the process step yet 
+
+old description (still testing)
 Extract fields at a number of sections which may be used later for TEF analysis
 of transport and other properties, making use of multiple subprocesses
 to speed up operation.  It also runs the process_sections.py and bulk_calc.py jobs
@@ -39,7 +43,7 @@ from subprocess import PIPE as Pi
     
 # set list of variables to extract
 if Ldir['get_bio']:
-    vn_list = tef_fun.vn_list
+    vn_list = transect_fun.vn_list
 else:
     vn_list = ['salt']
 
@@ -47,22 +51,22 @@ ds0 = Ldir['ds0']
 ds1 = Ldir['ds1']
 
 tt00 = time()
-print(' Doing TEF extraction for '.center(60,'='))
+print(' Doing transect extraction for '.center(60,'='))
 print(' gtagex = ' + Ldir['gtagex'])
 outname = 'extractions_' + ds0 + '_' + ds1
 print(' outname = ' + outname)
 
 # make sure the output directory exists
-out_dir = Ldir['LOo'] / 'extract' / Ldir['gtagex'] / 'tef' / outname
+out_dir = Ldir['LOo'] / 'extract' / Ldir['gtagex'] / 'transect' / outname
 Lfun.make_dir(out_dir, clean=True)
 
 # make the scratch directory for holding temporary files
-temp_dir = Ldir['LOo'] / 'extract' / Ldir['gtagex'] / ('tef_temp_' + ds0 + '_' + ds1)
+temp_dir = Ldir['LOo'] / 'extract' / Ldir['gtagex'] / ('transect_temp_' + ds0 + '_' + ds1)
 Lfun.make_dir(temp_dir, clean=True)
 
 # get the DataFrame of all sections
 gridname=Ldir['gtagex'].split('_')[0]
-sect_df = tef_fun.get_sect_df(gridname)
+sect_df = transect_fun.get_sect_df(gridname)
 
 # initialize a dictionary of info for each section
 sect_info = dict()
@@ -93,7 +97,7 @@ sect_info = dict()
 for sect_name in sect_list:
     x0, x1, y0, y1 = sect_df.loc[sect_name,:]
     # - get indices for this section
-    ii0, ii1, jj0, jj1, sdir, Lon, Lat, Mask = tef_fun.get_inds(x0, x1, y0, y1, G)
+    ii0, ii1, jj0, jj1, sdir, Lon, Lat, Mask = transect_fun.get_inds(x0, x1, y0, y1, G)
     NX = len(Mask)
     # - save some things for later use
     sect_info[sect_name] = (ii0, ii1, jj0, jj1, sdir, NX, Lon, Lat)
@@ -112,7 +116,7 @@ while len(sl) > 0:
 for sect_name in sect_list:
     out_fn = out_dir / (sect_name + '.nc')
     ii0, ii1, jj0, jj1, sdir, NX, Lon, Lat = sect_info[sect_name]
-    tef_fun.start_netcdf(fn, out_fn, NT, NX, NZ, Lon, Lat, Ldir, vn_list)
+    transect_fun.start_netcdf(fn, out_fn, NT, NX, NZ, Lon, Lat, Ldir, vn_list)
 
 print('Doing initial data extraction:')
 # We do extractions one hour at a time, as separate subprocess jobs.
@@ -125,7 +129,7 @@ for ii in range(N):
     fn = fn_list[ii]
     d = fn.parent.name.replace('f','')
     nhis = int(fn.name.split('.')[0].split('_')[-1])
-    cmd_list = ['python3', 'extract_section_one_time.py',
+    cmd_list = ['python3', 'extract_transect_one_time.py',
             '-pth', str(Ldir['roms_out']),
             '-out_dir',str(temp_dir),
             '-gtagex', Ldir['gtagex'],
@@ -147,40 +151,41 @@ print('Elapsed time = %0.2f sec' % (time()-tt000))
 # Extract and save time-dependent fields
 for sect_name in sect_list:
     out_fn = out_dir / (sect_name + '.nc')
-    tef_fun.add_fields(out_fn, temp_dir, sect_name, vn_list, S, NT)
+    transect_fun.add_fields(out_fn, temp_dir, sect_name, vn_list, S, NT)
     
 # Clean up
 Lfun.make_dir(temp_dir, clean=True)
 temp_dir.rmdir()
 
-# Then do the processing and bulk calculation
+# Then (we aren't doing processing or bulk calculations in this one.. wait to add in a diff calc, here just print times 
+# Pmac had:do the processing and bulk calculation
 if Ldir['testing'] == False:
     
-    # processing
-    tt0 = time()
-    print(' process_sections '.center(60,'='))
-    cmd_list = ['python3', 'process_sections.py',
-            '-gtagex', Ldir['gtagex'],
-            '-0', ds0, '-1', ds1]
-    proc = Po(cmd_list, stdout=Pi, stderr=Pi)
-    stdout, stderr = proc.communicate()
-    #print(stdout.decode())
-    if len(stderr) > 0:
-        print(stderr.decode())
-    print('Elapsed time = %0.2f sec' % (time()-tt0))
+    ## processing
+    #tt0 = time()
+    #print(' process_sections '.center(60,'='))
+    #cmd_list = ['python3', 'process_transects.py',
+    #        '-gtagex', Ldir['gtagex'],
+    #        '-0', ds0, '-1', ds1]
+    #proc = Po(cmd_list, stdout=Pi, stderr=Pi)
+    #stdout, stderr = proc.communicate()
+    ##print(stdout.decode())
+    #if len(stderr) > 0:
+    #    print(stderr.decode())
+    #print('Elapsed time = %0.2f sec' % (time()-tt0))
     
-    # bulk_calc
-    tt0 = time()
-    print(' bulk_calc '.center(60,'='))
-    cmd_list = ['python3', 'bulk_calc.py',
-            '-gtagex', Ldir['gtagex'],
-            '-0', ds0, '-1', ds1]
-    proc = Po(cmd_list, stdout=Pi, stderr=Pi)
-    stdout, stderr = proc.communicate()
-    #print(stdout.decode())
-    if len(stderr) > 0:
-        print(stderr.decode())
-    print('Elapsed time = %0.2f sec' % (time()-tt0))
+    ## bulk_calc
+    #tt0 = time()
+    #print(' bulk_calc '.center(60,'='))
+    #cmd_list = ['python3', 'bulk_calc.py',
+    #        '-gtagex', Ldir['gtagex'],
+    #        '-0', ds0, '-1', ds1]
+    #proc = Po(cmd_list, stdout=Pi, stderr=Pi)
+    #stdout, stderr = proc.communicate()
+    ##print(stdout.decode())
+    #if len(stderr) > 0:
+    #    print(stderr.decode())
+    #print('Elapsed time = %0.2f sec' % (time()-tt0))
 
 print(' Total elapsed time = %d sec '.center(60,'-') % (time()-tt00))
 print(' DONE '.center(60,'='))

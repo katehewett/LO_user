@@ -1,4 +1,9 @@
 """
+
+Edited copy of pmac extract_segment_one_time.py  
+Edited to fit extract_transect_one_time.py
+
+old description (still testing)
 This code extracts all needed segment data for one history file,
 looping over all variables and all segments.
 
@@ -15,7 +20,7 @@ import pickle
 import pandas as pd
 
 from lo_tools import Lfun, zfun, zrfun
-import tef_fun
+import transect_fun
 
 # command line arguments
 parser = argparse.ArgumentParser()
@@ -45,7 +50,7 @@ DA = G['DX'] * G['DY']
 DA3 = DA.reshape((1,G['M'],G['L']))
 
 # get segment info
-vol_dir = Ldir['LOo'] / 'extract' / 'tef' / ('volumes_' + Ldir['gridname'])
+vol_dir = Ldir['LOo'] / 'extract' / 'transect' / ('volumes_' + Ldir['gridname'])
 v_df = pd.read_pickle(vol_dir / 'volumes.p')
 j_dict = pickle.load(open(vol_dir / 'j_dict.p', 'rb'))
 i_dict = pickle.load(open(vol_dir / 'i_dict.p', 'rb'))
@@ -53,7 +58,7 @@ seg_list = list(v_df.index)
 
 # set list of variables to extract
 if args.get_bio:
-    vn_list = tef_fun.vn_list
+    vn_list = transect_fun.vn_list
 else:
     vn_list = ['salt']
 

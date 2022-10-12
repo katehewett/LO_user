@@ -1,37 +1,29 @@
-# README for the tef code
+# README for the transect code
 
-### This is code to do TEF extractions and processing. The code also works on the segments between TEF sections, for example to make volume-integrated budgets of volume, salt and salinity variance.
+### This is code to do transect extractions. It is based off the LO/extract/tef code 
 
 #### WORKFLOW OVERVIEW
+**NOTE: when copied LO/extract/tef folder, the scripts hadn't been updated to use xarray --> need to update from what it uses here (netCDF4 to xarray**
 
-In order to get to where you can run `flux_salt_budget.py` you need to go through two separate workflows because these prepare the independent information at (1) TEF sections, and (2) segments between the sections.
-
-(1) TEF sections:
- - `extract_sections.py`
- - `process_sections.py`
- - `bulk_calc.py`
-
-(2) Segments (the flux_ code):
- - `make_segment_volumes.py`
- - `extract_segments.py`
-
-Then you can run `tracer_budget.py`
-
-**NOTE: this has not yet been updated to use xarray instead of netCDF4.**
+Testing using NHL transect data (NH-1 thru NH-45) 
+'extract_sections.py' was used to form 'extract_transect.py'
 
 ---
 #### PREAMBLE
 
+in tef, Parker has: 
 `LO/pgrid/tef_section_maker.py` is a tool to define sections, if needed.  This is a GUI where you define section endpoints (forced to be either perfectly E-W or N-S), name the section, and define which direction is "landward" (i.e. which way is positive transport).  You can define one or more sections in a session.  At the end, when you push DONE it produces screen output suitable for pasting into new or existing lists in `tef_fun.get_sect_df()`.
 
 `tef_fun.py` is an important module for this code. It includes `tef_fun.get_sect_df()` which returns a DataFrame of all the section names and their lon,lat endpoints.
 
+here... 'LO_user/extract/transects/' has NHL stations entered in transect_fun
+
 ---
 #### EXTRACTION CODE
 
-`extract_sections.py` creates a NetCDF file for each section with arrays of hourly transport and tracer values on the section, arranged as (t, z, x-or-y). Using command line arguments you can change the run, the day range, the sections to extract, and the variables extracted. Typically this will be done on a remote machine, like perigee, although the defaults are designed to work with model output I have saved on my mac.
+`extract_transects.py` should(still testing?) create a NetCDF file for a section with arrays tracer values on the section, arranged as (t, z, x-or-y). Using command line arguments you can change the run, the day range, the sections to extract, and the variables extracted. Typically this will be done on a remote machine, like perigee, although the defaults are designed to work with model output I have saved on my mac.
 
-**NOTE**: this code runs multiple subprocess instances of `extract_section_one_time.py`, (set by the Nproc command line argument which has a default value of 10). This significantly speeds things up, but it tends to occupy the machine, e.g. if you use -Nproc 20 on perigee you are using all the cores and may slow down other jobs.
+**NOTE**: this code runs multiple subprocess instances of `extract_transect_one_time.py`, (set by the Nproc command line argument which has a default value of 10). This significantly speeds things up, but it tends to occupy the machine, e.g. if you use -Nproc 20 on perigee you are using all the cores and may slow down other jobs.
 
 **NOTE**: this code also automatically runs the two subsequent steps, `process_sections.py` and `bulk_calc.py`.  These can also be run as stand-alone (use -test True when running `extract_sections.py`) to facilitate debugging.
 
