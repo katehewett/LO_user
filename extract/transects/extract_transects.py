@@ -159,7 +159,7 @@ temp_dir.rmdir()
 
 # Then (we aren't doing processing or bulk calculations in this one.. wait to add in a diff calc, here just print times 
 # Pmac had:do the processing and bulk calculation
-if Ldir['testing'] == False:
+#if Ldir['testing'] == False:
     
     ## processing
     #tt0 = time()
@@ -187,8 +187,8 @@ if Ldir['testing'] == False:
     #    print(stderr.decode())
     #print('Elapsed time = %0.2f sec' % (time()-tt0))
 
-print(' Total elapsed time = %d sec '.center(60,'-') % (time()-tt00))
-print(' DONE '.center(60,'='))
+#print(' Total elapsed time = %d sec '.center(60,'-') % (time()-tt00))
+#print(' DONE '.center(60,'='))
 
     
 
