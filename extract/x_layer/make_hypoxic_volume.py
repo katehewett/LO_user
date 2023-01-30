@@ -104,7 +104,11 @@ Lfun.make_dir(out_dir)
 fn_list = Lfun.get_fn_list(args.list_type, Ldir, args.date_string0, args.date_string1)
 
 # name output file
-out_fn = (out_dir + 'hypoxic_volume_' + Ldir['list_type'] + '.nc')
+#out_fn = (outdir + 'hypoxic_volume_' + Ldir['list_type'] + '.nc')
+out_fn = out_dir / ('hypoxic_volume' + '_' + Ldir['date_string0'] + '_' + Ldir['date_string1'] + '.nc')
+out_fn.unlink(missing_ok=True)
+print(out_fn)
+
 # get rid of the old version, if it exists
 try:
     os.remove(out_fn)
