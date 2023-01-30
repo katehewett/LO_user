@@ -1,4 +1,4 @@
-name: loenv
+name: kh_loenv
 channels:
   - conda-forge
 dependencies:
@@ -31,16 +31,16 @@ dependencies:
   - lxml
   - xlrd
   - openpyxl
-  - pytide
+  # - pytide # removed for M1 chip modificaiton
   - sqlalchemy
   - git
   - pip
   - pip:
-    - -e lo_tools # package of local modules
+    - -e ../LO/lo_tools # package of local modules 
     - azure-storage-blob
     - PyCO2SYS
     # - nwm # to access the National Water Model
     # - hydrotools # different access to National Water Model
   # and some non-python tools
   - ffmpeg
-  - nco
+  # - nco # removed for M1 chip modificaiton; installed using homebrew
