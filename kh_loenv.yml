@@ -36,7 +36,7 @@ dependencies:
   - git
   - pip
   - pip:
-    - -e ../LO/lo_tools # package of local modules 
+    - -e ../LO/lo_tools lo_tools # package of local modules 
     - azure-storage-blob
     - PyCO2SYS
     # - nwm # to access the National Water Model
