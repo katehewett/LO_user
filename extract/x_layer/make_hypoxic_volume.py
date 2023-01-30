@@ -22,7 +22,9 @@ from time import time
 from subprocess import Popen as Po
 from subprocess import PIPE as Pi
 import numpy as np
-import xarray as xr  # before netcdf4
+
+import netCDF4 as nc
+import xarray as xr  # before netcdf4 need to fix, look at extract_moor
 
 #from datetime import datetime, timedelta
 #start_time = datetime.now()
