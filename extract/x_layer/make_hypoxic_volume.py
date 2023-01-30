@@ -81,17 +81,27 @@ if Ldir['roms_out_num'] == 0:
 elif Ldir['roms_out_num'] > 0:
     Ldir['roms_out'] = Ldir['roms_out' + str(Ldir['roms_out_num'])]
 
-# make sure the output directory exists
-outdir00 = Ldir['LOo']
-Lfun.make_dir(outdir00)
-outdir0 = outdir00 + 'layer/'
-Lfun.make_dir(outdir0)
-outdir = (outdir0 + Ldir['gtagex'] + '_' + Ldir['date_string0']
-        + '_' + Ldir['date_string1'] + '/')
-Lfun.make_dir(outdir, clean=False)
+## make sure the output directory exists
+#outdir00 = Ldir['LOo']
+#Lfun.make_dir(outdir00)
+#outdir0 = outdir00 + 'layer/'
+#Lfun.make_dir(outdir0)
+#outdir = (outdir0 + Ldir['gtagex'] + '_' + Ldir['date_string0']
+#        + '_' + Ldir['date_string1'] + '/')
+#Lfun.make_dir(outdir, clean=False)
+
+# set output location
+out_dir = Ldir['LOo'] / 'extract' / Ldir['gtagex'] / 'x_layer'
+#temp_dir = Ldir['LOo'] / 'extract' / Ldir['gtagex'] / 'moor' / ('temp_' + Ldir['sn'])
+Lfun.make_dir(out_dir)
+#Lfun.make_dir(temp_dir, clean=True)
+#xlayer_fn = out_dir / (Ldir['sn'] + '_' + Ldir['date_string0'] + '_' + Ldir['date_string1'] + '.nc')
+#xlayer_fn.unlink(missing_ok=True)
+#print(xlayer_fn)
+
 
 # get list of history files to plot
-fn_list = Lfun.get_fn_list(args.list_type, Ldir, args.ds0, args.ds1)
+fn_list = Lfun.get_fn_list(args.list_type, Ldir, args.date_string0, args.date_string1)
 
 # name output file
 out_fn = (outdir + 'hypoxic_volume_' + Ldir['list_type'] + '.nc')
