@@ -14,7 +14,7 @@ Testing: Jan 2023
 # imports
 # took these from extract_moor.py, extract_sections.py has a different way to deal with arg passing, but not sure which is best yet?
 
-import sys
+import os, sys
 from lo_tools import Lfun, zrfun, zfun
 import argparse 
 
