@@ -13,7 +13,6 @@ Testing: Jan 2023
 
 # imports
 # took these from extract_moor.py, extract_sections.py has a different way to deal with arg passing, but not sure which is best yet?
-
 import os, sys
 from lo_tools import Lfun, zrfun, zfun
 import argparse 
@@ -23,8 +22,8 @@ from subprocess import Popen as Po
 from subprocess import PIPE as Pi
 import numpy as np
 
-import netCDF4 as nc
-import xarray as xr  # before netcdf4 need to fix, look at extract_moor
+#import netCDF4 as nc
+import xarray as xr  # need to netcdf>xr, look at extract_moor. get roms output files for 2019.07.04 and 2019.07.06 and put on this machine 
 
 #from datetime import datetime, timedelta
 #start_time = datetime.now()
@@ -32,7 +31,7 @@ import xarray as xr  # before netcdf4 need to fix, look at extract_moor
 
 # Command line arguments
 
-# do we need the next 4 lines? or can it be replaced by arg below - see question boolean_testing
+# do we need the next 4 lines? or can it be replaced by arg below - see question boolean_testing 
 def boolean_string(s):
     if s not in ['False', 'True']:
         raise ValueError('Not a valid boolean string')
