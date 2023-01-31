@@ -134,7 +134,7 @@ zr, zw = zrfun.get_z(h, 0*h, S)
 dzr = np.diff(zw, axis=0)
 
 # becareful b/c dataset and datestring (see extract_moor were named ds)
-d1 = nc.Dataset(fn)
+ds1 = nc.Dataset(fn)
 ds2 = nc.Dataset(out_fn, 'w')
 
 # Create dimensions
