@@ -89,10 +89,10 @@ elif (str(HOME) == '/Users/katehewett'):
     lo_env = 'kh_mac'
     which_matlab = '/Applications/MATLAB_R2020a.app/bin/matlab'
 
-#elif str(HOME) == '/home/kmhewett') & ('perigee' in HOSTNAME):
-#    lo_env = 'kh_perigee'
-#    roms_out1 = Path('/agdat1/parker/LO_roms')
-#    roms_out2 = Path('/agdat2/parker/LO_roms')
+elif str(HOME) == '/home/kmhewett') & ('perigee' in HOSTNAME):
+    lo_env = 'kh_perigee'
+    roms_out1 = Path('/agdat1/parker/LO_roms')
+    roms_out2 = Path('/agdat2/parker/LO_roms')
     
 elif (str(HOME) == '/home/kmhewett') & ('apogee' in HOSTNAME):
     lo_env = 'kh_apogee'
