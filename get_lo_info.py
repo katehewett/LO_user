@@ -10,8 +10,6 @@ entries to the Ldir dict based on which model run you are working on.
 Users should copy this to LO_user/get_lo_info.py, edit as needed, and make it into
 their own GitHub repo.
 
-KMH LO_user edits
-
 """
 import os
 from pathlib import Path
@@ -50,18 +48,19 @@ except KeyError:
     
 # debugging
 # print('** from get_lo_info.py **')
-print('HOME = ' + str(HOME))
-print('HOSTNAME = ' + HOSTNAME)
+# print('HOME = ' + str(HOME))
+# print('HOSTNAME = ' + HOSTNAME)
 
-# parker 
 if str(HOME) == '/Users/pm8':
     lo_env = 'pm_mac'
     which_matlab = '/Applications/MATLAB_R2020a.app/bin/matlab'
-    
+
 elif (str(HOME) == '/home/parker') & ('perigee' in HOSTNAME):
     lo_env = 'pm_perigee'
     roms_out1 = Path('/agdat1/parker/LO_roms')
     roms_out2 = Path('/agdat2/parker/LO_roms')
+    roms_out3 = Path('/data1/parker/LiveOcean_roms/output')
+    roms_out4 = Path('/data2/parker/LiveOcean_roms/output')
 
 elif (str(HOME) == '/home/parker') & ('apogee' in HOSTNAME):
     lo_env = 'pm_apogee'
@@ -77,7 +76,7 @@ elif (str(HOME) == '/usr/lusers/pmacc'):
     remote_dir0 = '/dat1/parker'
     local_user = 'pmacc'
 
-elif (str(HOME) == '/mmfs1/home/pmacc'):
+elif ((str(HOME) == '/mmfs1/home/pmacc') or (str(HOME) == '/mmfs1/home/darrd')):
     lo_env = 'pm_klone'
     remote_user = 'parker'
     remote_machine = 'apogee.ocean.washington.edu'
@@ -93,6 +92,8 @@ elif str(HOME) == '/home/kmhewett') & ('perigee' in HOSTNAME):
     lo_env = 'kh_perigee'
     roms_out1 = Path('/agdat1/parker/LO_roms')
     roms_out2 = Path('/agdat2/parker/LO_roms')
+    roms_out3 = Path('/data1/parker/LiveOcean_roms/output')
+    roms_out4 = Path('/data2/parker/LiveOcean_roms/output')
     
 elif (str(HOME) == '/home/kmhewett') & ('apogee' in HOSTNAME):
     lo_env = 'kh_apogee'
@@ -105,7 +106,7 @@ elif (str(HOME) == '/mmfs1/home/kmhewett'):
     remote_machine = 'apogee.ocean.washington.edu'
     remote_dir0 = '/dat1/kmhewett'
     local_user = 'kmhewett'
-       
+    
 Ldir0 = dict()
 Ldir0['lo_env'] = lo_env
 Ldir0['parent'] = parent
@@ -125,7 +126,5 @@ Ldir0['remote_user'] = remote_user
 Ldir0['remote_machine'] = remote_machine
 Ldir0['remote_dir0'] = remote_dir0
 Ldir0['local_user'] = local_user
-
-
 
 
