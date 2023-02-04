@@ -92,8 +92,10 @@ elif (str(HOME) == '/home/kmhewett') & ('perigee' in HOSTNAME):
     lo_env = 'kh_perigee'
     roms_out1 = Path('/agdat1/parker/LO_roms')
     roms_out2 = Path('/agdat2/parker/LO_roms')
-    roms_out3 = Path('/data1/parker/LiveOcean_roms/output')
-    roms_out4 = Path('/data2/parker/LiveOcean_roms/output')
+    #roms_out3 = Path('/data1/parker/LiveOcean_roms/output')
+    #roms_out4 = Path('/data2/parker/LiveOcean_roms/output')
+    roms_out3 = Path('/data1/parker/LO_roms')
+    roms_out4 = Path('/data2/parker/LO_roms')
     
 elif (str(HOME) == '/home/kmhewett') & ('apogee' in HOSTNAME):
     lo_env = 'kh_apogee'
