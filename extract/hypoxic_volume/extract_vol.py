@@ -213,50 +213,50 @@ print('Time for initial extraction = %0.2f sec' % (time()- tt0))
 
 # add z variables
 #if (Ldir['surf']==False) and (Ldir['bot']==False):
-    tt0 = time()
-    ds = xr.load_dataset(out_fn) # have to load in order to add new variables
-    NT, N, NR, NC = ds.salt.shape # doesn't this assume all the jobs have salt? 
-    ds['z_rho'] = (('ocean_time', 's_rho', 'eta_rho', 'xi_rho'), np.nan*np.ones((NT, N, NR, NC)))
-    ds['z_w'] = (('ocean_time', 's_w', 'eta_rho', 'xi_rho'), np.nan*np.ones((NT, N+1, NR, NC)))
-    ds.z_rho.attrs = {'units':'m', 'long_name': 'vertical position on s_rho grid, positive up'}
-    ds.z_w.attrs = {'units':'m', 'long_name': 'vertical position on s_w grid, positive up'}
-    
-    for ii in range(NT):
-        h = ds.h.values
-        zeta = ds.zeta[ii,:,:].values
-        z_rho, z_w = zrfun.get_z(h, zeta, S)
-        ds['z_rho'][ii,:,:,:] = z_rho
-        ds['z_w'][ii,:,:,:] = z_w
-    ds.to_netcdf(out_fn)
-    ds.close()
-    print('Time to add z variables = %0.2f sec' % (time()- tt0))
+tt0 = time()
+ds = xr.load_dataset(out_fn) # have to load in order to add new variables
+NT, N, NR, NC = ds.salt.shape # doesn't this assume all the jobs have salt? 
+ds['z_rho'] = (('ocean_time', 's_rho', 'eta_rho', 'xi_rho'), np.nan*np.ones((NT, N, NR, NC)))
+ds['z_w'] = (('ocean_time', 's_w', 'eta_rho', 'xi_rho'), np.nan*np.ones((NT, N+1, NR, NC)))
+ds.z_rho.attrs = {'units':'m', 'long_name': 'vertical position on s_rho grid, positive up'}
+ds.z_w.attrs = {'units':'m', 'long_name': 'vertical position on s_w grid, positive up'}
+
+for ii in range(NT):
+    h = ds.h.values
+    zeta = ds.zeta[ii,:,:].values
+    z_rho, z_w = zrfun.get_z(h, zeta, S)
+    ds['z_rho'][ii,:,:,:] = z_rho
+    ds['z_w'][ii,:,:,:] = z_w
+ds.to_netcdf(out_fn)
+ds.close()
+print('Time to add z variables = %0.2f sec' % (time()- tt0))
     
 # add cell area 
-    ds = xr.load_dataset(out_fn) # have to load in order to add new variables
-    #NT, N, NR, NC = ds.salt.shape 
-    ds['DA'] = (('ocean_time', 'eta_rho', 'xi_rho'), DAall((NT, NR, NC))) #2xcheck, does it index like this
-    ds.DA.attrs = {'units':'m2', 'long_name': 'cell horizontal area'}
-    ds.to_netcdf(out_fn)
-    ds.close()
+ds = xr.load_dataset(out_fn) # have to load in order to add new variables
+#NT, N, NR, NC = ds.salt.shape 
+ds['DA'] = (('ocean_time', 'eta_rho', 'xi_rho'), DAall((NT, NR, NC))) #2xcheck, does it index like this
+ds.DA.attrs = {'units':'m2', 'long_name': 'cell horizontal area'}
+ds.to_netcdf(out_fn)
+ds.close()
        
 ## Kate add hyp vol stuff here - ask for help 
 # calc hyp volume
-    tt0 = time()
-    ds = xr.load_dataset(out_fn) # have to load in order to add new variables
-    ds['hyp_dz'] = (('ocean_time', 'eta_rho', 'xi_rho'), np.nan*np.ones((NT, NR, NC)))
-    ds.hyp_dz.attrs = {'units':'m', 'long_name': 'Thickness of hypoxic layer'}
+tt0 = time()
+ds = xr.load_dataset(out_fn) # have to load in order to add new variables
+ds['hyp_dz'] = (('ocean_time', 'eta_rho', 'xi_rho'), np.nan*np.ones((NT, NR, NC)))
+ds.hyp_dz.attrs = {'units':'m', 'long_name': 'Thickness of hypoxic layer'}
 
-    dzr = np.diff(ds.z_w, axis=0)
-    oxy = ds.oxygen
-    dzrm = np.ma.masked_where(oxy>61,dzr)
-    hyp_dz = dzrm.sum(axis=0)
+dzr = np.diff(ds.z_w, axis=0)
+oxy = ds.oxygen
+dzrm = np.ma.masked_where(oxy>61,dzr)
+hyp_dz = dzrm.sum(axis=0)
    
-    #Maskr = ds.mask_rho.values == 1 # True over water
-    #NR, NC = Maskr.shape
+#Maskr = ds.mask_rho.values == 1 # True over water
+#NR, NC = Maskr.shape
 
-    ds.to_netcdf(out_fn)
-    ds.close()
-    print('Time to calc hypoxic volume = %0.2f sec' % (time()- tt0))
+ds.to_netcdf(out_fn)
+ds.close()
+print('Time to calc hypoxic volume = %0.2f sec' % (time()- tt0))
 
 # squeeze and compress the resulting file
 tt0 = time()
