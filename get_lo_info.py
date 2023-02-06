@@ -87,7 +87,8 @@ elif ((str(HOME) == '/mmfs1/home/pmacc') or (str(HOME) == '/mmfs1/home/darrd')):
 elif (str(HOME) == '/Users/katehewett'):
     lo_env = 'kh_mac'
     which_matlab = '/Applications/MATLAB_R2020a.app/bin/matlab'
-
+    roms_out1 = Path('/Users/katehewett/Documents/LO_roms') # beeecareful!
+    
 elif (str(HOME) == '/home/kmhewett') & ('perigee' in HOSTNAME):
     lo_env = 'kh_perigee'
     roms_out1 = Path('/agdat1/parker/LO_roms')

@@ -115,8 +115,8 @@ zr, zw = zrfun.get_z(h, 0*h, S)
 dzr = np.diff(zw, axis=0)
 
 
-dataset1 = xr.DataArray(fn)
-dataset2 = xr.DataArray(out_fn)
+dataset1 = xr.Dataset(fn)
+dataset2 = xr.load_dataset(out_fn)
 # was ds1 = nc.Dataset(fn)
 #     ds2 = nc.Dataset(out_fn, 'w')
 

@@ -1,6 +1,8 @@
 """
 Modified box code to try and extract hypoxic volume 
 
+
+UPDATE TEXT after is working // this is from parker's box': start 
 Code to extract a box-like region, typically for another modeler to use
 as a boundary contition.  In cases where it gets velocity in addition to
 the rho-grid variables the grid limits mimic the standard ROMS organization,
@@ -20,9 +22,12 @@ or
 python extract_box.py -gtx cas6_v3_lo8b -ro 2 -0 2019.07.04 -1 2019.07.04 -lt hourly -job surface0 -uv_to_rho True -surf True
 
 Performance: this is very fast, takes just a few seconds for three days on boiler (for yang_sequim).
+: end 
 
 Testing January 2023 - present
 """
+
+# os.chdir('/Users/katehewett/Documents/LO_user/extract/hypoxic_volume')
 
 # imports
 import sys
@@ -35,8 +40,9 @@ from time import time
 import numpy as np
 import xarray as xr
 
+
 pid = os.getpid()
-print(' extract_box '.center(60,'='))
+print(' extract_vol '.center(60,'='))
 print('PID for this job = ' + str(pid))
 
 # command line arugments
@@ -244,10 +250,10 @@ ds.hyp_dz.attrs = {'units':'m', 'long_name': 'Thickness of hypoxic layer'}
 
 dzr = np.diff(ds.z_w, axis=0)
 oxy = ds.oxygen
-dzrm = np.ma.masked_where(oxy>61,dzr)
+dzrm = np.ma.masked_where(oxy>61,dzr)  # need to 2xcheeck this
 hyp_dz = dzrm.sum(axis=0)
    
-#Maskr = ds.mask_rho.values == 1 # True over water
+#Maskr = ds.mask_rho.values == 1 # True over water < masking in python. Is it faster to mask then calc? 
 #NR, NC = Maskr.shape
 
 ds.to_netcdf(out_fn)
