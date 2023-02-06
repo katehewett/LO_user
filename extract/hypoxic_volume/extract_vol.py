@@ -50,12 +50,7 @@ parser.add_argument('-1', '--ds1', type=str) # e.g. 2019.07.06
 parser.add_argument('-lt', '--list_type', type=str) # list type: hourly, daily, weekly
 # select job name
 parser.add_argument('-job', type=str) # job name
-# these flags get only surface or bottom fields if True
-# - cannot have both True -
-parser.add_argument('-surf', default=False, type=Lfun.boolean_string)
-parser.add_argument('-bot', default=False, type=Lfun.boolean_string)
-# set this to True to interpolate all u, and v fields to the rho-grid
-parser.add_argument('-uv_to_rho', default=False, type=Lfun.boolean_string)
+
 # Optional: set max number of subprocesses to run at any time
 parser.add_argument('-Nproc', type=int, default=10)
 # Optional: for testing
@@ -92,21 +87,14 @@ if Ldir['surf'] and Ldir['bot']:
     sys.exit()
     
 # output location
-out_dir = Ldir['LOo'] / 'extract' / Ldir['gtagex'] / 'box'
+out_dir = Ldir['LOo'] / 'extract' / Ldir['gtagex'] / 'hypoxic_volume'
 Lfun.make_dir(out_dir)
-if Ldir['surf']:
-    bname = Ldir['job'] + '_surf_' + Ldir['ds0'] + '_' + Ldir['ds1']
-    box_fn = out_dir / (bname + '.nc')
-elif Ldir['bot']:
-    bname = Ldir['job'] + '_bot_' + Ldir['ds0'] + '_' + Ldir['ds1']
-    box_fn = out_dir / (bname + '.nc')
-else:
-    bname = Ldir['job'] + '_' + Ldir['ds0'] + '_' + Ldir['ds1']
-    box_fn = out_dir / (bname + '.nc')
-box_fn.unlink(missing_ok=True)
+hvname = Ldir['job'] + '_' + Ldir['ds0'] + '_' + Ldir['ds1']
+out_fn = out_dir / (hvname + '.nc')
+out_fn.unlink(missing_ok=True)
 
 # name the temp dir to accumulate individual extractions
-temp_dir = out_dir / ('temp_' + bname)
+temp_dir = out_dir / ('temp_' + hvname)
 Lfun.make_dir(temp_dir, clean=True)
 
 # get list of files to work on
@@ -114,6 +102,8 @@ fn_list = Lfun.get_fn_list(Ldir['list_type'], Ldir, Ldir['ds0'], Ldir['ds1'])
 if Ldir['testing']:
     fn_list = fn_list[:5]
 G, S, T = zrfun.get_basic_info(fn_list[0])
+DA = G['DX'] * G['DY'] # is this right?
+
 Lon = G['lon_rho'][0,:]
 Lat = G['lat_rho'][:,0]
     
@@ -131,15 +121,16 @@ def check_bounds(lon, lat):
     return ilon, ilat
 
 # get the job_definitions module, looking first in LO_user
-pth = Ldir['LO'] / 'extract' / 'box'
-upth = Ldir['LOu'] / 'extract' / 'box'
+# pth = Ldir['LO'] / 'extract' / 'hypoxic_volume' # isn't located in LO 
+upth = Ldir['LOu'] / 'extract' / 'hypoxic_volume'
 if (upth / 'job_definitions.py').is_file():
     print('Importing job_definitions from LO_user')
     job_definitions = Lfun.module_from_file('job_definitions', upth / 'job_definitions.py')
 else:
-    print('Importing job_definitions from LO')
-    job_definitions = Lfun.module_from_file('job_definitions', pth / 'job_definitions.py')
-
+    #print('Importing job_definitions from LO')
+    #job_definitions = Lfun.module_from_file('job_definitions', pth / 'job_definitions.py')
+    print('ERROR - no LO user file')
+    
 aa, vn_list = job_definitions.get_box(Ldir['job'], Lon, Lat)
 lon0, lon1, lat0, lat1 = aa
 ilon0, ilat0 = check_bounds(lon0, lat0)
@@ -152,22 +143,19 @@ ilon1, ilat1 = check_bounds(lon1, lat1)
 N = len(fn_list)
 proc_list = []
 tt0 = time()
-print('Working on ' + box_fn.name + ' (' + str(N) + ' times)')
+print('Working on ' + out_fn.name + ' (' + str(N) + ' times)')
 for ii in range(N):
     fn = fn_list[ii]
     sys.stdout.flush()
     # extract one day at a time using ncks
     count_str = ('000000' + str(ii))[-6:]
-    out_fn = temp_dir / ('box_' + count_str + '.nc')
+    out_fn = temp_dir / ('hypoxic_volume_' + count_str + '.nc')
     cmd_list1 = ['ncks',
         '-v', vn_list,
         '-d', 'xi_rho,'+str(ilon0)+','+str(ilon1), '-d', 'eta_rho,'+str(ilat0)+','+str(ilat1),
         '-d', 'xi_u,'+str(ilon0)+','+str(ilon1-1), '-d', 'eta_u,'+str(ilat0)+','+str(ilat1),
         '-d', 'xi_v,'+str(ilon0)+','+str(ilon1), '-d', 'eta_v,'+str(ilat0)+','+str(ilat1-1)]
-    if Ldir['surf']:
-        cmd_list1 += ['-d','s_rho,'+str(S['N']-1)]
-    elif Ldir['bot']:
-        cmd_list1 += ['-d','s_rho,0']
+
     cmd_list1 += ['-O', str(fn), str(out_fn)]
     proc = Po(cmd_list1, stdout=Pi, stderr=Pi)
     proc_list.append(proc)
@@ -220,10 +208,10 @@ if Ldir['testing']:
 print('Time for initial extraction = %0.2f sec' % (time()- tt0))
 
 # add z variables
-if (Ldir['surf']==False) and (Ldir['bot']==False):
+#if (Ldir['surf']==False) and (Ldir['bot']==False):
     tt0 = time()
-    ds = xr.load_dataset(box_fn) # have to load in order to add new variables
-    NT, N, NR, NC = ds.salt.shape
+    ds = xr.load_dataset(out_fn) # have to load in order to add new variables
+    NT, N, NR, NC = ds.salt.shape # doesn't this assume all the jobs have salt? 
     ds['z_rho'] = (('ocean_time', 's_rho', 'eta_rho', 'xi_rho'), np.nan*np.ones((NT, N, NR, NC)))
     ds['z_w'] = (('ocean_time', 's_w', 'eta_rho', 'xi_rho'), np.nan*np.ones((NT, N+1, NR, NC)))
     ds.z_rho.attrs = {'units':'m', 'long_name': 'vertical position on s_rho grid, positive up'}
@@ -234,15 +222,17 @@ if (Ldir['surf']==False) and (Ldir['bot']==False):
         z_rho, z_w = zrfun.get_z(h, zeta, S)
         ds['z_rho'][ii,:,:,:] = z_rho
         ds['z_w'][ii,:,:,:] = z_w
-    ds.to_netcdf(box_fn)
+    ds.to_netcdf(out_fn)
     ds.close()
     print('Time to add z variables = %0.2f sec' % (time()- tt0))
 
+
+## Kate add hyp vol stuff here - ask for help on assigning a 3 v
 if Ldir['uv_to_rho']:
     # interpolate anything on the u and v grids to the rho grid, assuming
     # zero values where masked, and leaving a masked ring around the outermost edge
     tt0 = time()
-    ds = xr.load_dataset(box_fn) # have to load in order to add new variables
+    ds = xr.load_dataset(out_fn) # have to load in order to add new variables
     Maskr = ds.mask_rho.values == 1 # True over water
     NR, NC = Maskr.shape
     for vn in ds.data_vars:
@@ -288,13 +278,13 @@ if Ldir['uv_to_rho']:
                 Maskr3 = np.tile(Maskr.reshape(1,NR,NC),[NT,1,1])
                 vvv[~Maskr3] = np.nan
                 ds.update({vn:(('ocean_time', 'eta_rho', 'xi_rho'), vvv)})
-    ds.to_netcdf(box_fn)
+    ds.to_netcdf(out_fn)
     ds.close()
     print('Time to interpolate uv variables to rho grid = %0.2f sec' % (time()- tt0))
 
 # squeeze and compress the resulting file
 tt0 = time()
-ds = xr.load_dataset(box_fn)
+ds = xr.load_dataset(out_fn)
 ds = ds.squeeze() # remove singleton dimensions
 enc_dict = {'zlib':True, 'complevel':1, '_FillValue':1e20}
 Enc_dict = {vn:enc_dict for vn in ds.data_vars if 'ocean_time' in ds[vn].dims}
@@ -309,11 +299,11 @@ temp_dir.rmdir()
 print('Size of full rho-grid = %s' % (str(G['lon_rho'].shape)))
 print(' Contents of extracted box file: '.center(60,'-'))
 # check on the results
-ds = xr.open_dataset(box_fn)
+ds = xr.open_dataset(out_fn)
 for vn in ds.data_vars:
     print('%s %s max/min = %0.4f/%0.4f' % (vn, str(ds[vn].shape), ds[vn].max(), ds[vn].min()))
 ds.close()
 
-print('\nPath to file:\n%s' % (str(box_fn)))
+print('\nPath to file:\n%s' % (str(out_fn)))
 
 
