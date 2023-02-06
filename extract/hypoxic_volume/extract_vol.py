@@ -27,7 +27,12 @@ Performance: this is very fast, takes just a few seconds for three days on boile
 Testing January 2023 - present
 """
 
+# 
+# % clear 
+# % reset
+# import os 
 # os.chdir('/Users/katehewett/Documents/LO_user/extract/hypoxic_volume')
+# run extract_vol -gtx cas6_v0_live -ro 1 -0 2022.08.08 -1 2022.08.09 -lt daily -job LO_oxygen_WA 
 
 # imports
 import sys
@@ -217,7 +222,12 @@ print('Time for initial extraction = %0.2f sec' % (time()- tt0))
 #if (Ldir['surf']==False) and (Ldir['bot']==False):
 tt0 = time()
 ds = xr.load_dataset(out_fn) # have to load in order to add new variables
+
+#### #### ####  Will this break box if someone doesn't input salt as a var? 
 NT, N, NR, NC = ds.salt.shape # doesn't this assume all the jobs have salt? 
+#########
+
+
 ds['z_rho'] = (('ocean_time', 's_rho', 'eta_rho', 'xi_rho'), np.nan*np.ones((NT, N, NR, NC)))
 ds['z_w'] = (('ocean_time', 's_w', 'eta_rho', 'xi_rho'), np.nan*np.ones((NT, N+1, NR, NC)))
 ds.z_rho.attrs = {'units':'m', 'long_name': 'vertical position on s_rho grid, positive up'}
@@ -236,8 +246,16 @@ print('Time to add z variables = %0.2f sec' % (time()- tt0))
 # add cell area 
 ds = xr.load_dataset(out_fn) # have to load in order to add new variables
 #NT, N, NR, NC = ds.salt.shape 
-ds['DA'] = (('ocean_time', 'eta_rho', 'xi_rho'), DAall((NT, NR, NC))) #2xcheck, does it index like this
+ds['DA'] = (('eta_rho', 'xi_rho'), np.nan*np.ones((NR, NC))) #2xcheck, does it index like this and are the areas the same across the 6 yr period? 
 ds.DA.attrs = {'units':'m2', 'long_name': 'cell horizontal area'}
+
+#### NEED Help here - how do I reshape DA to have the same dims as the clipped region "box"??
+# DAall((NR, NC)
+
+ds['DA'][:,:]=DAall[NR,NC].values   #??
+
+####
+
 ds.to_netcdf(out_fn)
 ds.close()
        

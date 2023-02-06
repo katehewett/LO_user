@@ -43,4 +43,6 @@ dependencies:
     # - hydrotools # different access to National Water Model
   # and some non-python tools
   - ffmpeg
-  # - nco # removed for M1 chip modificaiton; installed using homebrew
+  - nco # have to install homebrew and nco before this one 
+  # Kate
+  - spyder
