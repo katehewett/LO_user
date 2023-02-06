@@ -115,8 +115,10 @@ zr, zw = zrfun.get_z(h, 0*h, S)
 dzr = np.diff(zw, axis=0)
 
 
-dataset1 = xr.Dataset(fn)
-dataset2 = xr.Dataset(out_fn, 'w')
+dataset1 = xr.open_dataset(fn)
+dataset2 = xr.open_dataset(out_fn, 'w')
+# was ds1 = nc.Dataset(fn)
+#     ds2 = nc.Dataset(out_fn, 'w')
 
 # Create dimensions
 for dname, the_dim in dataset1.dimensions.items():
@@ -161,7 +163,9 @@ for fn in fn_list:
     if np.mod(tt,24)==0:
         print(' working on %d of %d' % (tt, NF))
         sys.stdout.flush()
-    ds = xr.Dataset(fn)
+        
+    ds = xr.open_dataset(fn)
+    # was ds = nc.Dataset(fn)
     
     dataset2['ocean_time'][tt] = ds['ocean_time'][0]
         
