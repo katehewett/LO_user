@@ -197,7 +197,7 @@ print(' - Time for adding fill value = %0.2f sec' % (time()- tt1))
 # This bit of code is a nice example of how to replicate a bash pipe
 pp1 = Po(['ls', str(temp_dir)], stdout=Pi)
 pp2 = Po(['grep','box'], stdin=pp1.stdout, stdout=Pi)
-cmd_list = ['ncrcat','-p', str(temp_dir), '-O', str(box_fn)]
+cmd_list = ['ncrcat','-p', str(temp_dir), '-O', str(out_fn)]
 proc = Po(cmd_list, stdin=pp2.stdout, stdout=Pi, stderr=Pi)
 stdout, stderr = proc.communicate()
 if Ldir['testing']:
