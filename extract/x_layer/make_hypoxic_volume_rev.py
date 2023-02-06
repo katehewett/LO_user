@@ -121,21 +121,21 @@ dataset2 = xr.DataArray(out_fn)
 #     ds2 = nc.Dataset(out_fn, 'w')
 
 # Create dimensions
-#for dname, the_dim in dataset1.dimensions.items():
-#    if dname in dlist:
-#        dataset2.createDimension(dname, len(the_dim) if not the_dim.isunlimited() else None)
+for dname, the_dim in dataset1.dims.items():
+   if dname in dlist:
+        dataset2.createDimension(dname, len(the_dim) if not the_dim.isunlimited() else None)
         
 # Create variables and their attributes
 # - first time
 vn = 'ocean_time'
 varin = dataset1[vn]
-vv = dataset2.createVariable(vn, varin.dtype, varin.dimensions)
+vv = dataset2.createVariable(vn, varin.dtype, varin.dims)
 vv.long_name = varin.long_name
 vv.units = varin.units
 # - then static 2d fields
 for vn in vn_list_2d:
     varin = dataset1[vn]
-    vv = dataset1.createVariable(vn, varin.dtype, varin.dimensions)
+    vv = dataset1.createVariable(vn, varin.dtype, varin.dims)
     vv.setncatts({k: varin.getncattr(k) for k in varin.ncattrs()})
     vv[:] = dataset1[vn][:]
 # - then static custom fields
