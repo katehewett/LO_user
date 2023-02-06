@@ -85,7 +85,7 @@ elif Ldir['roms_out_num'] > 0:
 # output location
 out_dir = Ldir['LOo'] / 'extract' / Ldir['gtagex'] / 'hypoxic_volume'
 Lfun.make_dir(out_dir)
-hvname = (Ldir['job'] + '_' + Ldir['ds0'] + '_' + Ldir['ds1'])
+hvname = Ldir['job'] + '_' + Ldir['ds0'] + '_' + Ldir['ds1']
 out_fn = out_dir / (hvname + '.nc')
 out_fn.unlink(missing_ok=True)
 
