@@ -116,7 +116,7 @@ dzr = np.diff(zw, axis=0)
 
 
 dataset1 = xr.open_dataset(fn)
-dataset2 = xr.open_dataset(out_fn, 'w')
+dataset2 = xr.open_dataset(out_fn)
 # was ds1 = nc.Dataset(fn)
 #     ds2 = nc.Dataset(out_fn, 'w')
 
