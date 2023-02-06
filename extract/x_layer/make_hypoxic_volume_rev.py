@@ -15,102 +15,89 @@ Testing: Jan 2023
 # imports
 # took these from extract_moor.py, extract_sections.py has a different way to deal with arg passing, but not sure which is best yet?
 import sys
-from lo_tools import Lfun, zrfun, zfun
-import argparse 
-import os 
-
-from time import time
+import argparse
+from lo_tools import Lfun, zfun, zrfun
 from subprocess import Popen as Po
 from subprocess import PIPE as Pi
+import os
+from time import time
 import numpy as np
-
-#import netCDF4 as nc
-import xarray as xr  # need to netcdf>xr, look at extract_moor. get roms output files for 2019.07.04 and 2019.07.06 and put on this machine 
+import xarray as xr
 
 #from datetime import datetime, timedelta
 #start_time = datetime.now()
 
+pid = os.getpid()
+print(' extract_box '.center(60,'='))
+print('PID for this job = ' + str(pid))
 
-# Command line arguments
-
-# do we need the next 4 lines? or can it be replaced by arg below - see question boolean_testing 
-def boolean_string(s):
-    if s not in ['False', 'True']:
-        raise ValueError('Not a valid boolean string')
-    return s == 'True' # note use of ==
-
+# command line arugments
 parser = argparse.ArgumentParser()
-# which run to use 
+# which run to use
 parser.add_argument('-gtx', '--gtagex', type=str)   # e.g. cas6_v3_l08b
-parser.add_argument('-ro', '--roms_out_num', type=int) # 1 = Ldir['roms_out1'], etc.
-
+parser.add_argument('-ro', '--roms_out_num', type=int) # 2 = Ldir['roms_out2'], etc.
 # select time period and frequency
-parser.add_argument('-0', '--date_string0', type=str, default='2019.07.04') # e.g. 2019.07.04
-parser.add_argument('-1', '--date_string1', type=str, default='2019.07.06') # e.g. 2019.07.06
-parser.add_argument('-lt', '--list_type', type=str, default = 'daily') # list type: hourly or daily
+parser.add_argument('-0', '--ds0', type=str) # e.g. 2019.07.04
+parser.add_argument('-1', '--ds1', type=str) # e.g. 2019.07.06
+parser.add_argument('-lt', '--list_type', type=str) # list type: hourly, daily, weekly
 
-# Optional: for testing 
-# I think this replaces boolean testing, lines 36 - 37! check and delete above + this comment afterwards
-parser.add_argument('-test', '--testing', default=False, type=zfun.boolean_string)    
+# Later can we add this to make the box smaller and add in arag sat state etc?
+# select job name
+#parser.add_argument('-job', type=str) # job name 
 
+# Optional: set max number of subprocesses to run at any time
+parser.add_argument('-Nproc', type=int, default=10)
+# Optional: for testing
+parser.add_argument('-test', '--testing', default=False, type=Lfun.boolean_string)
 # get the args and put into Ldir
 args = parser.parse_args()
-
-# test that main required arguments were provided (other)
+# test that main required arguments were provided
 argsd = args.__dict__
 for a in ['gtagex']:
     if argsd[a] == None:
         print('*** Missing required argument: ' + a)
         sys.exit()
 gridname, tag, ex_name = args.gtagex.split('_')
-
 # get the dict Ldir
 Ldir = Lfun.Lstart(gridname=gridname, tag=tag, ex_name=ex_name)
-
 # add more entries to Ldir
 for a in argsd.keys():
     if a not in Ldir.keys():
         Ldir[a] = argsd[a]
+
 # testing
 if Ldir['testing']:
-    Ldir['roms_out_num'] = 0
-    Ldir['date_string0'] = '2019.07.04'
-    Ldir['date_string1'] = '2019.07.06'
+    Ldir['roms_out_num'] = 2
+    Ldir['ds0'] = '2019.07.04'
+    Ldir['ds1'] = '2019.07.06'
     Ldir['list_type'] = 'daily'
-    
 # set where to look for model output
 if Ldir['roms_out_num'] == 0:
     pass
 elif Ldir['roms_out_num'] > 0:
     Ldir['roms_out'] = Ldir['roms_out' + str(Ldir['roms_out_num'])]
 
-## make sure the output directory exists
-#outdir00 = Ldir['LOo']
-#Lfun.make_dir(outdir00)
-#outdir0 = outdir00 + 'layer/'
-#Lfun.make_dir(outdir0)
-#outdir = (outdir0 + Ldir['gtagex'] + '_' + Ldir['date_string0']
-#        + '_' + Ldir['date_string1'] + '/')
-#Lfun.make_dir(outdir, clean=False)
-
-# set output location
-out_dir = Ldir['LOo'] / 'extract' / Ldir['gtagex'] / 'x_layer'
-#temp_dir = Ldir['LOo'] / 'extract' / Ldir['gtagex'] / 'moor' / ('temp_' + Ldir['sn'])
+# output location
+out_dir = Ldir['LOo'] / 'extract' / Ldir['gtagex'] / 'hypoxic_volume'
 Lfun.make_dir(out_dir)
-#Lfun.make_dir(temp_dir, clean=True)
-#xlayer_fn = out_dir / (Ldir['sn'] + '_' + Ldir['date_string0'] + '_' + Ldir['date_string1'] + '.nc')
-#xlayer_fn.unlink(missing_ok=True)
-#print(xlayer_fn)
-
-
-# get list of history files to plot
-fn_list = Lfun.get_fn_list(args.list_type, Ldir, args.date_string0, args.date_string1)
-
-# name output file
-#out_fn = (outdir + 'hypoxic_volume_' + Ldir['list_type'] + '.nc')
-out_fn = out_dir / ('hypoxic_volume' + '_' + Ldir['date_string0'] + '_' + Ldir['date_string1'] + '.nc')
+# if add job names, then add this:
+# bname = Ldir['job'] + '_' + Ldir['ds0'] + '_' + Ldir['ds1']
+bname = 'HypoxicVolume_' + Ldir['ds0'] + '_' + Ldir['ds1']
+out_fn = out_dir / (bname + '.nc')
 out_fn.unlink(missing_ok=True)
-print(out_fn)
+
+# name the temp dir to accumulate individual extractions
+temp_dir = out_dir / ('temp_' + bname)
+Lfun.make_dir(temp_dir, clean=True)
+    
+# get list of history files to plot
+fn_list = Lfun.get_fn_list(Ldir['list_type'], Ldir, Ldir['ds0'], Ldir['ds1'])
+if Ldir['testing']:
+    fn_list = fn_list[:5]
+G, S, T = zrfun.get_basic_info(fn_list[0])
+Lon = G['lon_rho'][0,:]
+Lat = G['lat_rho'][:,0]
+
 
 # get rid of the old version, if it exists
 try:
