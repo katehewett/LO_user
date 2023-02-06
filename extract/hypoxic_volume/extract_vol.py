@@ -102,10 +102,14 @@ fn_list = Lfun.get_fn_list(Ldir['list_type'], Ldir, Ldir['ds0'], Ldir['ds1'])
 if Ldir['testing']:
     fn_list = fn_list[:5]
 G, S, T = zrfun.get_basic_info(fn_list[0])
-DA = G['DX'] * G['DY'] # is this right?
-
 Lon = G['lon_rho'][0,:]
 Lat = G['lat_rho'][:,0]
+
+DAall = G['DX'] * G['DY'] # cell horizontal area 
+h = G['h']
+
+# where's best to crop DA to fit the box? 
+
     
 def check_bounds(lon, lat):
     # error checking
@@ -129,9 +133,9 @@ if (upth / 'job_definitions.py').is_file():
 else:
     #print('Importing job_definitions from LO')
     #job_definitions = Lfun.module_from_file('job_definitions', pth / 'job_definitions.py')
-    print('ERROR - no LO user file')
+    print('ERROR - no file in LO user ??')
     
-aa, vn_list = job_definitions.get_box(Ldir['job'], Lon, Lat)
+aa, vn_list = job_definitions.get_vol(Ldir['job'], Lon, Lat)
 lon0, lon1, lat0, lat1 = aa
 ilon0, ilat0 = check_bounds(lon0, lat0)
 ilon1, ilat1 = check_bounds(lon1, lat1)
@@ -216,6 +220,7 @@ print('Time for initial extraction = %0.2f sec' % (time()- tt0))
     ds['z_w'] = (('ocean_time', 's_w', 'eta_rho', 'xi_rho'), np.nan*np.ones((NT, N+1, NR, NC)))
     ds.z_rho.attrs = {'units':'m', 'long_name': 'vertical position on s_rho grid, positive up'}
     ds.z_w.attrs = {'units':'m', 'long_name': 'vertical position on s_w grid, positive up'}
+    
     for ii in range(NT):
         h = ds.h.values
         zeta = ds.zeta[ii,:,:].values
@@ -225,62 +230,33 @@ print('Time for initial extraction = %0.2f sec' % (time()- tt0))
     ds.to_netcdf(out_fn)
     ds.close()
     print('Time to add z variables = %0.2f sec' % (time()- tt0))
-
-
-## Kate add hyp vol stuff here - ask for help on assigning a 3 v
-if Ldir['uv_to_rho']:
-    # interpolate anything on the u and v grids to the rho grid, assuming
-    # zero values where masked, and leaving a masked ring around the outermost edge
-    tt0 = time()
+    
+# add cell area 
     ds = xr.load_dataset(out_fn) # have to load in order to add new variables
-    Maskr = ds.mask_rho.values == 1 # True over water
-    NR, NC = Maskr.shape
-    for vn in ds.data_vars:
-        if ('xi_u' in ds[vn].dims) and ('ocean_time' in ds[vn].dims):
-            if len(ds[vn].dims) == 4:
-                uu = ds[vn].values
-                NT, N, NRu, NCu = uu.shape
-                uu[np.isnan(uu)] = 0
-                UU = (uu[:,:,1:-1,1:]+uu[:,:,1:-1,:-1])/2
-                uuu = np.nan * np.ones((NT, N, NR, NC))
-                uuu[:,:,1:-1,1:-1] = UU
-                Maskr3 = np.tile(Maskr.reshape(1,1,NR,NC),[NT,N,1,1])
-                uuu[~Maskr3] = np.nan
-                ds.update({vn:(('ocean_time', 's_rho', 'eta_rho', 'xi_rho'), uuu)})
-            elif len(ds[vn].dims) == 3:
-                uu = ds[vn].values
-                NT, NRu, NCu = uu.shape
-                uu[np.isnan(uu)] = 0
-                UU = (uu[:,1:-1,1:]+uu[:,1:-1,:-1])/2
-                uuu = np.nan * np.ones((NT, NR, NC))
-                uuu[:,1:-1,1:-1] = UU
-                Maskr3 = np.tile(Maskr.reshape(1,NR,NC),[NT,1,1])
-                uuu[~Maskr3] = np.nan
-                ds.update({vn:(('ocean_time', 'eta_rho', 'xi_rho'), uuu)})
-        elif ('xi_v' in ds[vn].dims) and ('ocean_time' in ds[vn].dims):
-            if len(ds[vn].dims) == 4:
-                vv = ds[vn].values
-                NT, N, NRv, NCv = vv.shape
-                vv[np.isnan(vv)] = 0
-                VV = (vv[:,:,1:,1:-1]+vv[:,:,:-1,1:-1])/2
-                vvv = np.nan * np.ones((NT, N, NR, NC))
-                vvv[:,:,1:-1,1:-1] = VV
-                Maskr3 = np.tile(Maskr.reshape(1,1,NR,NC),[NT,N,1,1])
-                vvv[~Maskr3] = np.nan
-                ds.update({vn:(('ocean_time', 's_rho', 'eta_rho', 'xi_rho'), vvv)})
-            elif len(ds[vn].dims) == 3:
-                vv = ds[vn].values
-                NT, NRv, NCv = vv.shape
-                vv[np.isnan(vv)] = 0
-                VV = (vv[:,1:,1:-1]+vv[:,:-1,1:-1])/2
-                vvv = np.nan * np.ones((NT, NR, NC))
-                vvv[:,1:-1,1:-1] = VV
-                Maskr3 = np.tile(Maskr.reshape(1,NR,NC),[NT,1,1])
-                vvv[~Maskr3] = np.nan
-                ds.update({vn:(('ocean_time', 'eta_rho', 'xi_rho'), vvv)})
+    #NT, N, NR, NC = ds.salt.shape 
+    ds['DA'] = (('ocean_time', 'eta_rho', 'xi_rho'), DAall((NT, NR, NC))) #2xcheck, does it index like this
+    ds.DA.attrs = {'units':'m2', 'long_name': 'cell horizontal area'}
     ds.to_netcdf(out_fn)
     ds.close()
-    print('Time to interpolate uv variables to rho grid = %0.2f sec' % (time()- tt0))
+       
+## Kate add hyp vol stuff here - ask for help 
+# calc hyp volume
+    tt0 = time()
+    ds = xr.load_dataset(out_fn) # have to load in order to add new variables
+    ds['hyp_dz'] = (('ocean_time', 'eta_rho', 'xi_rho'), np.nan*np.ones((NT, NR, NC)))
+    ds.hyp_dz.attrs = {'units':'m', 'long_name': 'Thickness of hypoxic layer'}
+
+    dzr = np.diff(ds.z_w, axis=0)
+    oxy = ds.oxygen
+    dzrm = np.ma.masked_where(oxy>61,dzr)
+    hyp_dz = dzrm.sum(axis=0)
+   
+    #Maskr = ds.mask_rho.values == 1 # True over water
+    #NR, NC = Maskr.shape
+
+    ds.to_netcdf(out_fn)
+    ds.close()
+    print('Time to calc hypoxic volume = %0.2f sec' % (time()- tt0))
 
 # squeeze and compress the resulting file
 tt0 = time()
@@ -305,5 +281,7 @@ for vn in ds.data_vars:
 ds.close()
 
 print('\nPath to file:\n%s' % (str(out_fn)))
+
+
 
 
