@@ -250,10 +250,9 @@ ds['DA'] = (('eta_rho', 'xi_rho'), np.nan*np.ones((NR, NC))) #2xcheck, does it i
 ds.DA.attrs = {'units':'m2', 'long_name': 'cell horizontal area'}
 
 #### NEED Help here - how do I reshape DA to have the same dims as the clipped region "box"??
-# DAall((NR, NC)
+# ds['DA'][:,:]=DAall[NR,NC].values   #why doesn't that work??
 
-ds['DA'][:,:]=DAall[NR,NC].values   #??
-
+ds['DA'][:,:]=DAall[NR,NC] 
 ####
 
 ds.to_netcdf(out_fn)
@@ -284,7 +283,7 @@ ds = xr.load_dataset(out_fn)
 ds = ds.squeeze() # remove singleton dimensions
 enc_dict = {'zlib':True, 'complevel':1, '_FillValue':1e20}
 Enc_dict = {vn:enc_dict for vn in ds.data_vars if 'ocean_time' in ds[vn].dims}
-ds.to_netcdf(box_fn, encoding=Enc_dict)
+ds.to_netcdf(out_fn, encoding=Enc_dict)
 ds.close()
 print('Time to compress = %0.2f sec' % (time()- tt0))
 
