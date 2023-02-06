@@ -121,9 +121,9 @@ dataset2 = xr.DataArray(out_fn)
 #     ds2 = nc.Dataset(out_fn, 'w')
 
 # Create dimensions
-for dname, the_dim in dataset1.dimensions.items():
-    if dname in dlist:
-        dataset2.createDimension(dname, len(the_dim) if not the_dim.isunlimited() else None)
+#for dname, the_dim in dataset1.dimensions.items():
+#    if dname in dlist:
+#        dataset2.createDimension(dname, len(the_dim) if not the_dim.isunlimited() else None)
         
 # Create variables and their attributes
 # - first time
