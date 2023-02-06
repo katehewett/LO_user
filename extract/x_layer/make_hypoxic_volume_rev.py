@@ -115,8 +115,8 @@ zr, zw = zrfun.get_z(h, 0*h, S)
 dzr = np.diff(zw, axis=0)
 
 
-dataset1 = xr.open_dataset(fn)
-dataset2 = xr.open_dataset(out_fn)
+dataset1 = xr.DataArray(fn)
+dataset2 = xr.DataArray(out_fn)
 # was ds1 = nc.Dataset(fn)
 #     ds2 = nc.Dataset(out_fn, 'w')
 
@@ -164,7 +164,7 @@ for fn in fn_list:
         print(' working on %d of %d' % (tt, NF))
         sys.stdout.flush()
         
-    ds = xr.open_dataset(fn)
+    ds = xr.DataArray(fn)
     # was ds = nc.Dataset(fn)
     
     dataset2['ocean_time'][tt] = ds['ocean_time'][0]
