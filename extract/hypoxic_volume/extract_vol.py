@@ -81,10 +81,6 @@ if Ldir['roms_out_num'] == 0:
     pass
 elif Ldir['roms_out_num'] > 0:
     Ldir['roms_out'] = Ldir['roms_out' + str(Ldir['roms_out_num'])]
-# check for input conflicts:
-if Ldir['surf'] and Ldir['bot']:
-    print('Error: cannot have surf and bot both True.')
-    sys.exit()
     
 # output location
 out_dir = Ldir['LOo'] / 'extract' / Ldir['gtagex'] / 'hypoxic_volume'
