@@ -24,8 +24,8 @@ from time import time
 import numpy as np
 import xarray as xr
 
-#from datetime import datetime, timedelta
-#start_time = datetime.now()
+from datetime import datetime, timedelta
+start_time = datetime.now()
 
 pid = os.getpid()
 print(' extract_box '.center(60,'='))
@@ -92,21 +92,13 @@ Lfun.make_dir(temp_dir, clean=True)
     
 # get list of history files to plot
 fn_list = Lfun.get_fn_list(Ldir['list_type'], Ldir, Ldir['ds0'], Ldir['ds1'])
-if Ldir['testing']:
-    fn_list = fn_list[:5]
-G, S, T = zrfun.get_basic_info(fn_list[0])
-Lon = G['lon_rho'][0,:]
-Lat = G['lat_rho'][:,0]
+#if Ldir['testing']:
+#    fn_list = fn_list[:5]
+#G, S, T = zrfun.get_basic_info(fn_list[0])
+#Lon = G['lon_rho'][0,:]
+#Lat = G['lat_rho'][:,0]
 
-
-# get rid of the old version, if it exists
-try:
-    os.remove(out_fn)
-except OSError:
-    pass
-    
 # lists of variables to process
-# can i make 3d_t_custom more like extract_moor w/ variables to extract (get_tsa get_bio etc)??
 dlist = ['xi_rho', 'eta_rho', 'xi_psi', 'eta_psi', 'ocean_time']
 vn_list_2d = [ 'lon_rho', 'lat_rho', 'lon_psi', 'lat_psi', 'mask_rho', 'h']
 vn_list_2d_custom = ['DA']
@@ -122,32 +114,32 @@ S = zrfun.get_basic_info(fn, only_S=True)
 zr, zw = zrfun.get_z(h, 0*h, S)
 dzr = np.diff(zw, axis=0)
 
-# becareful b/c dataset and datestring (see extract_moor were named ds)
-ds1 = nc.Dataset(fn)
-ds2 = nc.Dataset(out_fn, 'w')
+
+dataset1 = xr.Dataset(fn)
+dataset2 = xr.Dataset(out_fn, 'w')
 
 # Create dimensions
-for dname, the_dim in ds1.dimensions.items():
+for dname, the_dim in dataset1.dimensions.items():
     if dname in dlist:
-        ds2.createDimension(dname, len(the_dim) if not the_dim.isunlimited() else None)
+        dataset2.createDimension(dname, len(the_dim) if not the_dim.isunlimited() else None)
         
 # Create variables and their attributes
 # - first time
 vn = 'ocean_time'
-varin = ds1[vn]
-vv = ds2.createVariable(vn, varin.dtype, varin.dimensions)
+varin = dataset1[vn]
+vv = dataset2.createVariable(vn, varin.dtype, varin.dimensions)
 vv.long_name = varin.long_name
 vv.units = varin.units
 # - then static 2d fields
 for vn in vn_list_2d:
-    varin = ds1[vn]
-    vv = ds2.createVariable(vn, varin.dtype, varin.dimensions)
+    varin = dataset1[vn]
+    vv = dataset1.createVariable(vn, varin.dtype, varin.dimensions)
     vv.setncatts({k: varin.getncattr(k) for k in varin.ncattrs()})
-    vv[:] = ds1[vn][:]
+    vv[:] = dataset1[vn][:]
 # - then static custom fields
 for vn in vn_list_2d_custom:
     if vn == 'DA':
-        vv = ds2.createVariable(vn, float, ('eta_rho', 'xi_rho'))
+        vv = dataset2.createVariable(vn, float, ('eta_rho', 'xi_rho'))
         vv.long_name = 'Cell horizontal area'
         vv.units = 'm2'
         vv[:] = DA
@@ -155,7 +147,7 @@ for vn in vn_list_2d_custom:
 # - then time-dependent custom 3d fields (processed into 2d)
 for vn in vn_list_3d_t_custom:
     if vn == 'hyp_dz':
-        vv = ds2.createVariable(vn, float, ('ocean_time', 'eta_rho', 'xi_rho'))
+        vv = dataset2.createVariable(vn, float, ('ocean_time', 'eta_rho', 'xi_rho'))
         vv.long_name = 'Thickess of hypoxic water'
         vv.units = 'm'
         vv.time='ocean_time'
@@ -169,16 +161,16 @@ for fn in fn_list:
     if np.mod(tt,24)==0:
         print(' working on %d of %d' % (tt, NF))
         sys.stdout.flush()
-    ds = nc.Dataset(fn)
+    ds = xr.Dataset(fn)
     
-    ds2['ocean_time'][tt] = ds['ocean_time'][0]
+    dataset2['ocean_time'][tt] = ds['ocean_time'][0]
         
     for vn in vn_list_3d_t_custom:
         if vn == 'hyp_dz':
             oxy = ds['oxygen'][0,:,:,:]
-            dzrm = np.ma.masked_where(oxy > 60, dzr)
+            dzrm = np.ma.masked_where(oxy > 61, dzr)
             hyp_dz = dzrm.sum(axis=0)
-            ds2[vn][tt,:,:] = hyp_dz
+            dataset2[vn][tt,:,:] = hyp_dz
         
     tt += 1
     ds.close()
@@ -211,11 +203,11 @@ if args.testing:
     plt.rcdefaults()
     
     print(' Saved Variables '.center(50,'='))
-    for vn in ds2.variables:
+    for vn in dataset2.variables:
         print(vn)
 
-ds1.close()
-ds2.close()
+dataset1.close()
+dataset2.close()
 
 # finale
 import collections
