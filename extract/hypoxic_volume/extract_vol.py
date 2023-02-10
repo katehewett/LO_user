@@ -220,6 +220,9 @@ print('Time for initial extraction = %0.2f sec' % (time()- tt0))
 
 # add z variables
 #if (Ldir['surf']==False) and (Ldir['bot']==False):
+    
+    ### need to replicate more extract_box_chunks.py and look at lines 260 - 274ish
+    # open not load dataset and rename -- for ram
 tt0 = time()
 ds = xr.load_dataset(out_fn) # have to load in order to add new variables
 
@@ -249,11 +252,7 @@ ds = xr.load_dataset(out_fn) # have to load in order to add new variables
 ds['DA'] = (('eta_rho', 'xi_rho'), np.nan*np.ones((NR, NC))) #2xcheck, does it index like this and are the areas the same across the 6 yr period? 
 ds.DA.attrs = {'units':'m2', 'long_name': 'cell horizontal area'}
 
-#### NEED Help here - how do I reshape DA to have the same dims as the clipped region "box"??
-# ds['DA'][:,:]=DAall[NR,NC].values   #why doesn't that work??
-
-ds['DA'][:,:]=DAall[NR,NC] 
-####
+ds['DA'][:,:]=DAall[ilat0:ilat1+1,ilon0:ilon1+1] # need to use the ilat and lons; not NR NC; ncks is inclusive of last point and numpy isn't 
 
 ds.to_netcdf(out_fn)
 ds.close()
