@@ -7,6 +7,6 @@ def get_vol(job, Lon, Lat):
     # specific jobs
     if job == 'LO_oxygen_WA':
         aa = [-126, -122.5, 46, 49]
-        vn_list = 'h,pm,pn,mask_rho,salt,temp,oxygen,zeta'
+        vn_list = 'h,pm,pn,mask_rho,salt,temp,rho,oxygen,zeta'
         
     return aa, vn_list

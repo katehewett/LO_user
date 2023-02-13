@@ -1,4 +1,7 @@
 """
+Code to extract hypoxic volume - testing 
+
+From : Parker's tef2: extract_sections / get one section code 
 Code to extract tef2 sections.
 
 To test on mac:
