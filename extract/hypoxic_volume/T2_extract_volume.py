@@ -1,4 +1,8 @@
 """
+
+Code to extract hypoxic volumes, based after Parker's extract tef2/extract sections
+Testing January 2023 - 
+
 Code to extract tef2 sections.
 
 To test on mac:
