@@ -5,7 +5,7 @@ Baesd code on extract/box and /tef2 code: extract_sections; extract_one_section
 updated code to make the volume calculations run faster 
 
 To test on mac:
-run extract_vol_v2 -gtx cas6_v0_live -ro 1 -0 2022.08.08 -1 2022.08.09 -lt daily 
+run extract_vol_v2 -gtx cas6_v0_live -ro 1 -0 2022.08.08 -1 2022.08.09 
 
 Testing January 2023 - present
 """
@@ -18,8 +18,7 @@ Testing January 2023 - present
 #-job LO_oxygen_WA 
 
 # imports
-#from lo_tools import Lfun, zfun, zrfun
-from lo_tools import Lfun
+from lo_tools import Lfun, zfun, zrfun
 from lo_tools import extract_argfun as exfun
 Ldir = exfun.intro() # this handles the argument passing
 
@@ -28,10 +27,10 @@ from subprocess import PIPE as Pi
 
 from time import time
 import sys 
-#import pandas as pd
-#import xarray as xr
+import pandas as pd
+import xarray as xr
 import numpy as np
-#import pickle
+import pickle
 
 gctag = Ldir['gridname']
 hv_dir = Ldir['LOo'] / 'extract' / 'hypoxic_volume'
@@ -137,6 +136,9 @@ Variables in the NetCDF files:
 A useful tool is isel():
 a = ds.isel(p=np.arange(10,15))
 """
+
+
+# need to sort and finish here
 
 #ds1 = xr.open_dataset(temp_fn)
 #S = zrfun.get_basic_info(fn_list[0], only_S=True)
