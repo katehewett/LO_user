@@ -90,20 +90,3 @@ ds1['Lon'] = (('eta_rho', 'xi_rho'), CC['lon_rho'], {'units':'degree_east','long
 
 ds1.to_netcdf(args.out_fn, unlimited_dims='time')
 
-
-# I don't understand where parker defined his 'p' ??
-# put these in a Dataset
-# NZ, NP = CC['vel'].shape
-# ot = ds.ocean_time.values # an array with dtype='datetime64[ns]'
-# dti = to_datetime(ot) # a pandas DatetimeIndex with dtype='datetime64[ns]'
-# ds1 = Dataset()
-# ds1['time'] = dti
-# ds1['h'] = (('p'), CC['h'])
-# ds1['dd'] = (('p'), CC['dd'])
-# ds1['zeta'] = (('time','p'), CC['zeta'].reshape(1,NP))
-# for vn in CC.keys():
-#     if vn not in ['zeta', 'h', 'dd']:
-#         vv = CC[vn] # packed (z,p)
-#         ds1[vn] = (('time','z', 'p'), vv.reshape(1,NZ,NP))
-# ds1.to_netcdf(args.out_fn, unlimited_dims='time')
-
