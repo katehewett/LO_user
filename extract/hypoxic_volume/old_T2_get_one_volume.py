@@ -4,12 +4,18 @@ Testing January 2023 -
  
 Function to do the extraction of all sections for a single history file.
 """
+from lo_tools import Lfun, zrfun, zfun
+from lo_tools import extract_argfun as exfun
+Ldir = exfun.intro() # this handles the argument passing
 
-from argparse import ArgumentParser
-from xarray import open_dataset
-from numpy import nan, ones, diff
-from pickle import dump
-from pandas import read_pickle
+from subprocess import Popen as Po
+from subprocess import PIPE as Pi
+from time import time
+import sys
+import pandas as pd
+import xarray as xr
+import numpy as np
+import pickle
 
 parser = ArgumentParser()
 parser.add_argument('-sect_df_fn', type=str) # path to sect_df

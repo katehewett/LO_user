@@ -36,15 +36,17 @@ import xarray as xr
 import numpy as np
 import pickle
 
-gctag = Ldir['gridname'] + '_' + Ldir['collection_tag']
-tef2_dir = Ldir['LOo'] / 'extract' / 'tef2'
+# gctag = Ldir['gridname'] + '_' + Ldir['collection_tag']
+gctag = Ldir['gridname'] + '_' + Ldir['job']
+hv_dir = Ldir['LOo'] / 'extract' / 'hypoxic_volume'
 
-sect_df_fn = tef2_dir / ('sect_df_' + gctag + '.p')
-sect_df = pd.read_pickle(sect_df_fn)
+hv_df_fn = hv_dir / ('hv_df_' + gctag + '.p')
+hv_df = pd.read_pickle(hv_df_fn)
 
-fn_list = Lfun.get_fn_list('hourly', Ldir, Ldir['ds0'], Ldir['ds1'])
+#fn_list = Lfun.get_fn_list('hourly', Ldir, Ldir['ds0'], Ldir['ds1'])
+fn_list = Lfun.get_fn_list(Ldir['list_type'], Ldir, Ldir['ds0'], Ldir['ds1'])
 
-out_dir0 = Ldir['LOo'] / 'extract' / Ldir['gtagex'] / 'tef2'
+out_dir0 = Ldir['LOo'] / 'extract' / Ldir['gtagex'] / 'hypoxic_volume'
 out_dir = out_dir0 / ('extractions_' + Ldir['ds0'] + '_' + Ldir['ds1'])
 temp_dir = out_dir0 / ('temp_' + Ldir['ds0'] + '_' + Ldir['ds1'])
 Lfun.make_dir(out_dir, clean=True)
