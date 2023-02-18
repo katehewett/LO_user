@@ -18,7 +18,8 @@ Testing January 2023 - present
 #-job LO_oxygen_WA 
 
 # imports
-from lo_tools import Lfun, zfun, zrfun
+#from lo_tools import Lfun, zfun, zrfun
+from lo_tools import Lfun
 from lo_tools import extract_argfun as exfun
 Ldir = exfun.intro() # this handles the argument passing
 
@@ -27,10 +28,10 @@ from subprocess import PIPE as Pi
 
 from time import time
 import sys 
-import pandas as pd
-import xarray as xr
+#import pandas as pd
+#import xarray as xr
 import numpy as np
-import pickle
+#import pickle
 
 gctag = Ldir['gridname']
 hv_dir = Ldir['LOo'] / 'extract' / 'hypoxic_volume'
@@ -126,28 +127,25 @@ We will follow the structure of the output of LO/tef/extract_sections.py so that
 recycle the subsequent processing code:
 
 Variables in the NetCDF files:
-- salt is daily salinity in each cell (t, z, x-or-y) [same for all other variables]
-- q is hourly transport in each cell (t, z, x-or-y)
-- vel is velocity in each cell (t, z, x-or-y) positive to East or North
-- DA is the area of each cell (t, z, x-or-y) hence: q = vel * DA
+- hyp_dz is depth of the hypoxic layer in each cell (t, z, x) [same for all other variables]
+- DA is the area of each cell (t, z, x) < doesn't DA stay the same thru ocean_time? 
 - z0 is the average z-position of cell centers (assumes SSH=0), useful for plotting
-- DA0 is the average cross-sectional area of each cell (assumes SSH=0)
 - h is depth on the section (x-or-y) positive down
-- zeta is SSH on the section (t, x-or-y) positive up
 - ocean_time is a vector of time in seconds since (typically) 1/1/1970.
+- Lat and Lon on rho points 
     
 A useful tool is isel():
 a = ds.isel(p=np.arange(10,15))
 """
 
-ds1 = xr.open_dataset(temp_fn)
-S = zrfun.get_basic_info(fn_list[0], only_S=True)
-eta = ds1.zeta.values.squeeze() # packed (t, p)
-NT, NP = eta.shape
-hh = ds1.h.values.squeeze().reshape(1,NP) * np.ones((NT,1))
-zw = zrfun.get_z(hh, eta, S, only_w=True)
-dz = np.diff(zw, axis=0) # NOTE: this is packed (z,t,p)
-DZ = np.transpose(dz, (1,0,2)) # packed (t,z,p)
+#ds1 = xr.open_dataset(temp_fn)
+#S = zrfun.get_basic_info(fn_list[0], only_S=True)
+#eta = ds1.zeta.values.squeeze() # packed (t, p)
+#NT, NP = eta.shape
+#hh = ds1.h.values.squeeze().reshape(1,NP) * np.ones((NT,1))
+#zw = zrfun.get_z(hh, eta, S, only_w=True)
+#dz = np.diff(zw, axis=0) # NOTE: this is packed (z,t,p)
+#DZ = np.transpose(dz, (1,0,2)) # packed (t,z,p)
 
 ## Help on this too b/c not sure how to pack back in -- confusion continued from lines 35ish this coe
 #hv_list = list(hv_df.sn.unique())
