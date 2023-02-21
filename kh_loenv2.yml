@@ -1,4 +1,4 @@
-name: kh_loenv
+name: kh_loenv2
 channels:
   - conda-forge
 dependencies:

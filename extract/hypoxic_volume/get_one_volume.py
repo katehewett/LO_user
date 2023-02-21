@@ -21,7 +21,10 @@ args = parser.parse_args()
 
 #hv_df = read_pickle(args.hv_df_fn)
 
-ds = open_dataset(args.in_fn)
+ds = open_dataset(args.in_fn, decode_times=False)
+# the decode_times=False part is important for correct treatment
+# of the time axis later when we concatenate things in the calling function
+# using ncrcat
 
 vn_list = ['oxygen']
 # aa = [-126, -122.5, 46, 49] # WA Shelf, future - want to pass this in the arg passer job_defn?
@@ -77,7 +80,7 @@ NR, NC = CC['hyp_dz'].shape
 ot = ds.ocean_time.values # an array with dtype='datetime64[ns]'
 #attrs = {'units':ds.ocean_time.units} # ds time object has no attribute 'units' for me
 ds1 = Dataset()
-ds1['ocean_time'] = (('ocean_time'), ot, {'long_name':ds.ocean_time.long_name})
+ds1['ocean_time'] = (('ocean_time'), ot, {'long_name':ds.ocean_time.long_name,'units':ds.ocean_time.units})
 
 ds1['hyp_dz'] = (('ocean_time', 'eta_rho', 'xi_rho'), CC['hyp_dz'].reshape(1,NR,NC), {'units':'m', 'long_name': 'Thickness of hypoxic layer'})
 
@@ -88,5 +91,5 @@ ds1['h'] = (('eta_rho', 'xi_rho'), CC['h'], {'units':ds.h.units, 'long_name': ds
 ds1['Lat'] = (('eta_rho', 'xi_rho'), CC['lat_rho'], {'units':'degree_north','long_name': 'latitude of RHO-points'})
 ds1['Lon'] = (('eta_rho', 'xi_rho'), CC['lon_rho'], {'units':'degree_east','long_name': 'longitude of RHO-points'})
 
-ds1.to_netcdf(args.out_fn, unlimited_dims='time')
+ds1.to_netcdf(args.out_fn, unlimited_dims='ocean_time')
 
