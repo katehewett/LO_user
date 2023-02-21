@@ -71,6 +71,8 @@ oxy = ds.oxygen.values.squeeze()
 dzrm = np.ma.masked_where(oxy>61,dzr) 
 hyp_dz = dzrm.sum(axis=0)
 
+# add in anoxia 
+# add in Oag - p, T, S, oxy -> look at LO/daymovie/dm_pfun.py
 CC['hyp_dz'] = hyp_dz
 
 #dump(CC,open(args.out_fn),'wb')
