@@ -7,10 +7,9 @@ from xarray import open_dataset, Dataset
 from numpy import nan, ones, diff
 from pickle import dump
 from pandas import read_pickle, to_datetime
-from lo_tools import zrfun
 from time import time
 
-import numpy as np
+#import numpy as np
 
 parser = ArgumentParser()
 #parser.add_argument('-sect_df_fn', type=str) # path to sect_df
@@ -80,7 +79,7 @@ CC['hyp_dz'] = hyp_dz
 # put them in a dataset, ds1
 NR, NC = CC['hyp_dz'].shape
 ot = ds.ocean_time.values # an array with dtype='datetime64[ns]'
-#attrs = {'units':ds.ocean_time.units} # ds time object has no attribute 'units' for me
+
 ds1 = Dataset()
 ds1['ocean_time'] = (('ocean_time'), ot, {'long_name':ds.ocean_time.long_name,'units':ds.ocean_time.units})
 
