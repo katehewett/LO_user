@@ -106,7 +106,7 @@ print('Total processing time = %0.2f sec' % (time()-tt0))
 # This bit of code is a nice example of how to replicate a bash pipe
 pp1 = Po(['ls', str(temp_dir)], stdout=Pi)
 pp2 = Po(['grep','CC'], stdin=pp1.stdout, stdout=Pi)
-temp_fn = str(temp_dir)+'/all.nc'
+temp_fn = str(temp_dir)+'/all_maps.nc' # this is all the maps put to one
 cmd_list = ['ncrcat','-p', str(temp_dir), '-O', temp_fn]
 proc = Po(cmd_list, stdin=pp2.stdout, stdout=Pi, stderr=Pi)
 stdout, stderr = proc.communicate()
@@ -122,9 +122,6 @@ if len(stderr) > 0:
 """
 Next we want to repackage these results into one NetCDF file per section, with all times.
 
-We will follow the structure of the output of LO/tef/extract_sections.py so that we can mostly
-recycle the subsequent processing code:
-
 Variables in the NetCDF files:
 - hyp_dz is depth of the hypoxic layer in each cell (t, z, x) [same for all other variables]
 - DA is the area of each cell (t, z, x) < doesn't DA stay the same thru ocean_time? 
@@ -137,29 +134,9 @@ A useful tool is isel():
 a = ds.isel(p=np.arange(10,15))
 """
 
-
-# need to sort and finish here
-
-#ds1 = xr.open_dataset(temp_fn)
-#S = zrfun.get_basic_info(fn_list[0], only_S=True)
-#eta = ds1.zeta.values.squeeze() # packed (t, p)
-#NT, NP = eta.shape
-#hh = ds1.h.values.squeeze().reshape(1,NP) * np.ones((NT,1))
-#zw = zrfun.get_z(hh, eta, S, only_w=True)
-#dz = np.diff(zw, axis=0) # NOTE: this is packed (z,t,p)
-#DZ = np.transpose(dz, (1,0,2)) # packed (t,z,p)
-
-## Help on this too b/c not sure how to pack back in -- confusion continued from lines 35ish this coe
-#hv_list = list(hv_df.sn.unique())
-#hv_list.sort()
-#for sn in hv_list:
-#    ii = np.where(hv_df.sn == sn)[0]
-#    this_ds = ds1.isel(p=ii)
-#    # add DZ
-#    this_DZ = DZ[:,:,ii]
-#    this_ds['DZ'] = (('time','z','p'), this_DZ)
-#    this_fn = out_dir / (sn + '.nc')
-#    this_ds.to_netcdf(this_fn)
+ds1 = xr.open_dataset(temp_fn)
+this_fn = out_dir / ('all_maps.nc')
+ds1.to_netcdf(this_fn)
 
 
 
