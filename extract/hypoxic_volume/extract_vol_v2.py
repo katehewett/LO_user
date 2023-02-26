@@ -43,6 +43,8 @@ temp_dir = out_dir0 / ('temp_' + Ldir['ds0'] + '_' + Ldir['ds1'])
 Lfun.make_dir(out_dir, clean=True)
 Lfun.make_dir(temp_dir, clean=True)
 
+print('...working on files')
+
 # still working on this if section
 if Ldir['testing']:
     fn_list = fn_list[:3]
