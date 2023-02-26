@@ -9,16 +9,13 @@ run extract_vol_v2 -gtx cas6_v0_live -ro 1 -0 2022.08.08 -1 2022.08.09
 Need to add in testing lines 
 
 2 history files, all hypoxia Total processing time = 2.71 sec 
-Add Oag, 
+Add Oag, Total processing time = 185.70 sec (b/c have to calc Oag for each layer whole domain)
+
+File size 2 history files = ~103 MB 
+os.stat(file).st_size
 
 Testing January 2023 - present
 """
-# 
-# % clear 
-# % reset
-#import os 
-#os.chdir('/Users/katehewett/Documents/LO_user/extract/hypoxic_volume')
-#run extract_vol_v2 -gtx cas6_v0_live -ro 1 -0 2022.08.08 -1 2022.08.09 
 
 # imports
 from lo_tools import Lfun, zfun, zrfun
@@ -50,11 +47,6 @@ Lfun.make_dir(temp_dir, clean=True)
 if Ldir['testing']:
     fn_list = fn_list[:3]
 
-#if Ldir['get_bio']:
-#    vn_type = 'bio'
-#else:
-#    vn_type = 'salt'
-
 # loop over all jobs
 tt0 = time()
 N = len(fn_list)
@@ -66,12 +58,9 @@ for ii in range(N):
     out_fn = temp_dir / ('CC_' + ii_str + '.nc')
     # use subprocesses
     cmd_list = ['python3', 'get_one_volume.py',
-            #'-hv_df_fn', str(hv_df_fn),
-            #'#-job','LO_oxygen_WA',
             '-lt','daily',
             '-in_fn',str(fn),
             '-out_fn', str(out_fn)]
-            #'-vn_type', vn_type]
     proc = Po(cmd_list, stdout=Pi, stderr=Pi)
     proc_list.append(proc)
     # If we have accumulated Nproc jobs, or are at the end of the
@@ -125,10 +114,10 @@ if len(stderr) > 0:
 Next we want to repackage these results into one NetCDF file per section, with all times.
 
 Variables in the NetCDF files:
-- hyp_dz is depth of the hypoxic layer in each cell (t, z, x) [same for all other variables]
-- DA is the area of each cell (t, z, x) < doesn't DA stay the same thru ocean_time? 
-- z0 is the average z-position of cell centers (assumes SSH=0), useful for plotting
-- h is depth on the section (x-or-y) positive down
+- hyp_dz (mild, severe, anoxic) is depth of the hypoxic layer(s) in each cell (t, x, y) [same for all other variables]
+- corrosive_dz is the undersaturated layer (t, x, y)
+- DA is the area of each cell (x,y) < doesn't DA stay the same thru ocean_time? 
+- h is bathymetric depth 
 - ocean_time is a vector of time in seconds since (typically) 1/1/1970.
 - Lat and Lon on rho points 
     
