@@ -35,9 +35,6 @@ import pickle
 gctag = Ldir['gridname']
 hv_dir = Ldir['LOo'] / 'extract' / 'hypoxic_volume'
 
-# sect_df_fn = tef2_dir / ('sect_df_' + gctag + '.p') # buncha pickled sections 
-# sect_df = pd.read_pickle(sect_df_fn)
-
 fn_list = Lfun.get_fn_list('daily', Ldir, Ldir['ds0'], Ldir['ds1'])
 
 out_dir0 = Ldir['LOo'] / 'extract' / Ldir['gtagex'] / 'hypoxic_volume'

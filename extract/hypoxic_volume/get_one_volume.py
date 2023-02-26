@@ -5,9 +5,11 @@ Function to do the calculation for one hypoxic volume for a single history file.
 from argparse import ArgumentParser
 from xarray import open_dataset, Dataset
 from numpy import nan, ones, diff
-from pickle import dump
-from pandas import read_pickle, to_datetime
+#from pickle import dump
+#from pandas import read_pickle, to_datetime
 from time import time
+from lo_tools import zrfun
+import numpy as np
 
 #import numpy as np
 
@@ -15,6 +17,7 @@ parser = ArgumentParser()
 #parser.add_argument('-sect_df_fn', type=str) # path to sect_df
 parser.add_argument('-in_fn', type=str) # path to history file
 parser.add_argument('-out_fn', type=str) # path to outfile (temp directory)
+parser.add_argument('-lt', '--list_type', default = 'daily', type=str) # list type: hourly, daily, weekly
 #parser.add_argument('-vn_type', type=str) # 'salt' or 'bio'
 args = parser.parse_args()
 
@@ -25,7 +28,7 @@ ds = open_dataset(args.in_fn, decode_times=False)
 # of the time axis later when we concatenate things in the calling function
 # using ncrcat
 
-vn_list = ['oxygen']
+# vn_list = ['oxygen']
 # aa = [-126, -122.5, 46, 49] # WA Shelf, future - want to pass this in the arg passer job_defn?
 
 G, S, T = zrfun.get_basic_info(args.in_fn)    # grid information
