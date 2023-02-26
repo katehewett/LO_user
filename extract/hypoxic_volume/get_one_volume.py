@@ -1,8 +1,10 @@
 """
 Function to do the calculation for one hypoxic volume for a single history file.
+This does the whole domain. Need to add portion that allows a lat/lon box 
 """
 
 from argparse import ArgumentParser
+from lo_tools import zfun, zrfun
 from xarray import open_dataset, Dataset
 from numpy import nan, ones, diff
 #from time import time
@@ -20,23 +22,20 @@ ds = open_dataset(args.in_fn, decode_times=False)
 # of the time axis later when we concatenate things in the calling function
 # using ncrcat
 
-# vn_list = ['oxygen']
-# aa = [-126, -122.5, 46, 49] # WA Shelf, future - want to pass this in the arg passer job_defn?
-
 G, S, T = zrfun.get_basic_info(args.in_fn)    # grid information
 
-lon_rho = ds.lon_rho.values                
-lat_rho = ds.lat_rho.values
+lon = ds.lon_rho.values                
+lat = ds.lat_rho.values
 
 DX = 1/ds.pm.values
 DY = 1/ds.pn.values
 
-DA = DX * DY          # cell horizontal area 
+DA = DX * DY                                 # cell horizontal area 
 
-CC = dict()           # this is for holding fields extracted on sections
+CC = dict()                                  # this is for holding fields extracted on sections
 
-CC['lon_rho'] = lon_rho
-CC['lat_rho'] = lat_rho
+CC['lon'] = lon
+CC['lat'] = lat
 
 CC['DA'] = DA
 
@@ -50,43 +49,95 @@ CC['mask_rho']=mask_rho
 
 # Fields that do change with time
 #
-# First: tracers and zeta
-#for vn in vn_list:
-#    aa = ds[vn].values.squeeze()
-#    CC[vn] = aa; # whole shebang // not cropped to job yet - improve once get working
 
 zeta = ds.zeta.values.squeeze()
 z_rho, z_w = zrfun.get_z(h, zeta, S)
-#CC['zeta_rho'] = z_rho
-#CC['zeta_w'] = z_w
 
 # hypoxia thresholds 
 dzr = np.diff(z_w, axis = 0)
 oxy = ds.oxygen.values.squeeze()
 
-dzrm = np.ma.masked_where(oxy>60.9,dzr) 
-hyp_dz = dzrm.sum(axis=0)
-del dzrm 
-
 dzrm = np.ma.masked_where(oxy>106.6,dzr) 
 mild_dz = dzrm.sum(axis=0)
+del dzrm 
+
+dzrm = np.ma.masked_where(oxy>60.9,dzr) 
+hyp_dz = dzrm.sum(axis=0)
 del dzrm 
 
 dzrm = np.ma.masked_where(oxy>21.6,dzr) 
 severe_dz = dzrm.sum(axis=0)
 
 dzrm = np.ma.masked_where(oxy>0,dzr) 
-anox_dz = dzrm.sum(axis=0)
+anoxic_dz = dzrm.sum(axis=0)
 
-# add in anoxia 
-# add in Oag - p, T, S, oxy -> look at LO/daymovie/dm_pfun.py
+CC['mild_dz'] = mild_dz
 CC['hyp_dz'] = hyp_dz
+CC['severe_dz'] = severe_dz
+CC['anoxic_dz'] = anoxic_dz
 
-#dump(CC,open(args.out_fn),'wb')
+# add in Oag, see toy_Oag.py
+import gsw
+# Pressure calcs: Lpres
+ZZ = z_rho-zeta                         # zeta adjusted, see p_ref comment below
+Lpres = gsw.p_from_z(ZZ, lat)           # pressure [dbar]
+
+# Note gsw.p_from_z uses p_ref = 0 and requires z's to be neg. So need to adjust zeta to 'zero' for pressure calcs. There may be a better gsw function for this w/ adjustable p_ref, but prob takes longer than subtracting the two arrays (?) 
+
+# grab and convert physical variables + alkalinity and TIC from LO history files 
+SP = ds.salt.values.squeeze()
+TI = ds.temp.values.squeeze()
+ALK = ds.alkalinity.values.squeeze()
+TIC = ds.TIC.values.squeeze()
+
+SA = gsw.SA_from_SP(SP, Lpres, lon, lat)  # Q from dm_pfun.py: isn't LO output SA? 
+CT = gsw.CT_from_pt(SA, TI)
+rho = gsw.rho(SA, CT, Lpres)              # in situ density
+Ltemp = gsw.t_from_CT(SA, CT, Lpres)      # in situ temperature
+
+# convert from umol/L to umol/kg using in situ dentity
+Lalkalinity = 1000 * ALK / rho
+Lalkalinity[Lalkalinity < 100] = np.nan   # Q from dm_pfun.py: why? 
+ 
+LTIC = 1000 * TIC / rho
+LTIC[LTIC < 100] = np.nan                 # Q from dm_pfun.py: why? 
+
+Lpres = zfun.fillit(Lpres)               
+Ltemp = zfun.fillit(Ltemp)
+# zfun.fillit ensures a is an array with nan's for masked values
+# instead of a masked array  
+
+# calculate aragonite saturation:
+# For CO2SYS: All temperatures are in °C, 
+#             all salinities are on the PSS, 
+#             and all pressures are in dbar. 
+from PyCO2SYS import CO2SYS   
+
+ARAG = np.full(np.shape(SP),np.nan)
+A = np.shape(Lalkalinity)
+for ii in range(A[0]): 
+    aALK = Lalkalinity[ii,:,:].squeeze()
+    aTIC = LTIC[ii,:,:].squeeze()
+    aTemp = Ltemp[ii,:,:].squeeze()
+    aPres = Lpres[ii,:,:].squeeze()
+    aSalt = SP[ii,:,:].squeeze()
+    
+    CO2dict = CO2SYS(aALK, aTIC, 1, 2, aSalt, aTemp, aTemp,
+    aPres, aPres, 50, 2, 1, 10, 1, NH3=0.0, H2S=0.0)             # assumptions from dm_pfun.py
+    
+    aARAG = CO2dict['OmegaARout']
+    aARAG = aARAG.reshape((aSalt.shape))                         # reshape 
+    ARAG[ii,:,:] = np.expand_dims(aARAG, axis=0)
+
+dzr = np.diff(z_w, axis = 0)
+dzrm = np.ma.masked_where(ARAG>1,dzr) 
+corrosive_dz = dzrm.sum(axis=0)
+
+CC['corrosive_dz'] = corrosive_dz
 
 # put them in a dataset, ds1
-NR, NC = CC['hyp_dz'].shape
-ot = ds.ocean_time.values # an array with dtype='datetime64[ns]'
+NR, NC = CC['hyp_dz'].shape        # this feels sloppy 
+ot = ds.ocean_time.values          # an array with dtype='datetime64[ns]'
 
 ds1 = Dataset()
 ds1['ocean_time'] = (('ocean_time'), ot, {'long_name':ds.ocean_time.long_name,'units':ds.ocean_time.units})
@@ -94,14 +145,16 @@ ds1['ocean_time'] = (('ocean_time'), ot, {'long_name':ds.ocean_time.long_name,'u
 ds1['mild_dz'] = (('ocean_time', 'eta_rho', 'xi_rho'), CC['mild_dz'].reshape(1,NR,NC), {'units':'m', 'long_name': 'Thickness of mild hypoxic layer'})
 ds1['hyp_dz'] = (('ocean_time', 'eta_rho', 'xi_rho'), CC['hyp_dz'].reshape(1,NR,NC), {'units':'m', 'long_name': 'Thickness of hypoxic layer'})
 ds1['severe_dz'] = (('ocean_time', 'eta_rho', 'xi_rho'), CC['severe_dz'].reshape(1,NR,NC), {'units':'m', 'long_name': 'Thickness of severe hypoxic layer'})
-ds1['anox_dz'] = (('ocean_time', 'eta_rho', 'xi_rho'), CC['anox_dz'].reshape(1,NR,NC), {'units':'m', 'long_name': 'Thickness of anoxic layer'})
+ds1['anoxic_dz'] = (('ocean_time', 'eta_rho', 'xi_rho'), CC['anoxic_dz'].reshape(1,NR,NC), {'units':'m', 'long_name': 'Thickness of anoxic layer'})
+
+ds1['corrosive_dz'] = (('ocean_time', 'eta_rho', 'xi_rho'), CC['corrosive_dz'].reshape(1,NR,NC), {'units':'m', 'long_name': 'Thickness of undersaturated layer'})
 
 ds1['DA'] = (('eta_rho', 'xi_rho'), CC['DA'], {'units':'m^2', 'long_name': 'cell horizontal area '})
 ds1['mask_rho'] = (('eta_rho', 'xi_rho'), CC['DA'], {'flag_values':[0., 1.],'flag_meanings':'land water','long_name': 'mask on RHO-points'})
 ds1['h'] = (('eta_rho', 'xi_rho'), CC['h'], {'units':ds.h.units, 'long_name': ds.h.long_name})
 
-ds1['Lat'] = (('eta_rho', 'xi_rho'), CC['lat_rho'], {'units':'degree_north','long_name': 'latitude of RHO-points'})
-ds1['Lon'] = (('eta_rho', 'xi_rho'), CC['lon_rho'], {'units':'degree_east','long_name': 'longitude of RHO-points'})
+ds1['Lat'] = (('eta_rho', 'xi_rho'), CC['lat'], {'units':'degree_north','long_name': 'latitude of RHO-points'})
+ds1['Lon'] = (('eta_rho', 'xi_rho'), CC['lon'], {'units':'degree_east','long_name': 'longitude of RHO-points'})
 
 ds1.to_netcdf(args.out_fn, unlimited_dims='ocean_time')
 

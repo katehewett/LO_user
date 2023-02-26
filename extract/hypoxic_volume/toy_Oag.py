@@ -93,4 +93,9 @@ for ii in range(A[0]):
 #CO2dict = CO2SYS(Lalkalinity, LTIC, 1, 2, SP, Ltemp, Ltemp,
 #Lpres, Lpres, 50, 2, 1, 10, 1, NH3=0.0, H2S=0.0)             # from dm_pfun.py 
 
+dzr = np.diff(z_w, axis = 0)
+oxy = ds.oxygen.values.squeeze()
+dzrm = np.ma.masked_where(ARAG>1,dzr) 
+corrosive_dz = dzrm.sum(axis=0)
+
 print('Total processing time = %0.2f sec' % (time()-tt0))

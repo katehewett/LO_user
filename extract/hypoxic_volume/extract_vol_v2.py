@@ -6,6 +6,10 @@ updated code to make the volume calculations run faster
 
 To test on mac:
 run extract_vol_v2 -gtx cas6_v0_live -ro 1 -0 2022.08.08 -1 2022.08.09 
+Need to add in testing lines 
+
+2 history files, all hypoxia Total processing time = 2.71 sec 
+Add Oag, 
 
 Testing January 2023 - present
 """
@@ -14,8 +18,7 @@ Testing January 2023 - present
 # % reset
 #import os 
 #os.chdir('/Users/katehewett/Documents/LO_user/extract/hypoxic_volume')
-#run extract_vol_v2 -gtx cas6_v0_live -ro 1 -0 2022.08.08 -1 2022.08.09 -lt daily 
-#-job LO_oxygen_WA 
+#run extract_vol_v2 -gtx cas6_v0_live -ro 1 -0 2022.08.08 -1 2022.08.09 
 
 # imports
 from lo_tools import Lfun, zfun, zrfun
@@ -64,7 +67,8 @@ for ii in range(N):
     # use subprocesses
     cmd_list = ['python3', 'get_one_volume.py',
             #'-hv_df_fn', str(hv_df_fn),
-            #'#-job','LO_oxygen_WA'
+            #'#-job','LO_oxygen_WA',
+            '-lt','daily',
             '-in_fn',str(fn),
             '-out_fn', str(out_fn)]
             #'-vn_type', vn_type]
@@ -103,7 +107,8 @@ print('Total processing time = %0.2f sec' % (time()-tt0))
 # This bit of code is a nice example of how to replicate a bash pipe
 pp1 = Po(['ls', str(temp_dir)], stdout=Pi)
 pp2 = Po(['grep','CC'], stdin=pp1.stdout, stdout=Pi)
-temp_fn = str(temp_dir)+'/all_maps.nc' # this is all the maps put to one
+fn_p = 'Volumes_O2_Oag_'+str(Ldir['ds0'])+'_'+str(Ldir['ds1']+'.nc')
+temp_fn = str(temp_dir)+'/'+fn_p # this is all the maps put to one
 cmd_list = ['ncrcat','-p', str(temp_dir), '-O', temp_fn]
 proc = Po(cmd_list, stdin=pp2.stdout, stdout=Pi, stderr=Pi)
 stdout, stderr = proc.communicate()
@@ -132,7 +137,7 @@ a = ds.isel(p=np.arange(10,15))
 """
 
 ds1 = xr.open_dataset(temp_fn)
-this_fn = out_dir / ('all_maps.nc')
+this_fn = out_dir / (fn_p)
 ds1.to_netcdf(this_fn)
 
 
