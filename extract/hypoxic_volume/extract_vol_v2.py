@@ -14,6 +14,8 @@ Add Oag, Total processing time = 185.70 sec (b/c have to calc Oag for each layer
 File size 2 history files = ~103 MB 
 os.stat(file).st_size
 
+took 806.93 sec on perigee? 
+
 Testing January 2023 - present
 """
 
