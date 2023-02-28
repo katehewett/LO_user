@@ -120,10 +120,11 @@ for ii in range(nlay):
     aamat = amat.copy()
     aamat[mask_rho==1] = aARAG
     ARAG[ii,:,:] = aamat 
-    print('  ii = %d' % (ii))
-    print('  Time to get one slice = %0.2f sec' % (time()-tt00))
+    #print('  ii = %d' % (ii))
+    #print('  Time to get one slice = %0.2f sec' % (time()-tt00))
     sys.stdout.flush()
 print('Time to calculate ARAG for all layers = %0.2f sec' % (time()-tt0))
+print('saving:', args.in_fn)
 sys.stdout.flush()
 
 # 4. Form the map of the thickness of corrosive water [m].
