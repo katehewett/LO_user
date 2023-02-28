@@ -7,7 +7,7 @@ Total processing time = 11.23 sec < 1 depth layer
 
 Entering CO2sys calcs = 4.92 sec
 Total processing time = 175.14 sec sec < all 30 layers 
-
+[173.59 sec < with corrosive calc]
 """
 
 # imports
@@ -33,7 +33,7 @@ h = ds.h.values
 zeta = ds.zeta.values.squeeze()          # surface elevation 
 z_rho, z_w = zrfun.get_z(h, zeta, S)     
 
-tt0 = time()
+
 import gsw
 
 # Pressure calcs: Lpres
@@ -64,22 +64,32 @@ Ltemp = zfun.fillit(Ltemp)
 # zfun.fillit ensures a is an array with nan's for masked values
 # instead of a masked array  
 
-print('Entering CO2sys calcs = %0.2f sec' % (time()-tt0))
+#print('Entering CO2sys calcs = %0.2f sec' % (time()-tt0))
 
 # calculate aragonite saturation:
 # For CO2SYS: All temperatures are in °C, 
 #             all salinities are on the PSS, 
 #             and all pressures are in dbar. 
+
 from PyCO2SYS import CO2SYS               
 
-ARAG = np.full(np.shape(SP),np.nan)
+
+# take a subset of vars and see if we can put 3d to co2sys and compare times
+sALK = Lalkalinity[:,567:600,220:280]
+sTIC = LTIC[:,567:600,220:280]
+sTemp = Ltemp[:,567:600,220:280]
+sPres = Lpres[:,567:600,220:280]
+sSalt = SP[:,567:600,220:280].squeeze()
+    
+tt0 = time()
+ARAG = np.full(np.shape(sSalt),np.nan)
 A = np.shape(Lalkalinity)
 for ii in range(A[0]): 
-    aALK = Lalkalinity[ii,:,:].squeeze()
-    aTIC = LTIC[ii,:,:].squeeze()
-    aTemp = Ltemp[ii,:,:].squeeze()
-    aPres = Lpres[ii,:,:].squeeze()
-    aSalt = SP[ii,:,:].squeeze()
+    aALK = sALK[ii,:,:].squeeze()
+    aTIC = sTIC[ii,:,:].squeeze()
+    aTemp = sTemp[ii,:,:].squeeze()
+    aPres = sPres[ii,:,:].squeeze()
+    aSalt = sSalt[ii,:,:].squeeze()
     
     CO2dict = CO2SYS(aALK, aTIC, 1, 2, aSalt, aTemp, aTemp,
     aPres, aPres, 50, 2, 1, 10, 1, NH3=0.0, H2S=0.0)             # from dm_pfun.py
@@ -92,10 +102,25 @@ for ii in range(A[0]):
 # to test later, can you input 3D to CO2SYS? 
 #CO2dict = CO2SYS(Lalkalinity, LTIC, 1, 2, SP, Ltemp, Ltemp,
 #Lpres, Lpres, 50, 2, 1, 10, 1, NH3=0.0, H2S=0.0)             # from dm_pfun.py 
+print('Loop, total processing time = %0.2f sec' % (time()-tt0))
+    
 
-dzr = np.diff(z_w, axis = 0)
-oxy = ds.oxygen.values.squeeze()
-dzrm = np.ma.masked_where(ARAG>1,dzr) 
-corrosive_dz = dzrm.sum(axis=0)
+falkalinity = np.matrix.flatten(Lalkalinity)
+fSP = np.matrix.flatten(SP)
+fTIC = np.matrix.flatten(LTIC)
+ftemp = np.matrix.flatten(Ltemp)
+fpres = np.matrix.flatten(Lpres)
 
-print('Total processing time = %0.2f sec' % (time()-tt0))
+tt0 = time()
+CO2dict = CO2SYS(falkalinity, fTIC, 1, 2, fSP, ftemp, ftemp,
+    fpres, fpres, 50, 2, 1, 10, 1, NH3=0.0, H2S=0.0)             # from dm_pfun.py
+    
+ARAG2 = CO2dict['OmegaARout']
+ARAG2 = ARAG2.reshape((SP.shape))
+
+print('3D, total processing time = %0.2f sec' % (time()-tt0))
+
+
+
+
+
