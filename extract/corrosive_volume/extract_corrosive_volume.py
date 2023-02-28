@@ -1,22 +1,13 @@
 """
-Code to extract hypoxic volumes from LO domain.
+Code to extract corrosive volumes from LO domain.
 
-Baesd code on extract/box and /tef2 code: extract_sections; extract_one_section
-updated code to make the volume calculations run faster 
+Was taking a long time to run on perigree and then run would terminate after processing 100-ish history files. 
+Ran hypoxic volume calcs seperate while figuring out Oag calcs... 
+Need to combine hypoxic and corrosive vol calcs
 
-To test on mac:
-run extract_vol_v2 -gtx cas6_v0_live -ro 1 -0 2022.08.08 -1 2022.08.09 
-Need to add in testing lines 
+2 history files ran in 43 seconds (~36 seconds to do whole LO domain all layers loop in get_one_corrosive_volume.py)
 
-2 history files, all hypoxia Total processing time = 2.71 sec 
-Add Oag, Total processing time = 185.70 sec (b/c have to calc Oag for each layer whole domain)
-
-File size 2 history files = ~103 MB 
-os.stat(file).st_size
-
-took 806.93 sec on perigee? 
-
-Testing January 2023 - present
+Testing Feb. 2023 - present
 """
 
 # imports
@@ -39,7 +30,7 @@ hv_dir = Ldir['LOo'] / 'extract' / 'hypoxic_volume'
 
 fn_list = Lfun.get_fn_list('daily', Ldir, Ldir['ds0'], Ldir['ds1'])
 
-out_dir0 = Ldir['LOo'] / 'extract' / Ldir['gtagex'] / 'hypoxic_volume'
+out_dir0 = Ldir['LOo'] / 'extract' / Ldir['gtagex'] / 'corrosive_volume'
 out_dir = out_dir0 / ('extractions_' + Ldir['ds0'] + '_' + Ldir['ds1'])
 temp_dir = out_dir0 / ('temp_' + Ldir['ds0'] + '_' + Ldir['ds1'])
 Lfun.make_dir(out_dir, clean=True)
@@ -59,7 +50,7 @@ for ii in range(N):
     ii_str = ('0000' + str(ii))[-5:]
     out_fn = temp_dir / ('CC_' + ii_str + '.nc')
     # use subprocesses
-    cmd_list = ['python3', 'get_one_volume.py',
+    cmd_list = ['python3', 'get_one_corrosive_volume.py',
             '-lt','daily',
             '-in_fn',str(fn),
             '-out_fn', str(out_fn)]
@@ -98,7 +89,7 @@ print('Total processing time = %0.2f sec' % (time()-tt0))
 # This bit of code is a nice example of how to replicate a bash pipe
 pp1 = Po(['ls', str(temp_dir)], stdout=Pi)
 pp2 = Po(['grep','CC'], stdin=pp1.stdout, stdout=Pi)
-fn_p = 'Volumes_O2_Oag_'+str(Ldir['ds0'])+'_'+str(Ldir['ds1']+'.nc')
+fn_p = 'Volumes_Oag_'+str(Ldir['ds0'])+'_'+str(Ldir['ds1']+'.nc')
 temp_fn = str(temp_dir)+'/'+fn_p # this is all the maps put to one
 cmd_list = ['ncrcat','-p', str(temp_dir), '-O', temp_fn]
 proc = Po(cmd_list, stdin=pp2.stdout, stdout=Pi, stderr=Pi)
@@ -116,9 +107,8 @@ if len(stderr) > 0:
 Next we want to repackage these results into one NetCDF file per section, with all times.
 
 Variables in the NetCDF files:
-- hyp_dz (mild, severe, anoxic) is depth of the hypoxic layer(s) in each cell (t, x, y) [same for all other variables]
-- corrosive_dz is the undersaturated layer (t, x, y)
-
+- corrosive_dz is depth of the the undersaturated layer (t, x, y) in each cell 
+    
 Need to save a seperate file with the variables that don't change over time - this is to save space
 - DA is the area of each cell (x,y) < doesn't DA stay the same thru ocean_time? 
 - h is bathymetric depth 
