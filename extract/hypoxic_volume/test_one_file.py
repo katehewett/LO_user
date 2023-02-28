@@ -52,14 +52,15 @@ TIC = ds.TIC.values.squeeze()
 
 SA = gsw.SA_from_SP(SP, p, lon, lat)
 CT = gsw.CT_from_pt(SA, PT)
-rho = gsw.rho(SA, CT, p)              # in situ density
+rho = gsw.rho(SA, CT, p)           # in situ density
 ti = gsw.t_from_CT(SA, CT, p)      # in situ temperature
 
 # convert from umol/L to umol/kg using in situ dentity
 ALK1 = 1000 * ALK / rho
 TIC1 = 1000 * TIC / rho
+
 # I'm not sure if this is needed
-ALK1[ALK1 < 100] = np.nan   # Q from dm_pfun.py: why? 
+ALK1[ALK1 < 100] = np.nan                 # Q from dm_pfun.py: why? 
 TIC1[TIC1 < 100] = np.nan                 # Q from dm_pfun.py: why? 
 
 # calculate aragonite saturation:

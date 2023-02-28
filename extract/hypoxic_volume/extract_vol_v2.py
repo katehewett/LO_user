@@ -45,11 +45,9 @@ temp_dir = out_dir0 / ('temp_' + Ldir['ds0'] + '_' + Ldir['ds1'])
 Lfun.make_dir(out_dir, clean=True)
 Lfun.make_dir(temp_dir, clean=True)
 
-print('...working on files')
-
 # still working on this if section
-if Ldir['testing']:
-    fn_list = fn_list[:3]
+#if Ldir['testing']:
+#    fn_list = fn_list[:3]
 
 # loop over all jobs
 tt0 = time()
@@ -120,6 +118,8 @@ Next we want to repackage these results into one NetCDF file per section, with a
 Variables in the NetCDF files:
 - hyp_dz (mild, severe, anoxic) is depth of the hypoxic layer(s) in each cell (t, x, y) [same for all other variables]
 - corrosive_dz is the undersaturated layer (t, x, y)
+
+Need to save a seperate file with the variables that don't change over time - this is to save space
 - DA is the area of each cell (x,y) < doesn't DA stay the same thru ocean_time? 
 - h is bathymetric depth 
 - ocean_time is a vector of time in seconds since (typically) 1/1/1970.
