@@ -77,8 +77,8 @@ def get_box(job, Lon, Lat):
     elif job == 'LO_oxygen_WA':
         aa = [-126, -122.5, 46, 49]
         vn_list = 'h,pm,pn,mask_rho,salt,temp,oxygen'
-    elif job == 'full_plusO2Chem':
-        aa = [Lon[0], Lon[-1], Lat[0], Lat[-1]]
+    elif job == 'LO_domain_TSO2Chem':
+        aa = [-129.9, -122.1, 42.1, 51.9]
         vn_list = 'h,pm,pn,mask_rho,zeta,salt,temp,oxygen,TIC,alkalinity'
         
     return aa, vn_list
