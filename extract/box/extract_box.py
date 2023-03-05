@@ -237,18 +237,18 @@ if (Ldir['surf']==False) and (Ldir['bot']==False):
     ds.close()
     print('Time to add z variables = %0.2f sec' % (time()- tt0))
 
-# add bot z variables for carbon 
+# add bot z variables for carbon < this takes a little longer. Extraction ~3sec and z's 10 sec
 if Ldir['bot']:
     tt0 = time()
     ds = xr.load_dataset(box_fn) # have to load in order to add new variables
-    NT, NR, NC = ds.salt.shape
+    NT, N, NR, NC = ds.salt.shape # N = 1 bottom
     ds['z_rho'] = (('ocean_time', 'eta_rho', 'xi_rho'), np.nan*np.ones((NT, NR, NC)))
     ds.z_rho.attrs = {'units':'m', 'long_name': 'vertical position on s_rho grid, positive up; 0 for SSH'}
     for ii in range(NT):
         h = ds.h.values
-        zeta = ds.zeta[ii,:,:].values
+        zeta = ds.zeta[ii,:,:].values.squeeze()
         z_rho, z_w = zrfun.get_z(h, 0*h, S) # use 0 for SSH
-        ds['z_rho'][ii,:,:] = z_rho
+        ds['z_rho'][ii,:,:] = z_rho[1,:,:].squeeze() # just the bottom 
     ds.to_netcdf(box_fn)
     ds.close()
     print('Time to add z variables = %0.2f sec' % (time()- tt0))
