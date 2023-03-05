@@ -17,7 +17,9 @@ run extract_box -gtx cas6_v3_lo8b -ro 2 -0 2019.07.04 -1 2019.07.04 -lt hourly -
 or
 -
 
-edit from LO to add z_rho for carbon calculations. need to add carbon option to box? 
+edit from LO to add z_rho for carbon calculations. This takes a little longer than an extraction w/o the z_rhos
+need to figure how to make that part faster
+need to add carbon option to box? 
 
 Performance: this is very fast, takes just a few seconds for three days on boiler (for yang_sequim).
 """
@@ -252,7 +254,7 @@ if Ldir['bot']:
     ds.to_netcdf(box_fn)
     ds.close()
     print('Time to add z variables = %0.2f sec' % (time()- tt0))
-    
+   
 if Ldir['uv_to_rho']:
     # interpolate anything on the u and v grids to the rho grid, assuming
     # zero values where masked, and leaving a masked ring around the outermost edge
