@@ -13,7 +13,7 @@ from time import time
 import sys
 
 Ldir = Lfun.Lstart()
-fn = Ldir['roms_out'] / 'cas6_v0_live' / 'f2021.07.03' / 'ocean_his_0021.nc'
+fn = Ldir['roms_out'] / 'cas6_v0_live' / 'f2022.08.08' / 'ocean_his_0021.nc'
 
 testing = False # True => process fewer layers for ARAG
 
@@ -35,6 +35,7 @@ CC['h'] = h
 mask_rho = ds.mask_rho.values
 CC['mask_rho']=mask_rho
 z_rho, z_w = zrfun.get_z(h, 0*h, S) # use 0 for SSH
+
 dzr = np.diff(z_w, axis=0) # vertical thickness of all celle [m]
 print('Time to get initial fields = %0.2f sec' % (time()-tt0))
 sys.stdout.flush()

@@ -5,6 +5,7 @@ This does the whole domain. Need to add portion that allows a lat/lon box
 encorporate w/ box  ?
 
 on mac ~4-5seconds for 2 history files whole domain 
+Each history file runs ~12-15 seconds on perigee
 
 """
 import xarray as xr
