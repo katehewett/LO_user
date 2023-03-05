@@ -250,7 +250,7 @@ if Ldir['bot']:
         h = ds.h.values
         zeta = ds.zeta[ii,:,:].values.squeeze()
         z_rho, z_w = zrfun.get_z(h, 0*h, S) # use 0 for SSH
-        ds['z_rho'][ii,:,:] = z_rho[1,:,:].squeeze() # just the bottom 
+        ds['z_rho'][ii,:,:] = z_rho[0,:,:].squeeze() # just the bottom 
     ds.to_netcdf(box_fn)
     ds.close()
     print('Time to add z variables = %0.2f sec' % (time()- tt0))
