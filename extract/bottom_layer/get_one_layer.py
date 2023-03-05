@@ -4,7 +4,7 @@ and then calculate and pass back ARAG and pH total for a single history file.
 This does the whole domain. Need to add portion that allows a lat/lon box 
 encorporate w/ box  ?
 
-on mac ~5seconds for whole domain 
+on mac ~4-5seconds for 2 history files whole domain 
 
 """
 import xarray as xr
