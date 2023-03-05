@@ -6,14 +6,20 @@ def get_sta_dict(job_name):
     
     # specific job definitions
     
-    if job_name == 'OOI_WA_SM': # OOI Washington SM (Surface Moorings = SM)
+    if job_name == 'WIND_upwelling': # N41 N50
+       sta_dict = {
+       'N41': (-124.739, 47.352), 
+       'N50': (-124.546, 44.669)
+       }
+    
+    elif job_name == 'OOI_WA_SM':    # OOI Washington SM (Surface Moorings = SM)
        sta_dict = {
        'CE06ISSM': (-124.272, 47.1336), 
        'CE07SHSM': (-124.566, 46.9859),
        'CE09OSSM': (-124.972, 46.8508)
        }
        
-    elif job_name == 'OOI_OR_SM': # OOI Oregon SM (Surface Moorings = SM)
+    elif job_name == 'OOI_OR_SM':    # OOI Oregon SM (Surface Moorings = SM)
        sta_dict = {
        'CE01ISSM': (-124.095, 44.6598), 
        'CE02SHSM': (-124.304, 44.6393),
