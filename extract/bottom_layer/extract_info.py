@@ -1,7 +1,8 @@
 """
-Code to extract bottom layer with carb chem (arag and pH) from LO domain.
+Code to extract grid info and zetas for plotting 
 
 Future: encorporate to box - 
+takes about 1-2 seconds to run 2 history fiels on mac 
 
 Testing Feb. 2023 - present
 """
@@ -41,7 +42,7 @@ for ii in range(N):
     ii_str = ('0000' + str(ii))[-5:]
     out_fn = temp_dir / ('GZ_' + ii_str + '.nc')
     # use subprocesses
-    cmd_list = ['python3', 'get_one_layer.py',
+    cmd_list = ['python3', 'get_one_grid_layer.py',
             '-lt','daily',
             '-in_fn',str(fn),
             '-out_fn', str(out_fn)]
@@ -79,8 +80,8 @@ print('Total processing time = %0.2f sec' % (time()-tt0))
 # concatenate the records into one file
 # This bit of code is a nice example of how to replicate a bash pipe
 pp1 = Po(['ls', str(temp_dir)], stdout=Pi)
-pp2 = Po(['grep','CC'], stdin=pp1.stdout, stdout=Pi)
-fn_p = 'LOinfo_grid_zeta_'+str(Ldir['ds0'])+'_'+str(Ldir['ds1']+'.nc')
+pp2 = Po(['grep','GZ'], stdin=pp1.stdout, stdout=Pi)
+fn_p = 'GZinfo_'+str(Ldir['ds0'])+'_'+str(Ldir['ds1']+'.nc')
 temp_fn = str(temp_dir)+'/'+fn_p # this is all the maps put to one
 cmd_list = ['ncrcat','-p', str(temp_dir), '-O', temp_fn]
 proc = Po(cmd_list, stdin=pp2.stdout, stdout=Pi, stderr=Pi)
@@ -101,7 +102,7 @@ Variables in the NetCDF files:
 (x,y)
 - DA is the area of each cell  
 - h is bathymetric depth 
-- Lat and Lon on rho points (and on psi points for pmesh)
+- Lat and Lon on rho points 
 
 (t,x,y)
 - zr_bot bottom depth (with SSH = 0, for depth calcs)
@@ -122,11 +123,11 @@ ds1 = xr.open_dataset(temp_fn)
 
 ds1['lon_rho'] = dsg.lon_rho
 ds1['lat_rho'] = dsg.lat_rho
-ds1['lon_psi'] = dsg.lon_psi
-ds1['lat_psi'] = dsg.lat_psi
+#ds1['lon_psi'] = dsg.lon_psi
+#ds1['lat_psi'] = dsg.lat_psi
 ds1['mask_rho'] = dsg.mask_rho
 ds1['h'] = dsg.h
-ds1['DA'] = (('eta_rho', 'xi_rho'), CC['DA'], {'units':'m^2', 'long_name': 'cell horizontal area '})
+ds1['DA'] = (('eta_rho', 'xi_rho'), DA, {'units':'m^2', 'long_name': 'cell horizontal area '})
 
 this_fn = out_dir / (fn_p)
 ds1.to_netcdf(this_fn)
