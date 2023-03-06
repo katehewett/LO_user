@@ -28,7 +28,7 @@ gctag = Ldir['gridname']
 fn_list = Lfun.get_fn_list('daily', Ldir, Ldir['ds0'], Ldir['ds1'])
 
 out_dir0 = Ldir['LOo'] / 'extract' / Ldir['gtagex'] / 'bottom_layer'
-out_dir = out_dir0 / ('extractions_' + Ldir['ds0'] + '_' + Ldir['ds1'])
+out_dir = out_dir0 / ('grid_extractions_' + Ldir['ds0'] + '_' + Ldir['ds1'])
 temp_dir = out_dir0 / ('temp_' + Ldir['ds0'] + '_' + Ldir['ds1'])
 Lfun.make_dir(out_dir, clean=True)
 Lfun.make_dir(temp_dir, clean=True)
