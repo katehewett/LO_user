@@ -39,7 +39,7 @@ for ii in range(N):
     # Launch a job and add its process to a list.
     fn = fn_list[ii]
     ii_str = ('0000' + str(ii))[-5:]
-    out_fn = temp_dir / ('CC_' + ii_str + '.nc')
+    out_fn = temp_dir / ('GZ_' + ii_str + '.nc')
     # use subprocesses
     cmd_list = ['python3', 'get_one_layer.py',
             '-lt','daily',
@@ -80,7 +80,7 @@ print('Total processing time = %0.2f sec' % (time()-tt0))
 # This bit of code is a nice example of how to replicate a bash pipe
 pp1 = Po(['ls', str(temp_dir)], stdout=Pi)
 pp2 = Po(['grep','CC'], stdin=pp1.stdout, stdout=Pi)
-fn_p = 'LO_info_'+str(Ldir['ds0'])+'_'+str(Ldir['ds1']+'.nc')
+fn_p = 'LOinfo_grid_zeta_'+str(Ldir['ds0'])+'_'+str(Ldir['ds1']+'.nc')
 temp_fn = str(temp_dir)+'/'+fn_p # this is all the maps put to one
 cmd_list = ['ncrcat','-p', str(temp_dir), '-O', temp_fn]
 proc = Po(cmd_list, stdin=pp2.stdout, stdout=Pi, stderr=Pi)
