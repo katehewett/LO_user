@@ -80,7 +80,7 @@ print('Total processing time = %0.2f sec' % (time()-tt0))
 # This bit of code is a nice example of how to replicate a bash pipe
 pp1 = Po(['ls', str(temp_dir)], stdout=Pi)
 pp2 = Po(['grep','CC'], stdin=pp1.stdout, stdout=Pi)
-fn_p = 'Bottom_TSO2chem_'+str(Ldir['ds0'])+'_'+str(Ldir['ds1']+'.nc')
+fn_p = 'LO_info_'+str(Ldir['ds0'])+'_'+str(Ldir['ds1']+'.nc')
 temp_fn = str(temp_dir)+'/'+fn_p # this is all the maps put to one
 cmd_list = ['ncrcat','-p', str(temp_dir), '-O', temp_fn]
 proc = Po(cmd_list, stdin=pp2.stdout, stdout=Pi, stderr=Pi)
@@ -98,17 +98,39 @@ if len(stderr) > 0:
 Next we want to repackage these results into one NetCDF file per section, with all times.
 
 Variables in the NetCDF files:
-- Salt, Temp, Oxygen, TIC, Alkalinity, pH total, ARAG (t, x, y) for in each cell on rho_points
-- DA is the area of each cell (x,y) 
+(x,y)
+- DA is the area of each cell  
 - h is bathymetric depth 
-- ocean_time is a vector of time in seconds since (typically) 1/1/1970.
-- Lat and Lon on rho points 
-    
+- Lat and Lon on rho points (and on psi points for pmesh)
+
+(t,x,y)
+- zr_bot bottom depth (with SSH = 0, for depth calcs)
+- zeta surface (SSH ~= 0)
+
+(t)
+- ocean_time is a vector of time in seconds since (typically) 1/1/1970.    
 """
 
+tt0 = time()
+# add the variables that dont change w/ time and save
+fn = fn_list[0]
+dsg = xr.open_dataset(fn, decode_times=False)
+G, S, T = zrfun.get_basic_info(fn)
+DA = G['DX'] * G['DY']
+#open dataset and save with time varying variables extracted in get_one_grid_layer.py
 ds1 = xr.open_dataset(temp_fn)
+
+ds1['lon_rho'] = dsg.lon_rho
+ds1['lat_rho'] = dsg.lat_rho
+ds1['lon_psi'] = dsg.lon_psi
+ds1['lat_psi'] = dsg.lat_psi
+ds1['mask_rho'] = dsg.mask_rho
+ds1['h'] = dsg.h
+ds1['DA'] = (('eta_rho', 'xi_rho'), CC['DA'], {'units':'m^2', 'long_name': 'cell horizontal area '})
+
 this_fn = out_dir / (fn_p)
 ds1.to_netcdf(this_fn)
 
+print('Time to add grid fields = %0.2f sec' % (time()-tt0))
 
 
