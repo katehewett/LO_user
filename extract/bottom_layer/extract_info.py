@@ -3,6 +3,7 @@ Code to extract grid info and zetas for plotting
 
 Future: encorporate to box - 
 takes about 1-2 seconds to run 2 history fiels on mac 
+~4-5seconds on perigee 
 
 Testing Feb. 2023 - present
 """
