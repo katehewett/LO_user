@@ -84,7 +84,9 @@ def get_box(job, Lon, Lat):
         vn_list = 'h,pm,pn,mask_rho,zeta,salt,temp,oxygen,TIC,alkalinity'
     elif job == 'Freeman_OCNMS':
         aa = [-126.2, -123.8, 46.6, 48.8]  
-        #vn_list = 'h,pm,pn,mask_rho,salt,zeta'
         vn_list = 'h,pm,pn,mask_rho,zeta,salt,temp,phytoplankton,zooplankton,NO3,oxygen,TIC,alkalinity,Uwind,Vwind' 
-          
+    elif job == 'tester':
+        aa = [-125, -124, 47, 49]  
+        vn_list = 'h,pm,pn,mask_rho,salt,zeta'
+
     return aa, vn_list
