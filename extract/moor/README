@@ -1,0 +1,134 @@
+# README for new 'job _ names' in jobs_lists.py 
+
+### This is a cheatsheet for OOI and OCNMS mooring locations called using jobs_lists.py
+
+---
+
+#### OOI Coastal Endurance (CE) nomenclature + site designations: 
+CE = Coastal Endurance
+
+Oregon sites: CE01, -02, -04       [-03 skipped for potential future shelf break mooring location]
+Washington sites: CE06, -07 & -09  [-08 skipped for potential future shelf break mooring location]
+* Note: Site CE05 = Mobile Assets (MOAS) [CEO5MOAS, which are gliders and are not included here]
+
+IS = Inshore
+SH = Shelf 
+OS = Offshore
+
+SM = Surface Mooring (inshore, shelf, offshore)
+SP = Surface piercing profiler mooring (inshore and shelf) 
+PM = profiler mooring (offshore)
+
+cabled assets**
+PD = cabled deep profiler mooring (offshore)
+PS = cabled shallow profiler mooring (offshore)
+BP = benthic experiement package (shelf, offshore)
+
+Full asset list (moorings)
+Oregon Inshore Surface Mooring (CE01ISSM)
+Oregon Inshore Surface Piercing Profiler Mooring (CE01ISSP)
+Oregon Offshore Cabled Benthic Experiment Package (CE04OSBP)
+Oregon Offshore Cabled Deep Profiler Mooring (CE04OSPD)
+Oregon Offshore Cabled Shallow Profiler Mooring(CE04OSPS)
+Oregon Offshore Surface Mooring(CE04OSSM)
+Oregon Shelf Cabled Benthic Experiment Package(CE02SHBP)
+Oregon Shelf Surface Mooring(CE02SHSM)
+Oregon Shelf Surface Piercing Profiler Mooring(CE02SHSP)
+Washington Inshore Surface Mooring(CE06ISSM)
+Washington Inshore Surface Piercing Profiler Mooring(CE06ISSP)
+Washington Offshore Profiler Mooring(CE09OSPM)
+Washington Offshore Surface Mooring(CE09OSSM)
+Washington Shelf Surface Mooring(CE07SHSM)
+Washington Shelf Surface Piercing Profiler Mooring(CE07SHSP)
+
+##### OOI job_names
+
+'OOI_OR_SM':
+Oregon Inshore Surface Mooring (CE01ISSM)
+Oregon Offshore Surface Mooring(CE04OSSM)
+Oregon Shelf Surface Mooring(CE02SHSM)
+
+'OOI_WA_SM':
+Washington Inshore Surface Mooring(CE06ISSM)
+Washington Offshore Surface Mooring(CE09OSSM)
+Washington Shelf Surface Mooring(CE07SHSM)
+
+'OOI_OR_moorings':
+Oregon Inshore Surface Mooring (CE01ISSM)
+Oregon Inshore Surface Piercing Profiler Mooring (CE01ISSP)
+Oregon Shelf Cabled Benthic Experiment Package(CE02SHBP)
+Oregon Offshore Cabled Deep Profiler Mooring (CE04OSPD)
+Oregon Offshore Cabled Shallow Profiler Mooring(CE04OSPS)
+Oregon Offshore Surface Mooring(CE04OSSM)
+Oregon Shelf Cabled Benthic Experiment Package(CE02SHBP)
+Oregon Shelf Surface Mooring(CE02SHSM)
+Oregon Shelf Surface Piercing Profiler Mooring(CE02SHSP)
+
+'OOI_OR_moorings':
+Washington Inshore Surface Mooring(CE06ISSM)
+Washington Inshore Surface Piercing Profiler Mooring(CE06ISSP)
+Washington Offshore Profiler Mooring(CE09OSPM)
+Washington Offshore Surface Mooring(CE09OSSM)
+Washington Shelf Surface Mooring(CE07SHSM)
+Washington Shelf Surface Piercing Profiler Mooring(CE07SHSP)
+
+---
+
+#### OCNMS nomenclature + site designations: 
+Moored sensors were first deployed in 2000 and 10* lightweight, coastal moorings are currently 
+maintained from Cape Elizabeth (“CE”) to Makah Bay (“MB”) at depths ranging from ~42m to ~15m.
+
+North to south 
+MB = Makah Bay 
+CA = Cape Alava
+TH = Teahwhit Head
+KL = Kalaloch
+CE = Cape Elizabeth
+
+The mooring depth is listed with its site id, e.g., CE042 is placed at ~42m; 
+KL027 at ~27m; and CE015 is placed at ~15m.
+
+##### OCNMS job_names:
+
+'OCNMS_moorings_current':
+A list of the 10 moorings currently maintained in the sanctuary:
+	MB015
+	MB042
+	CA015
+	CA042
+	TH015
+	TH042
+	KL015
+	KL027
+	CE015
+	CE042
+
+'OCNMS_moorings_historical':
+A full list of OCNMS moorings. 
+Historically, moorings were also deployed at depths >42m. 
+These mooorings* were not deployed during LO model years 2017 - 2023. 
+	MB015
+	MB042
+	CA015
+	CA042
+	CA065*
+	CA100*
+	TH015
+	TH042
+	TH065*
+	KL015
+	KL027
+	KL050*
+	CE015
+	CE042
+	CE065*
+Note depths >42 are historical locations marked with an asterick above. 
+
+
+
+
+
+
+
+
+
