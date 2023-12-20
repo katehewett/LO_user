@@ -75,10 +75,10 @@ Washington Shelf Surface Piercing Profiler Mooring(CE07SHSP)
 ---
 
 #### OCNMS nomenclature + site designations: 
-Moored sensors were first deployed in 2000 and 10* lightweight, coastal moorings are currently 
-maintained from Cape Elizabeth (“CE”) to Makah Bay (“MB”) at depths ranging from ~42m to ~15m.
+Moored sensors were first deployed in 2000 and 10** lightweight, coastal moorings are currently 
+maintained from Cape Elizabeth (“CE”) to Makah Bay (“MB”) at depths of ~15m, ~42m, or ~27m (KL027).
 
-North to south 
+North to south sites:
 MB = Makah Bay 
 CA = Cape Alava
 TH = Teahwhit Head
@@ -91,7 +91,7 @@ KL027 at ~27m; and CE015 is placed at ~15m.
 ##### OCNMS job_names:
 
 'OCNMS_moorings_current':
-A list of the 10 moorings currently maintained in the sanctuary:
+**A list of the 10 moorings currently maintained in the sanctuary:
 	MB015
 	MB042
 	CA015
@@ -106,7 +106,7 @@ A list of the 10 moorings currently maintained in the sanctuary:
 'OCNMS_moorings_historical':
 A full list of OCNMS moorings. 
 Historically, moorings were also deployed at depths >42m. 
-These mooorings* were not deployed during LO model years 2017 - 2023. 
+These mooorings* were not deployed during LO model years 2017 - (2023). 
 	MB015
 	MB042
 	CA015
@@ -121,8 +121,7 @@ These mooorings* were not deployed during LO model years 2017 - 2023.
 	KL050*
 	CE015
 	CE042
-	CE065*
-Note depths >42 are historical locations marked with an asterick above. 
+	CE065* 
 
 
 
