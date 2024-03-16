@@ -173,9 +173,12 @@ axmap.text(-124.64,48.755, "   salinity + temperature", horizontalalignment='lef
 axmap.plot(-124.58,48.7, marker = '+',color = 'tab:red',markersize=10)
 axmap.text(-124.58,48.7, "  dissolved oxygen", horizontalalignment='left',verticalalignment='center', size=fs, color = 'tab:red',weight='bold')
 
-#fig_nm = data_dir / ('ocnms_2011_2023.png')
-fig_nm = '/Users/katehewett/Documents/LKH_output/OCNMS_processed/ocnms_2011_2023.png'
-plt.gcf().savefig(fig_nm)
+# Need to update this on perigee/apogee::
+# fig_nm = '/Users/katehewett/Documents/LKH_output/OCNMS_processed/ocnms_2011_2023.png'
+# plt.gcf().savefig(fig_nm)
 
-#plt.show()
+# fig_nm = data_dir / ('ocnms_2011_2023.png')
+
+
+# plt.show()
 
