@@ -86,7 +86,7 @@ def get_box(job, Lon, Lat):
         aa = [-126.2, -123.8, 46.6, 48.8]  
         vn_list = 'h,pm,pn,mask_rho,zeta,salt,temp,phytoplankton,zooplankton,NO3,oxygen,TIC,alkalinity,Uwind,Vwind' 
     elif job == 'NHL_transect':
-        aa = [-124.7, -124.1, 44.65, 44.65]  
+        aa = [-124.7, -124.1, 44.64, 44.66]  
         vn_list = 'h,pm,pn,mask_rho,mask_u,mask_v,zeta,u,v,w,ubar,vbar,salt,temp,rho,NO3,oxygen,sustr,svstr,bustr,bvstr,AKs,AKv,Uwind,Vwind'
     elif job == 'tester':
         aa = [-125, -124, 47, 49]  
