@@ -48,7 +48,17 @@ def get_sta_dict(job_name):
        'CE02SHSM': (-124.304, 44.6393),  
        'CE04OSSM': (-124.956, 44.3811)   
        }            
-    
+
+    elif job_name == 'OOI_WAOR_SM':                 # Washington + Oregon OOI Surface Moorings 
+       sta_dict = {
+       'CE06ISSM': (-124.272, 47.1336), 
+       'CE07SHSM': (-124.566, 46.9859), 
+       'CE09OSSM': (-124.972, 46.8508),
+       'CE01ISSM': (-124.095, 44.6598),  
+       'CE02SHSM': (-124.304, 44.6393),  
+       'CE04OSSM': (-124.956, 44.3811)   
+       }   
+           
     elif job_name == 'OCNMS_moorings_current':    # Mooring deployments for LO years: 2017 - 202(3) 
         sta_dict = {
             'MB015': (-124.6768, 48.3254),	
@@ -62,7 +72,7 @@ def get_sta_dict(job_name):
             'CE015': (-124.3481, 47.3568),
             'CE042': (-124.4887, 47.3531),
         }
-        
+                
     elif job_name == 'OCNMS_moorings_historical': # All OCNMS mooring locations; depths >42m are not part of current operations
         sta_dict = {
             'MB015': (-124.6768, 48.3254),	
