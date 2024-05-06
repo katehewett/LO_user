@@ -2,7 +2,7 @@
 Code to test the speed and memory use of one sml calculation for the LO domain
 
 Quesiton: this version is using 0 for SSH, and I don't know if that is best; 
-see line 38 :
+see line in step #1:
 z_rho, z_w = zrfun.get_z(h, 0*h, S) # [can we use 0 for SSH??]
 
 """
@@ -61,10 +61,13 @@ SIG0 = gsw.sigma0(SA,CT)
 
 # 3. Calculate a map of the thickness of SML using
 # notes:
-# Temp threshold N.CA/OR/Peru/NW Africa used 0.02 degC (lentz 92)
+# Temp threshold N.CA/OR/Peru/NW Africa used 0.02(0.05) degC (lentz 92)
 # threshold difference = 0.01 kg/m3 (defacto standard in oceans?)
 # threshold gradient = drho / dz <= 0.01 kg/m4 (?)
-# split merge methods et al. but for now lets just use T and sig0
+# split merge methods et al. 
+# for now we are going to use a threshold difference of 0.02 degC
+# because there are more temperature data near surface to check this with obs
+# although most casts also have S so can check using density too 
 
 #dz = np.diff(z_rho,axis=1)
 #drho = np.diff(SIG0,axis=1)
@@ -72,22 +75,62 @@ SIG0 = gsw.sigma0(SA,CT)
 #dS = np.diff(SA,axis=1)
 #dpdz = drho/dz
 
-# grabbing a random location on shelf  
+
+# grabbing a random location on shelf  (300 300 deeper ; 360 360 shallower)
 ts = CT[:,300,300].squeeze()
 sigs = SIG0[:,300,300].squeeze()
 zs = z_rho[:,300,300].squeeze()
 
-t0s = ts[-1]
+NZ = np.shape(ts)[0]
+t0s = ts[NZ-1]
 t0b = ts[0]
-sig0s = sigs[-1]
+sig0s = sigs[NZ-1]
 sig0b = sigs[0]
 
-dT_s = t0s - ts 
-dT_b = t0b - ts
+dT_s = np.round(ts-t0s,2)
+dT_b = np.round(ts-t0b,2)
 
-dSIG_s = sig0s - sigs
-dSIG_b = sig0b - sigs
+dSIG_s = np.round(sigs-sig0s,2)
+dSIG_b = np.round(sigs-sig0b,2)
 
+# define function to find consecutive true statements in a list 
+# put this in a seperate file that we can call 
+
+def find_consecutive_true(list1):
+    """
+    Finds consecutive true statements in a list.
+
+    Args:
+        list1 (list): A list of boolean values.
+
+    Returns:
+        list: A list of lists, where each sublist contains the indices of the
+        consecutive true statements in the original list.
+    """
+
+    result = []
+    start = 0
+    for i in range(len(list1)):
+        if list1[i]:
+            if i == start:
+                result.append([i])
+            else:
+                result[-1].append(i)
+        else:
+            start = i + 1
+    return result
+
+if dT_s[NZ-1]<-0.05:
+    print('sml 0')
+else:
+    A = dT_s>=-0.05 #boolean for temp threshold 
+    if np.any(A): # there are true values 
+        # list1 = np.where(A==True) 
+        AC = find_consecutive_true(A==True)
+        zidx=np.min(AC[-1])
+        zSML = zs[zidx]
+        
+              
 if yplotting==True:
     # initialize plot 
     plt.close('all')
@@ -107,17 +150,19 @@ if yplotting==True:
 
     axnum = 1
     rhoplot = plt.gcf().axes[axnum].plot(sigs,zs,color='pink',marker='x') 
+    plt.gcf().axes[axnum].plot(sigs[zidx],zs[zidx],color='red',marker='o') 
     plt.gcf().axes[axnum].set_title('SIG0')
     
     axnum = 2 
     plt.gcf().axes[axnum].plot(dT_s,zs,color='black',marker='x')
     plt.gcf().axes[axnum].set_title('diff T surf > bot')
     plt.gcf().axes[axnum].axvline(x = -0.02, color = 'r', label = 'axvline - full height')
+    plt.gcf().axes[axnum].axvline(x = -0.05, color = 'tab:pink', label = 'axvline - full height')
     
     axnum = 3 
     plt.gcf().axes[axnum].plot(dSIG_s,zs,color='black',marker='x')
     plt.gcf().axes[axnum].set_title('diff sig0 surf > bot')
-    plt.gcf().axes[axnum].axvline(x = -0.01, color = 'r', label = 'axvline - full height')
+    plt.gcf().axes[axnum].axvline(x = 0.01, color = 'r', label = 'axvline - full height')
     
 
 

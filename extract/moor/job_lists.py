@@ -25,16 +25,25 @@ def get_sta_dict(job_name):
         'CE02SHSP': (-124.30384, 44.63762)
         }
         
+#    elif job_name == 'OOI_WA_moorings':           # Washington mooring assets
+#        sta_dict = {
+#        'CE06ISSM': (-124.27158, 47.13359),
+#        'CE06ISSP': (-124.27326, 47.1348),
+#        'CE09OSPM': (-124.96643, 46.85283),
+#        'CE09OSSM': (-124.9775,	46.84905),
+#        'CE07SHSM': (-124.56395, 46.98792),
+#        'CE07SHSP': (-124.56825, 46.98898)
+#        }
+        
     elif job_name == 'OOI_WA_moorings':           # Washington mooring assets
         sta_dict = {
         'CE06ISSM': (-124.27158, 47.13359),
-        'CE06ISSP': (-124.27326, 47.1348),
-        'CE09OSPM': (-124.96643, 46.85283),
+        'WA30'
         'CE09OSSM': (-124.9775,	46.84905),
+        'WA130'
         'CE07SHSM': (-124.56395, 46.98792),
-        'CE07SHSP': (-124.56825, 46.98898)
         }
-    
+            
     elif job_name == 'OOI_WA_SM':                 # Only OOI Washington Surface Moorings 
        sta_dict = {
        'CE06ISSM': (-124.272, 47.1336), 
