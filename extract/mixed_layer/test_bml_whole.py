@@ -86,6 +86,8 @@ Tdz = Tdzrs.sum(axis=0)                       # SML thickness temp threshold
 Sdzrs = np.ma.masked_where(dSIG_s>0.01,dzr)
 SIGdz = Sdzrs.sum(axis=0)                     # SML thickness sigma threshold 
 
+Sdzrs = dSIG_s>0.01
+
 print('Time to get initial SML = %0.2f sec' % (time()-tt0))
 sys.stdout.flush()
 
