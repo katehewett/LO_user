@@ -87,10 +87,13 @@ def get_box(job, Lon, Lat):
         vn_list = 'h,pm,pn,mask_rho,zeta,salt,temp,phytoplankton,zooplankton,NO3,oxygen,TIC,alkalinity,Uwind,Vwind' 
     elif job == 'NHL_transect':
         aa = [-124.7, -124.1, 44.64, 44.66]  
-        vn_list = 'h,pm,pn,mask_rho,zeta,u,v,w,salt,temp,oxygen,NO3,AKs,AKv,Uwind,Vwind'
+        vn_list = 'h,pm,pn,mask_rho,zeta,u,v,w,salt,temp,AKs,AKv,sustr,svstr,bustr,bvstr,Uwind,Vwind'
+    elif job == 'NHL_bio':
+        aa = [-124.7, -124.1, 44.64, 44.66]  
+        vn_list = 'h,pm,pn,mask_rho,zeta,NO3,NH4,phytoplankton,zooplankton,SdetritusN,LdetritusN,SdetritusC,LdetritusC,oxygen,alkalinity,TIC,rho'
     elif job == 'shelf_box':
             aa = [-127.5, -123.5, 50, 43]
-            vn_list = 'h,f,pm,pn,mask_rho,mask_u,mask_v,salt,temp,oxygen,NO3,u,v,w,zeta,AKs,AKv,sustr,svstr,bustr,bvstr,Uwind,Vwind'
+            vn_list = 'h,f,pm,pn,zeta,mask_rho,mask_u,mask_v,salt,temp,oxygen,NO3,u,v,w,AKs,AKv,sustr,svstr,bustr,bvstr,Uwind,Vwind'
     elif job == 'tester':
         aa = [-125, -124, 47, 49]  
         vn_list = 'h,pm,pn,mask_rho,salt,zeta'
