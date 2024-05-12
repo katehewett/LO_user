@@ -93,7 +93,7 @@ def get_box(job, Lon, Lat):
         vn_list = 'h,pm,pn,mask_rho,zeta,NO3,NH4,phytoplankton,zooplankton,SdetritusN,LdetritusN,SdetritusC,LdetritusC,oxygen,alkalinity,TIC,rho'
     elif job == 'shelf_box':
         aa = [-127.5, -123.5, 50, 43]
-        vn_list = 'h,f,pm,pn,zeta,mask_rho,salt,temp,sustr,svstr,bustr,bvstr,Uwind,Vwind'
+        vn_list = 'h,f,pm,pn,zeta,mask_rho,salt,temp'
     elif job == 'tester':
         aa = [-125, -124, 47, 49]  
         vn_list = 'h,pm,pn,mask_rho,salt,zeta'
