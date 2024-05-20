@@ -83,6 +83,7 @@ Tf = np.flipud(CT)
 dzrf = np.flipud(dzr)
 z_wf = np.flipud(z_w)
 z_rhof = np.flipud(z_rho)
+dzrf= flipud(dzr)
 
 sig0s = SIGf[0,:,:]                      
 t0s = Tf[0,:,:]
@@ -91,13 +92,28 @@ dSIG_s = np.round(SIGf-sig0s,2)
 dT_s = np.round(Tf-t0s,2)
 
 Tbool = dT_s>-0.05
-Sbool = dSIG_s<0.02
+Sbool = dSIG_s<0.01
 
-A = np.argmax(Tbool==False,axis=0)    # grab the first index where false 
-B = np.argmax(Sbool==False,axis=0)
+# grab the first index where false 
+# keep dims = True makes grabbing the z variables way easier 
+A = np.argmax(Tbool==False,axis=0,keepdims = True)    
+B = np.argmax(Sbool==False,axis=0,keepdims = True)    
+
+sml_zrho = np.take_along_axis(z_rhof,A,axis=0)
+Aw = A+1
+sml_zw = np.take_along_axis(z_wf,Aw,axis=0)
 
 print('Time to get initial SML = %0.2f sec' % (time()-tt0))
 sys.stdout.flush()
+
+# 5. Grab z's and calc a thickness.
+tt0 = time()
+DSML = np.nan * np.ones(dzrf.shape) # Initialize array (z,y,z) to hold results.
+nz, nr, nc = dzrf.shape             # handy dimension sizes
+amat = np.nan * np.ones((nr,nc))    # Initialize array (y,x) for single layer.
+
+aSML = dzrf.squeeze()[mask_rho==1]
+
 
 yplotting = True 
 if yplotting==True:
@@ -112,20 +128,33 @@ if yplotting==True:
     ax3 = plt.subplot2grid((1,4),(0,2),colspan=1,rowspan=1)
     ax4 = plt.subplot2grid((1,4),(0,3),colspan=1,rowspan=1)
     
+    xx = CT[:,300,300].squeeze()
+    yy = z_rho[:,300,300].squeeze()
+    yvals = np.arange(yy[0],yy[-1],0.1)
+    xint = np.interp(yvals,yy,xx)
+    dTi = np.round(xint-t0s[300,300],2)
+    
     axnum = 0 
     Tplot = plt.gcf().axes[axnum].plot(CT[:,300,300].squeeze(),z_rho[:,300,300].squeeze(),color='pink',marker='x') 
+    Tplot = plt.gcf().axes[axnum].plot(xint,yvals,color='tab:purple',marker='.') 
     Tplot = plt.gcf().axes[axnum].plot(Tf[:,300,300].squeeze(),z_rhof[:,300,300].squeeze(),color='blue',marker='o')
     plt.gcf().axes[axnum].plot(Tf[A[300,300],300,300].squeeze(),z_rhof[A[300,300],300,300],color='black',marker='*')
+    plt.gcf().axes[axnum].plot(Tf[A[300,300],300,300].squeeze(),z_wf[A[300,300]+1,300,300],color='red',marker='s')
     plt.gcf().axes[axnum].set_title('CT')
     plt.gcf().axes[axnum].set_ylabel('depth m')
 
-    axnum = 1
+    axnum = 1 
+    dTplot = plt.gcf().axes[axnum].plot(dTi,yvals,color='tab:purple',marker='.') 
+    plt.gcf().axes[axnum].plot(Tf[A[300,300],300,300].squeeze()-t0s[300,300],z_wf[A[300,300]+1,300,300],color='red',marker='s')
+    plt.gcf().axes[axnum].set_title('del T')
+    plt.gcf().axes[axnum].set_ylabel('depth m')
+    
+    axnum = 2
     rhoplot = plt.gcf().axes[axnum].plot(SIG0[:,300,300].squeeze(),z_rho[:,300,300].squeeze(),color='pink',marker='x') 
     rhoplot = plt.gcf().axes[axnum].plot(SIGf[:,300,300].squeeze(),z_rhof[:,300,300].squeeze(),color='blue',marker='o')
     plt.gcf().axes[axnum].plot(SIGf[B[300,300],300,300].squeeze(),z_rhof[B[300,300],300,300],color='black',marker='*') 
     plt.gcf().axes[axnum].set_title('SIG0')
     
-
 
 
  
