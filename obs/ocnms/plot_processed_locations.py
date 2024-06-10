@@ -25,6 +25,8 @@ source = 'ocnms'
 otype = 'moor' 
 data_dir = Ldir['LOo'] / 'obs' / source / otype
 
+model_dir = Ldir['LOo'] /
+
 # named in this order for plotting 
 sn_name_dict = {
     'MB042':'Makah Bay 42m',
