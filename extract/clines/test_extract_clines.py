@@ -1,15 +1,19 @@
 """
-Code to test calculation of pycnocline and thermocline 
-will extract max depths for each 
-also extract S and T at each max depth and save with depths
+This code uses a job_list.py to clip history files to box locations
+in the LO domain
+From that temp file 'box_###.nc' we calculate a pycnocline and thermocline 
+in get_one_cline.py. That script will find the depth of dp/dz dT/dz max
+flag the depth, value, and extract the S and T at that depth 
 
-Made this code because wanted to grab the depth of N2 max for the shelf_box 
-for a bunch of years, and extract_box chunks couldn't concatenate all the 
-chunks together at the end. We don't need all 30 layers saved - so trying to 
-improve that here by just saving one layer per grid cell instead of 30 
+This code was created because we wanted to grab the depth of N2 max across the shelf 
+for a bunch of years, and extract_box chunks couldn't concatenate a years worth of 
+chunks together using extract_box(_chunks).py. Sicne we don't need all 30 layers saved 
+we made a 'cline'extractor which will save one layer per grid cell instead of all depth 
+layers
  
-running testing code with two history files on kh personal mac
+running testing code with two history files on kh personal mac, looks like:
 run test_extract_clines -gtx cas6_v0_live -ro 1 -0 2022.08.08 -1 2022.08.09 -lt daily -job shelf_box -test True
+
 scripts dev based on extract_box; extract_box_chunks.py and extract_hypoxic_volume.py
 
 
@@ -61,13 +65,13 @@ for a in argsd.keys():
     if a not in Ldir.keys():
         Ldir[a] = argsd[a]
 
-# testing
-if Ldir['testing']:
-    Ldir['roms_out_num'] = 1
-    Ldir['ds0'] = '2022.08.08'
-    Ldir['ds1'] = '2022.08.09'
-    Ldir['list_type'] = 'daily'
-    Ldir['job'] = 'shelf_box'
+# testing 
+#if Ldir['testing']:
+#    Ldir['roms_out_num'] = 1
+#    Ldir['ds0'] = '2022.08.08'
+#    Ldir['ds1'] = '2022.08.09'
+#    Ldir['list_type'] = 'daily'
+#    Ldir['job'] = 'shelf_box'
     
 # set where to look for model output
 if Ldir['roms_out_num'] == 0:
@@ -155,6 +159,7 @@ def messages(mess_str, stdout, stderr):
 # second to run thru clipped files to calc clines?
 NFN = len(fn_list)
 proc_list = []
+proc_list2 = []
 tt0 = time()
 print('Working on ' + cline_fn_final.name + ' (' + str(NFN) + ' times)')
 for ii in range(NFN):
@@ -163,7 +168,6 @@ for ii in range(NFN):
     # extract one day at a time using ncks
     count_str = ('000000' + str(ii))[-6:]
     box_out_fn = temp_box_dir / ('box_' + count_str + '.nc')
-    #cline_out_fn = temp_cline_dir / ('cline_' + count_str + '.nc')
     cmd_list1 = ['ncks',
         '-v', vn_list,
         '-d', 'xi_rho,'+str(ilon0)+','+str(ilon1), '-d', 'eta_rho,'+str(ilat0)+','+str(ilat1),
@@ -171,10 +175,6 @@ for ii in range(NFN):
         '-d', 'xi_v,'+str(ilon0)+','+str(ilon1), '-d', 'eta_v,'+str(ilat0)+','+str(ilat1-1),
         '--mk_rec_dim', 'ocean_time']
     cmd_list1 += ['-O', str(fn), str(box_out_fn)]
-    #cmd_list2 = ['python3', 'get_one_cline.py',
-    #        '-lt',args.list_type,
-    #        '-in_fn',str(box_out_fn),
-    #        '-out_fn', str(cline_out_fn)]
             
     proc = Po(cmd_list1, stdout=Pi, stderr=Pi)
     proc_list.append(proc)
@@ -198,43 +198,16 @@ for ii in range(NFN):
             messages('ncks messages:', stdout, stderr)
         # make sure everyone is finished before continuing
         proc_list = []
-    ii += 1
-print(' - Time for clipping box = %0.2f sec' % (time()- tt0))
-
-# Ensure that all days have the same fill value.  This was required for cas6_v3_lo8b
-# when passing from 2021.10.31 to 2021.11.01 because they had inconsistent fill values,
-# which leaks through the ncrcat call below.
-# I think we just need to do this once for the clines b/c won't be concat the box files 
-# they're getting deleted once job wraps up  
-tt1 = time()
-enc_dict = {'_FillValue':1e20}
-vn_List = vn_list.split(',')
-Enc_dict = {vn:enc_dict for vn in vn_List}
-for out_fn in list(temp_box_dir.glob('box_*.nc')):
-    ds = xr.load_dataset(box_out_fn) # need to load, not open, for overwrite
-    ds.to_netcdf(box_out_fn, encoding=Enc_dict)
-    ds.close()
-print(' - Time for adding fill value = %0.2f sec' % (time()- tt1))
-sys.stdout.flush()
-
-# now we have a clipped set of data sitting in box_out_fn named box_000000.nc thru $$$NFN
-# I want to fix this so that we can have one NFN loop but unsure how to best 
-# deal with the fill value issue above (commented out the cline text in the first loop)
-# do the extractions - clip the box then feed the temp file to get_one_cline.py
-proc_list2 = []
-tt0 = time()
-print(' Working on calculations (' + str(NFN) + ' times)')
-for ii in range(NFN):
-    sys.stdout.flush()
-    # step thru the box files and calculate pycnocline
-    count_str = ('000000' + str(ii))[-6:]
-    cline_out_fn = temp_cline_dir / ('cline_' + count_str + '.nc')
-    box_out_fn = temp_box_dir / ('box_' + count_str + '.nc')
+    
+    # start new job once the prior [10] are finished    
+    cline_out_fn = temp_cline_dir / ('cline_' + count_str + '.nc')  
+    print(str(box_out_fn))
     cmd_list2 = ['python3', 'get_one_cline.py',
             '-lt',args.list_type,
+            '-his_fn',str(fn_list[0]), #grabbing one history file locaiton for adding z's this feels messy here
             '-in_fn',str(box_out_fn),
             '-out_fn', str(cline_out_fn)]
-            
+    
     proc2 = Po(cmd_list2, stdout=Pi, stderr=Pi)
     proc_list2.append(proc2)
 
@@ -252,11 +225,36 @@ for ii in range(NFN):
     # Nproc controls how many ncks subprocesses we allow to stack up
     # before we require them all to finish.
     if ((np.mod(ii,Ldir['Nproc']) == 0) and (ii > 0)) or (ii == NFN-1):
-        for proc in proc_list:
-            stdout, stderr = proc.communicate()
-            messages('ncks messages:', stdout, stderr)
+        for proc2 in proc_list2:
+            stdout, stderr = proc2.communicate()
+            messages('get_one_cline messages:', stdout, stderr)
         # make sure everyone is finished before continuing
-        proc_list = []
+        proc_list2 = []
+                
     ii += 1
-print(' - Time for calculation = %0.2f sec' % (time()- tt0))
+print(' - Time for clipping box = %0.2f sec' % (time()- tt0))
 
+# Ensure that all days have the same fill value.  This was required for cas6_v3_lo8b
+# when passing from 2021.10.31 to 2021.11.01 because they had inconsistent fill values,
+# which leaks through the ncrcat call below.
+# can comment out if using long hindcast
+tt1 = time()
+enc_dict = {'_FillValue':1e20}
+vn_List = vn_list.split(',')
+Enc_dict = {vn:enc_dict for vn in vn_List}
+for out_fn in list(temp_box_dir.glob('box_*.nc')):
+    ds = xr.load_dataset(box_out_fn) # need to load, not open, for overwrite
+    ds.to_netcdf(box_out_fn, encoding=Enc_dict)
+    ds.close()
+print(' - Time for adding fill value = %0.2f sec' % (time()- tt1))
+sys.stdout.flush()
+
+
+
+
+
+
+## parker ex on del temp dir 
+# clean up
+#    Lfun.make_dir(temp_dir, clean=True)
+#    temp_dir.rmdir()

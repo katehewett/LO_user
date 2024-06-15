@@ -3,6 +3,12 @@ Function to do the calculation for a single clipped file
 calculates GSW vars > drho/dz dT/dz
 finds max drho(dT)/dz + returns the max depth + values
 
+THIS IS A TESTING ONE OFF FILE for get_one_cline.py 
+update original when working and delete this file
+
+Time to get initial fields = 0.72 sec
+Time to apply GSW = 0.82 sec
+
 """
 
 import numpy as np
@@ -13,26 +19,26 @@ from lo_tools import zfun, zrfun
 from xarray import open_dataset, Dataset
 from numpy import nan, ones, diff
 from time import time
-from lo_tools import zrfun
+from lo_tools import Lfun, zrfun, zfun
+
 import gsw 
 
-parser2 = ArgumentParser()
-parser2.add_argument('-in_fn', '--input_box_files', type=str) # path to clipped box files (temp directory)
-parser2.add_argument('-out_fn', '--output_cline_files', type=str) # path to save cline files (temp directory)
-parser2.add_argument('-his_fn', '--input_his_file', type=str) # path to one history file for grid info > z's
-parser2.add_argument('-lt', '--list_type', type=str) # list type: hourly, daily, weekly, lowpass         
-args2 = parser2.parse_args()
+######## ######## ######## 
+# remove this testing after get the pycnocline to work here. and replace with the 
+# arg pass tags in get_one_cline.py 
+box_fn_in = '/Users/katehewett/Documents/LO_output/extract/cas6_v0_live/clines/shelf_box_2022.08.08_2022.08.09/temp_box_dir/box_000001.nc'
+his_in = '/Users/katehewett/Documents/LO_roms/cas6_v0_live/f2022.08.08/ocean_his_0021.nc'
+######## ######## ######## 
 
-# 1. Get some grid information 
 tt0 = time()
-dsb = open_dataset(args2.input_box_files, decode_times=False)
+dsb = open_dataset(box_fn_in, decode_times=False) # TODO UPDATE
 # the decode_times=False part is important for correct treatment
 # of the time axis later when we concatenate things in the calling function
 # using ncrcat
 
 # add z variables
 # NOTE: this only works if you have salt as a saved field!
-G, S, T = zrfun.get_basic_info(args2.input_his_file)   # grid information
+G, S, T = zrfun.get_basic_info(his_in)   # grid information # TODO UPDATE
 NT, NZ, NETA, NXI = np.shape(dsb.salt)
 h = dsb.h.values
 zeta = dsb.zeta.values
@@ -67,27 +73,13 @@ sys.stdout.flush()
 dp = np.diff(SIG0,axis=1)
 dT = np.diff(CT,axis=1) 
 dz = np.diff(z_rho,axis=1)
-    
-g = 9.8     
-po = 1025 
-dpdz = dp/dz
-N2 = -(g/po)*dpdz     # radians / second
-dTdz = dp/dz
-
-C = np.argmax(N2,axis=1,keepdims=True)
-z_N2max = np.take_along_axis(z_w.values,C+1,axis=1)
-val_N2max = np.take_along_axis(N2,C,axis=1)
-
-B = np.argmax(dTdz,axis=1,keepdims=True)
-z_dTdzmax = np.take_along_axis(z_w.values,B+1,axis=1)
-val_dTdzmax = np.take_along_axis(dTdz,B,axis=1)
-
-# put to 
-#ds1 = Dataset()
-
-#ds1.to_netcdf(args2.output_cline_files, unlimited_dims='ocean_time')
 
 
 
 
 
+
+
+
+
+  
