@@ -83,7 +83,7 @@ Tf = np.flipud(CT)
 dzrf = np.flipud(dzr)
 z_wf = np.flipud(z_w)
 z_rhof = np.flipud(z_rho)
-dzrf= flipud(dzr)
+dzrf= np.flipud(dzr)
 
 sig0s = SIGf[0,:,:]                      
 t0s = Tf[0,:,:]
@@ -112,7 +112,7 @@ DSML = np.nan * np.ones(dzrf.shape) # Initialize array (z,y,z) to hold results.
 nz, nr, nc = dzrf.shape             # handy dimension sizes
 amat = np.nan * np.ones((nr,nc))    # Initialize array (y,x) for single layer.
 
-aSML = dzrf.squeeze()[mask_rho==1]
+#aSML = dzrf.squeeze()[mask_rho==1]
 
 
 yplotting = True 
@@ -138,21 +138,17 @@ if yplotting==True:
     Tplot = plt.gcf().axes[axnum].plot(CT[:,300,300].squeeze(),z_rho[:,300,300].squeeze(),color='pink',marker='x') 
     Tplot = plt.gcf().axes[axnum].plot(xint,yvals,color='tab:purple',marker='.') 
     Tplot = plt.gcf().axes[axnum].plot(Tf[:,300,300].squeeze(),z_rhof[:,300,300].squeeze(),color='blue',marker='o')
-    plt.gcf().axes[axnum].plot(Tf[A[300,300],300,300].squeeze(),z_rhof[A[300,300],300,300],color='black',marker='*')
-    plt.gcf().axes[axnum].plot(Tf[A[300,300],300,300].squeeze(),z_wf[A[300,300]+1,300,300],color='red',marker='s')
     plt.gcf().axes[axnum].set_title('CT')
     plt.gcf().axes[axnum].set_ylabel('depth m')
 
     axnum = 1 
     dTplot = plt.gcf().axes[axnum].plot(dTi,yvals,color='tab:purple',marker='.') 
-    plt.gcf().axes[axnum].plot(Tf[A[300,300],300,300].squeeze()-t0s[300,300],z_wf[A[300,300]+1,300,300],color='red',marker='s')
     plt.gcf().axes[axnum].set_title('del T')
     plt.gcf().axes[axnum].set_ylabel('depth m')
     
     axnum = 2
     rhoplot = plt.gcf().axes[axnum].plot(SIG0[:,300,300].squeeze(),z_rho[:,300,300].squeeze(),color='pink',marker='x') 
-    rhoplot = plt.gcf().axes[axnum].plot(SIGf[:,300,300].squeeze(),z_rhof[:,300,300].squeeze(),color='blue',marker='o')
-    plt.gcf().axes[axnum].plot(SIGf[B[300,300],300,300].squeeze(),z_rhof[B[300,300],300,300],color='black',marker='*') 
+    rhoplot = plt.gcf().axes[axnum].plot(SIGf[:,300,300].squeeze(),z_rhof[:,300,300].squeeze(),color='blue',marker='o') 
     plt.gcf().axes[axnum].set_title('SIG0')
     
 

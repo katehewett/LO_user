@@ -83,13 +83,15 @@ elif Ldir['roms_out_num'] > 0:
 dd_str = Ldir['ds0'] + '_' + Ldir['ds1']
 bb_str = '_'     # leaving this so can update to have other types of clines later in gtags
 out_dir = Ldir['LOo'] / 'extract' / Ldir['gtagex'] / 'clines' / (Ldir['job'] + bb_str + dd_str)
-cline_fn_final = out_dir / (Ldir['job'] + bb_str + dd_str + '.nc')
+
 temp_box_dir = out_dir / 'temp_box_dir'
 temp_cline_dir = out_dir / 'temp_cline_dir'
 
 Lfun.make_dir(out_dir, clean=True)
 Lfun.make_dir(temp_box_dir, clean=True)
 Lfun.make_dir(temp_cline_dir, clean=True)
+
+cline_fn_final = out_dir / (Ldir['job'] + bb_str + dd_str + '.nc')
 
 # get list of files to work on and check before entering loop over all files 
 fn_list = Lfun.get_fn_list(Ldir['list_type'], Ldir, Ldir['ds0'], Ldir['ds1'])
