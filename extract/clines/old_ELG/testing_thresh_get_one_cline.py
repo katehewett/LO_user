@@ -3,7 +3,7 @@ Function to do the calculation for a single clipped file
 calculates GSW vars > drho/dz dT/dz
 finds max drho(dT)/dz + returns the max depth + values
 
-THIS IS A TESTING FILE for ELG method to find thermocline 
+THIS IS A TESTING FILE for threshold method to find SML 
 at first doing one location // enter lat and lon
 then modify to fit into get one cline - 
 do winter first and then summer 
@@ -20,8 +20,6 @@ box_fn_in = '/Users/katehewett/Documents/LO_output/extract/cas7_t0_x4b/clines/sh
 his_in = '/Users/katehewett/Documents/LO_roms/cas7_t0_x4b/f2017.12.12/ocean_his_0021.nc'
 
 The history files are ~ random in that I had 4 on my personal computer and wanted one summer and one winter 
-
-TODO: look at this in an estuary and in shallow water 
 
 Time to get initial fields = 0.65 sec
 Time to apply GSW = 0.81 sec
@@ -54,8 +52,8 @@ import matplotlib.dates as mdates
 from matplotlib.dates import DateFormatter
 import cmcrameri.cm as cmc
 
-#box_fn_in = '/Users/katehewett/Documents/LO_output/extract/cas6_v0_live/clines/shelf_box_2022.08.08_2022.08.09/temp_box_dir/box_000001.nc'
-#his_in = '/Users/katehewett/Documents/LO_roms/cas6_v0_live/f2022.08.08/ocean_his_0021.nc'
+box_fn_in = '/Users/katehewett/Documents/LO_output/extract/cas6_v0_live/clines/shelf_box_2022.08.08_2022.08.09/temp_box_dir/box_000001.nc'
+his_in = '/Users/katehewett/Documents/LO_roms/cas6_v0_live/f2022.08.08/ocean_his_0021.nc'
 
 box_fn_in = '/Users/katehewett/Documents/LO_output/extract/cas7_t0_x4b/clines/shelf_box_2017.12.12_2017.12.12/temp_box_dir/box_000000.nc'
 his_in = '/Users/katehewett/Documents/LO_roms/cas7_t0_x4b/f2017.12.12/ocean_his_0021.nc'
@@ -72,13 +70,16 @@ dsb = open_dataset(box_fn_in, decode_times=False) # TODO UPDATE
 # NOTE: this only works if you have salt as a saved field!
 G, S, T = zrfun.get_basic_info(his_in)   # grid information to get S 
                                          # G is the whole domain. not the clipped box 
-
 lat = dsb.lat_rho.values    
 lon = dsb.lon_rho.values
 
 # get indices for plotting // ilon and ilat will be the index of the mlon mlat inputs::
-mlon = -124.06#-124.502
+#mlon = -124.502
+#mlat = 45.135
+
+mlon = -124.06
 mlat = 45.135
+
 Lon = lon[0,:]
 Lat = lat[:,0]
 # error checking
@@ -127,6 +128,12 @@ fCT = np.flipud(CT)
 fz_w = np.flipud(z_w)
 fz_rho = np.flipud(z_rho)
 
+sS = fSIG0[0] #surface 
+sTp = gsw.sigma0(SA[-1],CT[-1]+0.8)
+sTm = gsw.sigma0(SA[-1],CT[-1]-0.8)
+
+sm8 = fSIG0[0]-fSIG0
+
 print('Time to apply GSW = %0.2f sec' % (time()-tt0))
 sys.stdout.flush()
      
@@ -168,7 +175,7 @@ GD17 = -((D01-D07)/(z01-z07))
 # but if it's jumpy then may not be representative, and instead caculate like this:
 # And recall, only doing the calc between i=1:I (we exclude i=0=po + remember we flipped data is packed surface on top)
 GDi = -((D01-pi[1:NGD])/(z01-zi[1:NGD]))  
-
+  
 # I think we should actually caclulate the gradients like this:
 dpdz17 = -diff(pi)/diff(zi)  
 
@@ -176,6 +183,7 @@ dpdz17 = -diff(pi)/diff(zi)
 # characteristic gradient; pycnocline gradient                               
 # If small, TD <= 0.001degC/m (GD <= ?? need threshold) then MLD extends to base of profile 
 GD = np.nanmedian(GDi)
+
 
 print('Time to calc characteristic gradient = %0.2f sec' % (time()-tt0))
 sys.stdout.flush()
@@ -208,14 +216,18 @@ zk = fz_rho[iz:iD70+1]
 pk = fSIG0[iz:iD70+1]
 
 NG = np.shape(zk)[0]
-N = np.floor(log2(NG)).astype('int64') # if NG = 20; N = 4
+N = np.floor(log2(NZ-1-NG-1)).astype('int64') # if NG = 20; N = 4
 
-testN = (NG-1) + (2**N) # TODO fix flags here because can't extend past bottom
-if testN>NZ-1:
-    N = np.floor(log2(NZ - (NG-1))).astype('int64') #adjust so can do whole thing #3
-
-
-
+DnD = np.nan * np.ones((NZ))   # initialize 
+for k in range(NG-1): 
+    print(k)
+    for ni in range(N-1): 
+        print(ni)
+        n = np.arange(0,N,1)
+        tn = 2**n
+        k2 = k+tn
+    
+        DnD[k]=np.nanmean((fSIG0[k] - fSIG0[k+k2])/(fz_rho[k]-fz_rho[k+k2]))
 
 # 
 dp = diff(fSIG0)
@@ -269,7 +281,8 @@ plt.axhline(z07)
 axsig.set_ylim([np.nanmin(fz_rho)-1, np.nanmax(fz_rho)+1])
 
 # plot dp/dz
-pp = ax2.plot(-dpdz,fz_w[1:NW-1],color='red',marker='.',label = 'dpdz') 
+#pp = ax2.plot(-dpdz,fz_w[1:NW-1],color='red',marker='.',label = 'dpdz') 
+ax2.plot(-sm8,fz_rho,color='orange',marker='.')
 ax2.set_ylabel('depth m')
 ax2.set_xlabel('drho/dz',color='red')
 ax2.tick_params(axis='x',color='red')
@@ -278,16 +291,20 @@ ax2.xaxis.label.set_color('red')
 #ax2.set_xticks(tticks)
 ax2.tick_params(labelcolor='red')
 #ax2.plot(val_dpmax[:,:,ilat,ilon],z_dpmax[:,:,ilat,ilon],color='black',marker='x')
-ax2.axhline(z01)
-ax2.axhline(z07)
+#ax2.axhline(z01)
+#ax2.axhline(z07)
 ax2.set_ylim([np.nanmin(fz_rho)-1, np.nanmax(fz_rho)+1])
-ax2.axvline(x = 0.001, color = 'k', linestyle = '-') 
+#ax2.axvline(x = 0.001*1.1, color = 'k', linestyle = '-') 
+#ax2.axvline(x = 0.002*1.1, color = 'k', linestyle = '-') 
+ax2.axvline(x = 0.03)
+ax2.axvline(x = 0.05)
+ax2.axvline(x = 0.08)
 
 #gradient filter
 ax3.axhline(z01)
 ax3.axhline(z07)
 ax3.plot(-dpdz/GD,fz_w[1:NW-1],color='black',marker='x',label = 'dpdz') 
-#ax3.plot(-dpdz/np.nanmedian(dpdz17),fz_w[1:NW-1],color='green',marker='x',label = 'dpdz') 
+ax3.plot(-DnD,fz_rho,color='green',marker='x',label = 'dpdz') 
 ax3.axvline(0.1)
 ax3.set_ylim([np.nanmin(fz_rho)-1, np.nanmax(fz_rho)+1])
 # plot dt/dz

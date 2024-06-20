@@ -37,6 +37,11 @@ import cmcrameri.cm as cmc
 
 box_fn_in = '/Users/katehewett/Documents/LO_output/extract/cas6_v0_live/clines/shelf_box_2022.08.08_2022.08.09/temp_box_dir/box_000001.nc'
 his_in = '/Users/katehewett/Documents/LO_roms/cas6_v0_live/f2022.08.08/ocean_his_0021.nc'
+
+box_fn_in = '/Users/katehewett/Documents/LO_output/extract/cas7_t0_x4b/clines/shelf_box_2017.12.12_2017.12.12/temp_box_dir/box_000000.nc'
+his_in = '/Users/katehewett/Documents/LO_roms/cas7_t0_x4b/f2017.12.12/ocean_his_0021.nc'
+
+threshold = 0.03
 ######## ######## ######## 
 
 tt0 = time()
@@ -83,25 +88,74 @@ po = np.where(z_rho>-250,SIG0,np.nan)
 print('Time to apply GSW = %0.2f sec' % (time()-tt0))
 sys.stdout.flush()
      
-# 1. calc dp/dz and dT/dz 
+# 1. calc threshold SML 
 tt0 = time()       
 
+Dsurf = SIG0[:,-1,:,:]
+Dbot = SIG0[:,0,:,:]
+
+sthresh = np.abs(SIG0 - Dsurf)
+bthresh = np.abs(SIG0 - Dbot)
+
+# SML calc 
+# flip along z axis so that ocean packed surface:bottom
+# find where the first value passes the threshold ("B")
+fSIG0 = np.flip(SIG0, axis=1)
+fsthresh = np.flip(sthresh, axis=1)
+fz_rho = np.flip(z_rho, axis=1)
+fz_w = np.flip(z_w, axis=1)
+
+# the flag returned by argmin acts on SIG0, which is on 
+# z_rho. The base of the sml, with our thresh, occurs somewhere 
+# between those two z_rho points at B and B-1. 
+# Assign the midpoint fz_w[:,B,:,:] as the base. 
+# Note: if sml is found to be zero, the depth is saved as 
+# the first z_w point in the flipped "fz_w" array. 
+# So when we calc the thickness, zeta - SML base, 
+# we get zero for the SML thickness.
+B = np.argmin(fsthresh<threshold,axis=1,keepdims=True)
+Bz = np.take_along_axis(fz_w,B,axis=1)
+
+Bval = np.take_along_axis(fSIG0,B,axis=1) 
+# if SML is zero and in water keep as just the surface 
+# else if in water and non zero we calc the avg SIG0 of the 
+# two z_rhos:
+bmask = (B.squeeze()!=0) & (mask_rho.values == 1) 
+b1 = np.take_along_axis(fSIG0,B-1,axis=1)
+b2 = np.take_along_axis(fSIG0,B,axis=1)
+bb = (b1+b2)/2
+Bval[:,:,bmask] = bb[:,:,bmask]
+
+#b1 = np.take_along_axis(fSIG0,B,axis=1)
+#b2 = np.take_along_axis(fSIG0,B+1,axis=1)
+#Bval = (b1+b2)/2
+
+print('Time to calc SML = %0.2f sec' % (time()-tt0))
+sys.stdout.flush()
+
+tt0 = time()  
+# BML is similar to SML but not using flipped data 
+C = np.argmin(bthresh<threshold,axis=1,keepdims=True)
+Cz = np.take_along_axis(z_rho,B,axis=1)
+Cval = np.take_along_axis(SIG0,B,axis=1)
+
+# find loco of max drho/dz and dT/dz and grab value
 dp = np.diff(SIG0,axis=1)
-dT = np.diff(CT,axis=1) 
 dz = np.diff(z_rho,axis=1)
-
 dpdz = dp/dz
-dtdz = dT/dz
 
-C = np.argmin(dpdz,axis=1,keepdims=True)
-z_dpmax = np.take_along_axis(z_w,C+1,axis=1)
-val_dpmax = np.take_along_axis(dpdz,C,axis=1)
+D = np.argmax(dpdz,axis=1,keepdims=True)
+z_dpmax = np.take_along_axis(z_w,D+1,axis=1)
+val_dpmax = np.take_along_axis(dpdz,D,axis=1)
 
-D = np.argmax(dtdz,axis=1,keepdims=True)
-z_dtmax = np.take_along_axis(z_w,D+1,axis=1)
-val_dtmax = np.take_along_axis(dtdz,D,axis=1)
+dT = np.diff(CT,axis=1)
+dTdz = dT/dz
 
-print('Time to calc dp/dz and dt/dz = %0.2f sec' % (time()-tt0))
+E = np.argmax(dpdz,axis=1,keepdims=True)
+z_dtmax = np.take_along_axis(z_w,E+1,axis=1)
+val_dtmax = np.take_along_axis(dTdz,E,axis=1)
+
+print('Time to calc BML = %0.2f sec' % (time()-tt0))
 sys.stdout.flush()
 
 ######## ######## ######## 
@@ -109,10 +163,11 @@ sys.stdout.flush()
 ##### PRINTING THINGS 
 
 # get indices for plotting // ilon and ilat will be the index of the mlon mlat inputs::
-mlon = -124.4
-mlat = 44.65
-Lon = G['lon_rho'][0,:]
-Lat = G['lat_rho'][:,0]
+mlon = -124.06
+mlat = 45.135
+
+Lon = lon[0,:]
+Lat = lat[:,0]
 # error checking
 if (mlon < Lon[0]) or (mlon > Lon[-1]):
     print('ERROR: lon out of bounds ' + moor_fn.name)
@@ -136,11 +191,11 @@ ax2 = plt.subplot2grid((1,3),(0,1),colspan=1,rowspan=1)
 ax3 = plt.subplot2grid((1,3),(0,2),colspan=1,rowspan=1)
 
 # plot T and SIG0
-Tmin = np.floor(np.min(CT[:,:,ilon,ilat]))-1
-Tmax = np.floor(np.max(CT[:,:,ilon,ilat]))+1
+Tmin = np.floor(np.min(CT[:,:,ilat,ilon])) - 0.5
+Tmax = np.floor(np.max(CT[:,:,ilat,ilon])) + 0.5
 tticks = np.arange(Tmin,Tmax+1,2)
 
-Tplot = ax1.plot(CT[:,:,ilon,ilat].squeeze(),z_rho[:,:,ilon,ilat].squeeze(),color='blue',marker='.',label = 'CT') 
+Tplot = ax1.plot(CT[:,:,ilat,ilon].squeeze(),z_rho[:,:,ilat,ilon].squeeze(),color='blue',marker='.',label = 'CT') 
 ax1.set_ylabel('depth m')
 ax1.set_xlabel('CT',color='blue')
 ax1.tick_params(axis='x',color='blue')
@@ -151,11 +206,11 @@ ax1.tick_params(labelcolor='blue')
 #ax1.axhline(y = z_dtmax[:,:,ilon,ilat], color = 'k', linestyle = '--') 
 
 axsig = ax1.twiny()
-SIGmin = np.floor(np.min(SIG0[:,:,ilon,ilat]))-0.5
-SIGmax = np.floor(np.max(SIG0[:,:,ilon,ilat]))+0.5
+SIGmin = np.floor(np.min(SIG0[:,:,ilat,ilon])) - 0.5
+SIGmax = np.floor(np.max(SIG0[:,:,ilat,ilon])) + 0.5
 sigticks = np.arange(SIGmin,SIGmax+1,1)
 
-Splot = axsig.plot(SIG0[:,:,ilon,ilat].squeeze(),z_rho[:,:,ilon,ilat].squeeze(),color='red',marker='.',label = 'SIG0')
+Splot = axsig.plot(SIG0[:,:,ilat,ilon].squeeze(),z_rho[:,:,ilat,ilon].squeeze(),color='red',marker='.',label = 'SIG0')
 axsig.set_xlabel('SIG0',color='red')
 axsig.tick_params(axis='x',color='red')
 axsig.xaxis.label.set_color('red')
@@ -163,25 +218,18 @@ axsig.set_xlim([SIGmin, SIGmax])
 axsig.set_xticks(sigticks)
 axsig.tick_params(labelcolor='red')
 #axsig.axhline(y = z_dpmax[:,:,ir,ic], color = 'k', linestyle = '-') 
+axsig.plot(Bval[:,:,ilat,ilon].squeeze(),Bz[:,:,ilat,ilon].squeeze(),'x')
 
-# plot dp/dz
-pp = ax2.plot(dpdz[:,:,ilon,ilat].squeeze(),z_w[:,1:NW-1,ilon,ilat].squeeze(),color='red',marker='.',label = 'dpdz') 
+# plot thresh
+pp = ax2.plot(np.abs(sthresh[:,:,ilat,ilon].squeeze()),z_rho[:,:,ilat,ilon].squeeze(),color='green',marker='.',label = 'surf') 
+ax2.plot(np.abs(bthresh[:,:,ilat,ilon].squeeze()),z_rho[:,:,ilat,ilon].squeeze(),color='orange',marker='.',label = 'bot') 
 ax2.set_ylabel('depth m')
-ax2.set_xlabel('drho/dz',color='red')
-ax2.tick_params(axis='x',color='red')
-ax2.xaxis.label.set_color('red')
+ax2.set_xlabel('surf:bot',color='blue')
+ax2.set_title('thresholds (orange B; green S)')
+ax2.tick_params(axis='x',color='blue')
+ax2.xaxis.label.set_color('blue')
 #ax2.set_xlim([Tmin, Tmax])
 #ax2.set_xticks(tticks)
-ax2.tick_params(labelcolor='red')
-ax2.plot(val_dpmax[:,:,ilon,ilat],z_dpmax[:,:,ilon,ilat],color='black',marker='x')
+ax2.tick_params(labelcolor='blue')
+ax2.axvline(x=0.03)
 
-# plot dt/dz
-pt = ax3.plot(dtdz[:,:,ilon,ilat].squeeze(),z_w[:,1:NW-1,ilon,ilat].squeeze(),color='blue',marker='.',label = 'dpdz') 
-ax3.set_ylabel('depth m')
-ax3.set_xlabel('dT/dz',color='blue')
-ax3.tick_params(axis='x',color='blue')
-ax3.xaxis.label.set_color('blue')
-#ax2.set_xlim([Tmin, Tmax])
-#ax2.set_xticks(tticks)
-ax3.tick_params(labelcolor='blue')
-ax3.plot(val_dtmax[:,:,ilon,ilat],z_dtmax[:,:,ilon,ilat],color='black',marker='x')
