@@ -12,9 +12,7 @@ we made a 'cline'extractor which will save one layer per grid cell instead of al
 layers
  
 running testing code with two history files on kh personal mac, looks like:
-run test_extract_clines -gtx cas6_v0_live -ro 1 -0 2022.08.08 -1 2022.08.09 -lt daily -job shelf_box -test True
-run test_extract_clines -gtx cas7_t0_x4b -ro 1 -0 2017.12.12 -1 2017.12.12 -lt daily -job shelf_box -test True
-run test_extract_clines -gtx cas7_t0_x4b -ro 1 -0 2017.12.12 -1 2017.12.13 -lt lowpass -job shelf_box -test True
+run extract_clines -gtx cas7_t0_x4b -ro 1 -0 2017.12.12 -1 2017.12.13 -lt lowpass -job shelf_box -test True
 
 scripts dev based on extract_box; extract_box_chunks.py and extract_hypoxic_volume.py
 
