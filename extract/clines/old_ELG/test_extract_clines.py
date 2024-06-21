@@ -13,9 +13,25 @@ layers
  
 running testing code with two history files on kh personal mac, looks like:
 run test_extract_clines -gtx cas6_v0_live -ro 1 -0 2022.08.08 -1 2022.08.09 -lt daily -job shelf_box -test True
+run test_extract_clines -gtx cas7_t0_x4b -ro 1 -0 2017.12.12 -1 2017.12.12 -lt daily -job shelf_box -test True
+run test_extract_clines -gtx cas7_t0_x4b -ro 1 -0 2017.12.12 -1 2017.12.13 -lt lowpass -job shelf_box -test True
 
 scripts dev based on extract_box; extract_box_chunks.py and extract_hypoxic_volume.py
 
+get_one_cline messages:
+Time to get initial fields = 1.00 sec
+Time to apply GSW = 0.72 sec
+Time to calc SML + assign T/S= 0.22 sec
+Time to calc BML + assign T/S= 0.20 sec
+Time to calc max dT/dz(drho/dz) and assign SA(CT)= 0.16 sec
+Time to calc interior gradients and T/S= 0.32 sec
+
+Total processing time = ~ 14seconds
+But, it's ~7 sec to run the code to: clip box; calculate params and save for 2 days lowpass data
+
+Then after the cat step... we open and reassign time independent vars and delete the temp folders. 
+This step takes an additional 6-7 seconds. But we put that on the outside of the loops because we 
+just need to do it 1x / job, which makes this run faster
 
 """
 import sys
@@ -45,6 +61,8 @@ parser.add_argument('-1', '--ds1', type=str) # e.g. 2019.07.06
 parser.add_argument('-lt', '--list_type', type=str) # list type: hourly, daily, weekly, lowpass
 # select job name
 parser.add_argument('-job', type=str) # job name
+# for grabbing pycnocline
+#parser.add_argument('-pycno', '--pycnocline', default=True, type=Lfun.boolean_string)
 # Optional: set max number of subprocesses to run at any time
 parser.add_argument('-Nproc', type=int, default=10)
 # Optional: for testing
@@ -91,7 +109,7 @@ Lfun.make_dir(out_dir, clean=True)
 Lfun.make_dir(temp_box_dir, clean=True)
 Lfun.make_dir(temp_cline_dir, clean=True)
 
-cline_fn_final = out_dir / (Ldir['job'] + bb_str + dd_str + '.nc')
+cline_fn_final = out_dir / (Ldir['job'] + '_pycnocline' + bb_str + dd_str + '.nc')
 
 # get list of files to work on and check before entering loop over all files 
 fn_list = Lfun.get_fn_list(Ldir['list_type'], Ldir, Ldir['ds0'], Ldir['ds1'])
@@ -201,12 +219,26 @@ for ii in range(NFN):
         # make sure everyone is finished before continuing
         proc_list = []
     
-    # start new job once the prior [10] are finished    
+    ii += 1
+
+print(' - Time for clipping box; calculating layers = %0.2f sec' % (time()- tt0))   
+
+# Originally, I had get_one_cline_rev.py placed ~here but w/in the ii/NFN loop. 
+# But it was grabbing the last box####.nc for get_one_cline_rev.py and not starting at box00000
+# so breaking to it's own loop. Need to figure how to make this part faster and not have a 2x loop. 
+# Maybe with grep and then put them in order
+    
+print('Working on extracting gradients...')
+for ii in range(NFN):
+    fn = fn_list[ii]
+    sys.stdout.flush()
+    # extract one day at a time using ncks
+    count_str = ('000000' + str(ii))[-6:]
     cline_out_fn = temp_cline_dir / ('cline_' + count_str + '.nc')  
     print(str(box_out_fn))
-    cmd_list2 = ['python3', 'get_one_cline.py',
+    cmd_list2 = ['python3', 'get_one_cline_rev.py',
             '-lt',args.list_type,
-            '-his_fn',str(fn_list[0]), #grabbing one history file locaiton for adding z's this feels messy here
+            '-his_fn',str(fn_list[0]), 
             '-in_fn',str(box_out_fn),
             '-out_fn', str(cline_out_fn)]
     
@@ -232,30 +264,100 @@ for ii in range(NFN):
             messages('get_one_cline messages:', stdout, stderr)
         # make sure everyone is finished before continuing
         proc_list2 = []
-                
+            
     ii += 1
-print(' - Time for clipping box = %0.2f sec' % (time()- tt0))
 
-# Ensure that all days have the same fill value.  This was required for cas6_v3_lo8b
-# when passing from 2021.10.31 to 2021.11.01 because they had inconsistent fill values,
-# which leaks through the ncrcat call below.
-# can comment out if using long hindcast
-tt1 = time()
-enc_dict = {'_FillValue':1e20}
-vn_List = vn_list.split(',')
-Enc_dict = {vn:enc_dict for vn in vn_List}
-for out_fn in list(temp_box_dir.glob('box_*.nc')):
-    ds = xr.load_dataset(box_out_fn) # need to load, not open, for overwrite
-    ds.to_netcdf(box_out_fn, encoding=Enc_dict)
-    ds.close()
-print(' - Time for adding fill value = %0.2f sec' % (time()- tt1))
-sys.stdout.flush()
+# don't think we need this step b/c running cas7, but check 
+## Ensure that all days have the same fill value.  This was required for cas6_v3_lo8b
+## when passing from 2021.10.31 to 2021.11.01 because they had inconsistent fill values,
+## which leaks through the ncrcat call below.
+## can comment out if using long hindcast
+#tt1 = time()
+#enc_dict = {'_FillValue':1e20}
+#vn_List = vn_list.split(',')
+#Enc_dict = {vn:enc_dict for vn in vn_List}
+#for out_fn in list(temp_box_dir.glob('box_*.nc')):
+#    ds = xr.load_dataset(box_out_fn) # need to load, not open, for overwrite
+#    ds.to_netcdf(box_out_fn, encoding=Enc_dict)
+#    ds.close()
+#print(' - Time for adding fill value = %0.2f sec' % (time()- tt1))
+#sys.stdout.flush()
 
+# we now have box.nc's and cline.nc's in a temp dir and want to stitch together all the clines
+# At the very end we will delete the temp dirs to save space. 
+# The temp file PSB "pycnocline SML BML" will be saved in the temp dir too, because once concat'd 
+# we are going to add vars that don't change w/ time: lat lon mask_rho h to the dataset
+# and save the final outside the temp dir's
 
+# concatenate the records into one file
+# This bit of code is a nice example of how to replicate a bash pipe
+pp1 = Po(['ls', str(temp_cline_dir)], stdout=Pi)
+pp2 = Po(['grep','cline'], stdin=pp1.stdout, stdout=Pi)
+fn_p = 'PSB_'+str(Ldir['ds0'])+'_'+str(Ldir['ds1']+'.nc')
+temp_fn = str(temp_cline_dir)+'/'+fn_p # this is all the maps put to one
+cmd_list = ['ncrcat','-p', str(temp_cline_dir), '-O', temp_fn]
+proc = Po(cmd_list, stdin=pp2.stdout, stdout=Pi, stderr=Pi)
+stdout, stderr = proc.communicate()
+if len(stdout) > 0:
+    print('\nSTDOUT:')
+    print(stdout.decode())
+    sys.stdout.flush()
+if len(stderr) > 0:
+    print('\nSTDERR:')
+    print(stderr.decode())
+    sys.stdout.flush()
 
+    
+print('saving vars')
+"""
+Saving variables that don't change over time - this is here to make the cat step faster
+- h is bathymetric depth 
+- ocean_time is a vector of time; [lowpass is converted to UTC and centered at 1200 UTC; daily is diff] 
+- Lat and Lon on rho points 
+"""
 
+lon_rho = G['lon_rho'][ilat0:ilat1+1,ilon0:ilon1+1]
+lat_rho = G['lat_rho'][ilat0:ilat1+1,ilon0:ilon1+1]
+mask_rho = G['mask_rho'][ilat0:ilat1+1,ilon0:ilon1+1]
+h = G['h'][ilat0:ilat1+1,ilon0:ilon1+1]
 
+ds1 = xr.open_dataset(temp_fn)
 
+ds1['lat_rho'] = (('eta_rho', 'xi_rho'),lat_rho,{'units':'degree_north'})
+ds1['lat_rho'].attrs['standard_name'] = 'grid_latitude_at_cell_center'
+ds1['lat_rho'].attrs['long_name'] = 'latitude of RHO-points'
+ds1['lat_rho'].attrs['field'] = 'lat_rho'
+
+ds1['lon_rho'] = (('eta_rho', 'xi_rho'),lon_rho,{'units': 'degree_east'})
+ds1['lon_rho'].attrs['standard_name'] = 'grid_longitude_at_cell_center'
+ds1['lon_rho'].attrs['long_name'] = 'longitude of RHO-points'
+ds1['lon_rho'].attrs['field'] = 'lon_rho'
+ 
+ds1['h'] = (('eta_rho', 'xi_rho'),h,{'units': 'm'})
+ds1['h'].attrs['standard_name'] = 'sea_floor_depth'
+ds1['h'].attrs['long_name'] = 'time_independent bathymetry'
+ds1['h'].attrs['field'] = 'bathymetry'
+ds1['h'].attrs['grid'] =  args.gtagex
+
+ds1['mask_rho'] = (('eta_rho', 'xi_rho'),mask_rho,{'units': 'm'})
+ds1['mask_rho'].attrs['standard_name'] = 'land_sea_mask_at_cell_center'
+ds1['mask_rho'].attrs['long_name'] = 'mask on RHO-points'
+ds1['mask_rho'].attrs['flag_values'] = np.array([0.,1.])
+ds1['mask_rho'].attrs['flag_meanings'] = 'land water'
+ds1['mask_rho'].attrs['grid'] =  args.gtagex
+
+ds1.to_netcdf(cline_fn_final, unlimited_dims='ocean_time')
+
+# clean up
+Lfun.make_dir(temp_box_dir, clean=True)
+temp_box_dir.rmdir()
+
+Lfun.make_dir(temp_cline_dir, clean=True)
+temp_cline_dir.rmdir()
+
+print('Total processing time = %0.2f sec' % (time()-tt0))
+
+# clean up
 ## parker ex on del temp dir 
 # clean up
 #    Lfun.make_dir(temp_dir, clean=True)

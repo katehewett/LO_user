@@ -1,23 +1,27 @@
 """
-Function to do the calculation for a single clipped file
-calculates GSW vars > drho/dz dT/dz
-finds max drho(dT)/dz + returns the max depth + values
-
-THIS IS A TESTING 1 OFF FILE for
-get_one_cline.py 
+Function to do the calculation for a single file sent
+by extract_clines.py 
+This script: 
+calculates (1) GSW vars (2) SML and BML using a threshold method 
+decided to do this rather than ELG or other because returned similar
+results and was a lot faster. Can come back to this later. 
+(3) the location of max dp/dz 
+(4) values are saved in a temp file and then concat'd in extract_clines
 
 Time to get initial fields = 0.65 sec
 Time to apply GSW = 0.81 sec
 Time to calc dp/dz and dt/dz = 0.09 sec
 
-# TODO make a function for the masked data flag when finding mean 
+TODO make a function for the masked data flag when finding mean
+make flags for pycnocline and thermocline and pass threshold too 
+Right now using 0.03 kg/m3 = thresh 
 
-Time to get initial fields = 2.32 sec
-Time to apply GSW = 4.79 sec
-Time to calc SML + assign T/S= 1.33 sec
+Time to get initial fields = 4.26 sec
+Time to apply GSW = 5.39 sec
+Time to calc SML + assign T/S= 1.39 sec
 Time to calc BML + assign T/S= 1.29 sec
-Time to calc max dT/dz(drho/dz) and assign SA(CT)= 1.26 sec
-Time to calc interior gradients and T/S= 2.11 sec
+Time to calc max dT/dz(drho/dz) and assign SA(CT)= 1.28 sec
+Time to calc interior gradients and T/S= 2.01 sec
 
 """
 
@@ -33,35 +37,27 @@ from lo_tools import Lfun, zrfun, zfun
 
 import gsw 
 
-######## ######## ######## 
-# remove this testing after get the pycnocline to work here. and replace with the 
-# arg pass tags in get_one_cline.py 
+parser2 = ArgumentParser()
+parser2.add_argument('-in_fn', '--input_box_files', type=str) # path to clipped box files (temp directory)
+parser2.add_argument('-out_fn', '--output_cline_files', type=str) # path to save cline files (temp directory)
+parser2.add_argument('-his_fn', '--input_his_file', type=str) # path to one history file for grid info > z's
+parser2.add_argument('-lt', '--list_type', type=str) # list type: hourly, daily, weekly, lowpass   
+#parser2.add_argument('-pycno', '--pycnocline', type=bool)     
+args2 = parser2.parse_args()
 
-#plotting things
-import matplotlib.pyplot as plt
-from matplotlib.lines import Line2D
-import matplotlib.dates as mdates
-from matplotlib.dates import DateFormatter
-import cmcrameri.cm as cmc
-
-#box_fn_in = '/Users/katehewett/Documents/LO_output/extract/cas6_v0_live/clines/shelf_box_2022.08.08_2022.08.09/temp_box_dir/box_000001.nc'
-#his_in = '/Users/katehewett/Documents/LO_roms/cas6_v0_live/f2022.08.08/ocean_his_0021.nc'
-
-box_fn_in = '/Users/katehewett/Documents/LO_output/extract/cas7_t0_x4b/clines/shelf_box_2017.12.12_2017.12.13/temp_box_dir/box_000000.nc'
-his_in = '/Users/katehewett/Documents/LO_roms/cas7_t0_x4b/f2017.12.12/ocean_his_0021.nc'
-
+#############################make this an argument
 threshold = 0.03
-######## ######## ######## 
+#############################
 
 tt0 = time()
-dsb = open_dataset(box_fn_in, decode_times=False) # TODO UPDATE
+dsb = open_dataset(args2.input_box_files, decode_times=False) # TODO UPDATE
 # the decode_times=False part is important for correct treatment
 # of the time axis later when we concatenate things in the calling function
 # using ncrcat
 
 # add z variables
 # NOTE: this only works if you have salt as a saved field!
-G, S, T = zrfun.get_basic_info(his_in)   # grid information # TODO UPDATE
+G, S, T = zrfun.get_basic_info(args2.input_his_file)   # grid information # TODO UPDATE
 
 lat = np.nanmean(G['lat_rho'])
 lon = np.nanmean(G['lon_rho']) # for gsw calcs
@@ -128,12 +124,12 @@ SML_z = np.take_along_axis(fz_w,B,axis=1)
 # if SML is zero and in water keep SIG0 value just as the the surface 
 # value else if in water and non zero we calc the avg SIG0 for the 
 # two z_rhos at B and B-1:
-Bval = np.take_along_axis(fSIG0,B,axis=1) 
+#Bval = np.take_along_axis(fSIG0,B,axis=1) 
 bmask = (B.squeeze()!=0) & (mask_rho.values == 1) 
-b1 = np.take_along_axis(fSIG0,B-1,axis=1)
-b2 = np.take_along_axis(fSIG0,B,axis=1)
-bb = (b1+b2)/2
-Bval[:,:,bmask] = bb[:,:,bmask]
+#b1 = np.take_along_axis(fSIG0,B-1,axis=1)
+#b2 = np.take_along_axis(fSIG0,B,axis=1)
+#bb = (b1+b2)/2
+#Bval[:,:,bmask] = bb[:,:,bmask]
 
 # save mean value of T and S in the SML; 1st initialize: 
 # note: when SML = 0; we still save the surface CT(SA); and save the land as NaNs
@@ -172,12 +168,12 @@ bthresh = np.abs(SIG0 - Dbot)
 C = np.argmin(bthresh<threshold,axis=1,keepdims=True)
 BML_z = np.take_along_axis(z_w,C,axis=1)
 
-Cval = np.take_along_axis(SIG0,C,axis=1) 
+#Cval = np.take_along_axis(SIG0,C,axis=1) 
 cmask = (C.squeeze()!=0) & (mask_rho.values == 1) 
-c1 = np.take_along_axis(SIG0,C-1,axis=1)
-c2 = np.take_along_axis(SIG0,C,axis=1)
-cc = (c1+c2)/2
-Cval[:,:,cmask] = cc[:,:,cmask]
+#c1 = np.take_along_axis(SIG0,C-1,axis=1)
+#c2 = np.take_along_axis(SIG0,C,axis=1)
+#cc = (c1+c2)/2
+#Cval[:,:,cmask] = cc[:,:,cmask]
 
 BML_CT = np.expand_dims(CT[:,0,:,:],axis=1)    
 BML_SA = np.expand_dims(SA[:,0,:,:],axis=1)
@@ -188,7 +184,6 @@ CTbot[z_rho>BML_z] = np.NaN
 masked_data = np.ma.masked_array(CTbot, np.isnan(CTbot)) 
 mCTbot = np.ma.average(masked_data, axis=1,keepdims=True)      
 #mCTbot = np.nanmean(CTbot,axis=1,keepdims=True)
-del masked_data
 
 SAbot = np.copy(SA)
 SAbot[z_rho>BML_z] = np.NaN          
@@ -286,115 +281,22 @@ CTstack = np.hstack((SML_CT,INT_CT,Dct,BML_CT))
 ds1 = Dataset()
 ds1['ocean_time'] = dsb.ocean_time
 
-ds1['zeta'] = (('ocean_time', 'lon_rho', 'lat_rho'), dsb.zeta.values, {'units':'m', 'long_name':'free-surface'}
-ds1['zSML'] = (('ocean_time', 'lon_rho', 'lat_rho'), np.squeeze(SML_z,axis=1), {'units':'m', 'long_name': 'depth of bottom of SML threshold'})
-ds1['zBML'] = (('ocean_time', 'lon_rho', 'lat_rho'), np.squeeze(BML_z,axis=1), {'units':'m', 'long_name': 'depth of bottom of SML threshold'})
-ds1['zDGmax'] = (('ocean_time', 'lon_rho', 'lat_rho'), np.squeeze(Dz,axis=1), {'units':'m', 'long_name': 'depth of max density gradient'})
-ds1['DGmax'] = (('ocean_time', 'lon_rho', 'lat_rho'), np.squeeze(Dval,axis=1), {'units':'kg/m3/m', 'long_name': 'value of max density gradient'})
-ds1['DGint'] = (('ocean_time', 'lon_rho', 'lat_rho'), np.squeeze(INT_dpdz,axis=1), {'units':'kg/m3/m', 'long_name': 'mean density gradient between SML and BML'})
+ds1['zeta'] = (('ocean_time', 'eta_rho', 'xi_rho'), dsb.zeta.values, {'units':'m', 'long_name':'free-surface'})
+ds1['zSML'] = (('ocean_time', 'eta_rho', 'xi_rho'), np.squeeze(SML_z,axis=1), {'units':'m', 'long_name': 'depth of bottom of SML threshold'})
+ds1['zBML'] = (('ocean_time', 'eta_rho', 'xi_rho'), np.squeeze(BML_z,axis=1), {'units':'m', 'long_name': 'depth of bottom of SML threshold'})
+ds1['zDGmax'] = (('ocean_time', 'eta_rho', 'xi_rho'), np.squeeze(Dz,axis=1), {'units':'m', 'long_name': 'depth of max density gradient'})
+ds1['DGmax'] = (('ocean_time', 'eta_rho', 'xi_rho'), np.squeeze(Dval,axis=1), {'units':'kg/m3/m', 'long_name': 'value of max density gradient'})
+ds1['DGint'] = (('ocean_time', 'eta_rho', 'xi_rho'), np.squeeze(INT_dpdz,axis=1), {'units':'kg/m3/m', 'long_name': 'mean density gradient between SML and BML'})
 
-ds1.coords['zone'] = [0,1,2,3]
-ds1['SA'] = (('ocean_time', 'zone', 'lon_rho', 'lat_rho'), SAstack, {'units':'g/kg', 'long_name': 'mean Absolute Salinity by zone'})
-ds1['SA'].attrs['zone_values'] = [0,1,2,3]
+ds1.coords['zone'] = np.array([0.,1.,2.,3.])
+ds1['SA'] = (('ocean_time', 'zone', 'eta_rho', 'xi_rho'), SAstack, {'units':'g/kg', 'long_name': 'mean Absolute Salinity by zone'})
+ds1['SA'].attrs['zone_values'] = np.array([0.,1.,2.,3.])
 ds1['SA'].attrs['zone_meanings'] = ['SML','INT(SML:BML)','DGmax','BML'] 
 
-ds1['CT'] = (('ocean_time', 'zone', 'lon_rho', 'lat_rho'), CTstack, {'units':'degrees celcius', 'long_name': 'mean Conservative Temperature by zone'})
-ds1['CT'].attrs['zone_values'] = [0,1,2,3]
+ds1['CT'] = (('ocean_time', 'zone', 'eta_rho', 'xi_rho'), CTstack, {'units':'degrees celcius', 'long_name': 'mean Conservative Temperature by zone'})
+ds1['CT'].attrs['zone_values'] = np.array([0.,1.,2.,3.])
 ds1['CT'].attrs['zone_meanings'] = ['SML','INT(SML:BML)','DGmax','BML']
 
-sys.exit()
+ds1.to_netcdf(args2.output_cline_files, unlimited_dims='ocean_time')
 
-######## ######## ######## 
-# remove this testing after get the pycnocline to work here. 
-##### PRINTING THINGS 
-
-# get indices for plotting // ilon and ilat will be the index of the mlon mlat inputs::
-mlon = -124.06
-mlat = 45.135
-
-Lon = lon[0,:]
-Lat = lat[:,0]
-# error checking
-if (mlon < Lon[0]) or (mlon > Lon[-1]):
-    print('ERROR: lon out of bounds ' + moor_fn.name)
-    sys.exit()
-if (mlat < Lat[0]) or (mlat > Lat[-1]):
-    print('ERROR: lat out of bounds ' + moor_fn.name)
-    sys.exit()
-# get indices
-ilon = zfun.find_nearest_ind(Lon, mlon)
-ilat = zfun.find_nearest_ind(Lat, mlat)
-
-
-# initialize plot 
-plt.close('all')
-fs=12
-plt.rc('font', size=fs)
-fig = plt.figure(figsize=(16,8))
-
-ax1 = plt.subplot2grid((1,4),(0,0),colspan=1,rowspan=1)
-ax2 = plt.subplot2grid((1,4),(0,1),colspan=1,rowspan=1)
-ax3 = plt.subplot2grid((1,4),(0,2),colspan=1,rowspan=1)
-ax4 = plt.subplot2grid((1,4),(0,3),colspan=1,rowspan=1)
-
-# plot T and SIG0
-Tmin = np.floor(np.nanmin(CT[:,:,ilat,ilon])) - 0.5
-Tmax = np.floor(np.nanmax(CT[:,:,ilat,ilon])) + 0.5
-tticks = np.arange(Tmin,Tmax+1,2)
-
-Tplot = ax1.plot(CT[:,:,ilat,ilon].squeeze(),z_rho[:,:,ilat,ilon].squeeze(),color='blue',marker='.',label = 'CT') 
-#ax1.plot(SML_CT[:,:,ilat,ilon].squeeze(),SML_z[:,:,ilat,ilon].squeeze(),color='blue',marker='o',label = 'CT') 
-ax1.set_ylabel('depth m')
-ax1.set_xlabel('CT',color='blue')
-ax1.tick_params(axis='x',color='blue')
-ax1.xaxis.label.set_color('blue')
-ax1.set_xlim([Tmin, Tmax])
-ax1.set_xticks(tticks)
-ax1.tick_params(labelcolor='blue')
-#ax1.axhline(y = z_dtmax[:,:,ilon,ilat], color = 'k', linestyle = '--') 
-
-axsig = ax1.twiny()
-SIGmin = np.floor(np.min(SIG0[:,:,ilat,ilon])) - 0.5
-SIGmax = np.floor(np.max(SIG0[:,:,ilat,ilon])) + 0.5
-sigticks = np.arange(SIGmin,SIGmax+1,1)
-
-Splot = axsig.plot(SIG0[:,:,ilat,ilon].squeeze(),z_rho[:,:,ilat,ilon].squeeze(),color='red',marker='.',label = 'SIG0')
-axsig.set_xlabel('SIG0',color='red')
-axsig.tick_params(axis='x',color='red')
-axsig.xaxis.label.set_color('red')
-axsig.set_xlim([SIGmin, SIGmax])
-axsig.set_xticks(sigticks)
-axsig.tick_params(labelcolor='red')
-#axsig.axhline(y = z_dpmax[:,:,ir,ic], color = 'k', linestyle = '-') 
-axsig.plot(Bval[:,:,ilat,ilon].squeeze(),SML_z[:,:,ilat,ilon].squeeze(),'x')
-axsig.plot(Cval[:,:,ilat,ilon].squeeze(),BML_z[:,:,ilat,ilon].squeeze(),'x')
-
-# plot thresh
-pp = ax2.plot(np.abs(sthresh[:,:,ilat,ilon].squeeze()),z_rho[:,:,ilat,ilon].squeeze(),color='green',marker='.',label = 'surf') 
-ax2.plot(np.abs(bthresh[:,:,ilat,ilon].squeeze()),z_rho[:,:,ilat,ilon].squeeze(),color='orange',marker='.',label = 'bot') 
-ax2.set_ylabel('depth m')
-ax2.set_xlabel('surf:bot',color='blue')
-ax2.set_title('thresholds (orange B; green S)')
-ax2.tick_params(axis='x',color='blue')
-ax2.xaxis.label.set_color('blue')
-#ax2.set_xlim([Tmin, Tmax])
-#ax2.set_xticks(tticks)
-ax2.tick_params(labelcolor='blue')
-ax2.axvline(x=threshold)
-
-# plot dp/dz 
-ax3.plot(np.abs(dpdz[:,:,ilat,ilon].squeeze()),z_w[:,1:NW-1,ilat,ilon].squeeze(),color='green',marker='.',label = 'dpdz') 
-ax3.plot(np.abs(Dval[:,:,ilat,ilon].squeeze()),Dz[:,:,ilat,ilon].squeeze(),color='black',marker='o',label = 'max') 
-ax3.set_ylabel('depth m')
-ax3.set_xlabel('dp/dz')
-ax3.tick_params(axis='x')
-
-# plot dp/dz 
-ax4.plot(np.abs(dTdz[:,:,ilat,ilon].squeeze()),z_w[:,1:NW-1,ilat,ilon].squeeze(),color='green',marker='.',label = 'dpdz') 
-ax4.plot(np.abs(Fval[:,:,ilat,ilon].squeeze()),Fz[:,:,ilat,ilon].squeeze(),color='black',marker='o',label = 'max') 
-ax4.set_ylabel('depth m')
-ax4.set_xlabel('dT/dz')
-ax4.tick_params(axis='x')
-
-# po = np.where(z_rho>-250,SIG0,np.nan)  
-
+print('saved!')
