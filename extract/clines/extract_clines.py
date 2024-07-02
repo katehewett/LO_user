@@ -348,12 +348,12 @@ ds1['mask_rho'].attrs['grid'] =  args.gtagex
 
 ds1.to_netcdf(cline_fn_final, unlimited_dims='ocean_time')
 
-# clean up
-Lfun.make_dir(temp_box_dir, clean=True)
-temp_box_dir.rmdir()
+## clean up
+#Lfun.make_dir(temp_box_dir, clean=True)
+#temp_box_dir.rmdir()
 
-Lfun.make_dir(temp_cline_dir, clean=True)
-temp_cline_dir.rmdir()
+#Lfun.make_dir(temp_cline_dir, clean=True)
+#temp_cline_dir.rmdir()
 
 print('Total processing time = %0.2f sec' % (time()-tt0))
 
