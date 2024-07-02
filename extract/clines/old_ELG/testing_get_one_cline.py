@@ -286,7 +286,7 @@ CTstack = np.hstack((SML_CT,INT_CT,Dct,BML_CT))
 ds1 = Dataset()
 ds1['ocean_time'] = dsb.ocean_time
 
-ds1['zeta'] = (('ocean_time', 'lon_rho', 'lat_rho'), dsb.zeta.values, {'units':'m', 'long_name':'free-surface'}
+ds1['zeta'] = (('ocean_time', 'lon_rho', 'lat_rho'), dsb.zeta.values, {'units':'m', 'long_name':'free-surface'})
 ds1['zSML'] = (('ocean_time', 'lon_rho', 'lat_rho'), np.squeeze(SML_z,axis=1), {'units':'m', 'long_name': 'depth of bottom of SML threshold'})
 ds1['zBML'] = (('ocean_time', 'lon_rho', 'lat_rho'), np.squeeze(BML_z,axis=1), {'units':'m', 'long_name': 'depth of bottom of SML threshold'})
 ds1['zDGmax'] = (('ocean_time', 'lon_rho', 'lat_rho'), np.squeeze(Dz,axis=1), {'units':'m', 'long_name': 'depth of max density gradient'})

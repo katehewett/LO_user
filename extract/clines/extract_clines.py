@@ -31,6 +31,8 @@ Then after the cat step... we open and reassign time independent vars and delete
 This step takes an additional 6-7 seconds. But we put that on the outside of the loops because we 
 just need to do it 1x / job, which makes this run faster
 
+23 minutes to run a year on apogee! 2.59 Gb file 
+
 """
 import sys
 import argparse
