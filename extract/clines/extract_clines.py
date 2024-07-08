@@ -239,13 +239,13 @@ for ii in range(NFN):
     sys.stdout.flush()
     # extract one day at a time using ncks
     count_str = ('000000' + str(ii))[-6:]
-    box_in_fn = temp_box_dir / ('box_' + count_str + '.nc')
+    box_out_fn = temp_box_dir / ('box_' + count_str + '.nc')
     cline_out_fn = temp_cline_dir / ('cline_' + count_str + '.nc')  
     print(str(box_out_fn))
     cmd_list2 = ['python3', 'get_one_cline_rev.py',
             '-lt',args.list_type,
             '-his_fn',str(fn_list[0]), 
-            '-in_fn',str(box_in_fn),
+            '-in_fn',str(box_out_fn),
             '-out_fn', str(cline_out_fn)]
     
     proc2 = Po(cmd_list2, stdout=Pi, stderr=Pi)
