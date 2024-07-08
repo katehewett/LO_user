@@ -16,27 +16,27 @@ run extract_clines -gtx cas7_t0_x4b -ro 1 -0 2017.12.12 -1 2017.12.13 -lt lowpas
 
 scripts dev based on extract_box; extract_box_chunks.py and extract_hypoxic_volume.py
 
-get_one_cline messages:
-Time to get initial fields = 1.00 sec
-Time to apply GSW = 0.72 sec
-Time to calc SML + assign T/S= 0.22 sec
-Time to calc BML + assign T/S= 0.20 sec
-Time to calc max dT/dz(drho/dz) and assign SA(CT)= 0.16 sec
-Time to calc interior gradients and T/S= 0.32 sec
+----
+processing time and file size: 
 
-Total processing time = ~ 14seconds
-But, it's ~7 sec to run the code to: clip box; calculate params and save for 2 days lowpass data
+get_one_cline runs for each file (e.g. per day or per hour): lowpass run takes
+Time to get initial fields = 2.81 sec
+Time to apply GSW = 2.21 sec
+Time to calc SML + assign T/S= 0.71 sec
+Time to calc BML + assign T/S= 0.66 sec
+Time to calc max dT/dz(drho/dz) and assign SA(CT)= 0.69 sec
+Time to calc interior gradients and T/S= 1.06 sec
 
-Then after the cat step... we open and reassign time independent vars and delete the temp folders. 
+And then the total time for extract clines (1 year of lowpass data):
+Total processing time = 1299.55 sec 
+
+~21 - 22  minutes for a year, which makes a 6.14 GB file 
+
+---- 
+Notes: * after the cat step... we open and reassign time independent vars and delete the temp folders. 
 This step takes an additional 6-7 seconds. But we put that on the outside of the loops because we 
 just need to do it 1x / job, which makes this run faster
-
-23 minutes to run a year on apogee! 2.59 Gb file 
-
-_rev: 
-code saves duplicate files and time = 0 in final cat file
-something is wrong with the way i'm dealing w/ time - esp 2x check the diff
-between daily and lp data 
+* TODO nearshore/estuaries need to look closer at the N2-max 
 
 """
 import sys
@@ -354,13 +354,12 @@ ds1['mask_rho'].attrs['grid'] =  args.gtagex
 
 ds1.to_netcdf(cline_fn_final, unlimited_dims='ocean_time')
 
-# commented out while getting help on saving step from parker 
 ## clean up
-#Lfun.make_dir(temp_box_dir, clean=True)
-#temp_box_dir.rmdir()
+Lfun.make_dir(temp_box_dir, clean=True)
+temp_box_dir.rmdir()
 
-#Lfun.make_dir(temp_cline_dir, clean=True)
-#temp_cline_dir.rmdir()
+Lfun.make_dir(temp_cline_dir, clean=True)
+temp_cline_dir.rmdir()
 
 print('Total processing time = %0.2f sec' % (time()-tt0))
 
