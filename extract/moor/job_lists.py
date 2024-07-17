@@ -57,7 +57,16 @@ def get_sta_dict(job_name):
        'CE02SHSM': (-124.304, 44.6393),  
        'CE04OSSM': (-124.956, 44.3811)   
        }            
-    
+
+    elif job_name == 'OCNMS_mid':    
+        sta_dict = {
+            'MB042': (-124.7354, 48.324),
+            'CA042': (-124.8234, 48.166),
+            'TH042': (-124.7334, 47.8762),
+            'KL027': (-124.4971, 47.5946),
+            'CE042': (-124.4887, 47.3531),
+        }
+            
     elif job_name == 'OCNMS_moorings_current':    # Mooring deployments for LO years: 2017 - 202(3) 
         sta_dict = {
             'MB015': (-124.6768, 48.3254),	
