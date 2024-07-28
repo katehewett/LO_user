@@ -6,6 +6,7 @@ updated code to make the volume calculations run faster
 
 To test on mac:
 run extract_vol_v2 -gtx cas6_v0_live -ro 1 -0 2022.08.08 -1 2022.08.09 
+run extract_vol_v2 -gtx cas7_t0_x4b -ro 1 -0 2017.12.12 -1 2017.12.13 
 Need to add in testing lines 
 
 2 history files, all hypoxia Total processing time = 2.71 sec 
@@ -24,7 +25,7 @@ Testing January 2023 - present
 # imports
 from lo_tools import Lfun, zfun, zrfun
 from lo_tools import extract_argfun as exfun
-Ldir = exfun.intro() # this handles the argument passing
+Ldir = exfun.intro()                          # this handles the argument passing
 
 from subprocess import Popen as Po
 from subprocess import PIPE as Pi
