@@ -1,19 +1,15 @@
 """
-Code to extract hypoxic volumes from LO domain 
+Code to extract corrosive volume from LO domain 
 
 running testing code with two history files on kh personal mac, looks like:
-run extract_hypoxic_volume_rev1 -gtx cas7_t0_x4b -ro 1 -0 2017.12.12 -1 2017.12.13 -lt lowpass -test True
-run extract_hypoxic_volume_rev1 -gtx cas7_t0_x4b -ro 1 -0 2017.12.12 -1 2017.12.13 -lt lowpass -fb True
+run extract_corrosive_volume_rev1 -gtx cas7_t0_x4b -ro 1 -0 2017.12.12 -1 2017.12.13 -lt lowpass -test True
 
 apogee:
-python extract_hypoxic_volume_rev1.py -gtx cas7_t0_x4b -ro 3 -0 2014.01.31 -1 2014.12.31 -lt lowpass > test.log &
-python extract_hypoxic_volume_rev1.py -gtx cas7_t0_x4b -ro 3 -0 2014.01.01 -1 2014.12.31 -lt lowpass -fb True > a_falsebot.log & 
+python extract_corrosive_volume_rev1.py -gtx cas7_t0_x4b -ro 3 -0 2014.01.31 -1 2014.12.31 -lt lowpass > test.log & 
 
 First created: January 2023
 July 2024, rev1: 
-* using argparse so can set gtx and, 
-* updated lt so its fed in as an argument and not hardcoded to daily 
-* changed the way we open/save vars that do not change with time to speed up run
+* using argparse so can set gtx and lt 
 
 """
 
@@ -34,7 +30,7 @@ import xarray as xr
 import numpy as np
 
 pid = os.getpid()
-print('Calculating hypoxic volumes '.center(60,'='))
+print('Calculating corrosive volumes '.center(60,'='))
 print('PID for this job = ' + str(pid))
 
 # command line arugments
@@ -47,7 +43,7 @@ parser.add_argument('-0', '--ds0', type=str) # e.g. 2019.07.04
 parser.add_argument('-1', '--ds1', type=str) # e.g. 2019.07.06
 parser.add_argument('-lt', '--list_type', type=str) # list type: hourly, daily, weekly, lowpass
 # Optional args for testing and proc:
-parser.add_argument('-fb','--false_bottom', default = False, type = Lfun.boolean_string) # places 200m false bottom 
+#parser.add_argument('-fb','--false_bottom', default = False, type = Lfun.boolean_string) # places 200m false bottom 
 parser.add_argument('-Nproc', type=int, default=10)
 parser.add_argument('-test', '--testing', default=False, type=Lfun.boolean_string)
 # get the args and put into Ldir
@@ -89,16 +85,16 @@ elif Ldir['roms_out_num'] > 0:
     
 # output location and filenames + temp dir to accumulate individual extractions
 dd_str = '_' + Ldir['ds0'] + '_' + Ldir['ds1']
-out_dir = Ldir['LOo'] / 'extract' / Ldir['gtagex'] / 'hypoxic_volume' / ('LO' + dd_str)
+out_dir = Ldir['LOo'] / 'extract' / Ldir['gtagex'] / 'corrosive_volume' / ('LO' + dd_str)
 temp_vol_dir = out_dir / 'temp_vol_dir'
 
 Lfun.make_dir(out_dir, clean=False)
 Lfun.make_dir(temp_vol_dir, clean=True)
 
 if args.false_bottom == True:
-    vol_fn_final = 'LO_hypoxic_volume_' + args.list_type + dd_str + '_false_bottom.nc'
+    vol_fn_final = 'LO_corrosive_volume_' + args.list_type + dd_str + '_false_bottom.nc'
 elif args.false_bottom == False:
-    vol_fn_final = 'LO_hypoxic_volume_' + args.list_type + dd_str + '.nc'
+    vol_fn_final = 'LO_corrosive_volume_' + args.list_type + dd_str + '.nc'
         
 # get list of files to work on and check before entering loop over all files 
 fn_list = Lfun.get_fn_list(Ldir['list_type'], Ldir, Ldir['ds0'], Ldir['ds1'])
@@ -130,9 +126,9 @@ for ii in range(N):
     fn = fn_list[ii]
     ii_str = ('0000' + str(ii))[-5:]
     out_fn = temp_vol_dir / ('CC_' + ii_str + '.nc')
-    cmd_list = ['python3', 'get_one_hypoxic_volume_rev1.py',
+    cmd_list = ['python3', 'get_one_corrosive_volume_rev1.py',
             '-lt',args.list_type,
-            '-fb',str(args.false_bottom),
+            #'-fb',str(args.false_bottom),
             '-in_fn',str(fn),
             '-out_fn', str(out_fn)]
     proc = Po(cmd_list, stdout=Pi, stderr=Pi)
@@ -190,7 +186,7 @@ print('Time to concat = %0.2f sec' % (time()-tt0))
 Next we want to repackage these results into one NetCDF file per section, with all times.
 
 Variables in the NetCDF files:
-- hyp_dz (mild, severe, anoxic) is depth of the hypoxic layer(s) in each cell (t, x, y) [same for all other variables]
+- hyp_dz (mild, severe, anoxic) is depth of the corrosive layer(s) in each cell (t, x, y) [same for all other variables]
 - corrosive_dz is the undersaturated layer (t, x, y)
 
 To save space, we save the variables that don't change over time once 
@@ -244,4 +240,6 @@ Lfun.make_dir(temp_vol_dir, clean=True)
 temp_vol_dir.rmdir()
 
 print('Time to save and clean-up = %0.2f sec' % (time()-tt0)) 
+
+
 
