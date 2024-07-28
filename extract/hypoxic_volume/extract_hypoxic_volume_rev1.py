@@ -42,6 +42,7 @@ parser.add_argument('-0', '--ds0', type=str) # e.g. 2019.07.04
 parser.add_argument('-1', '--ds1', type=str) # e.g. 2019.07.06
 parser.add_argument('-lt', '--list_type', type=str) # list type: hourly, daily, weekly, lowpass
 # Optional args for testing and proc:
+#parser.add_argument('-false_bot', default = False, type = Lfun.boolean_string) # places 200m false bottom 
 parser.add_argument('-Nproc', type=int, default=10)
 parser.add_argument('-test', '--testing', default=False, type=Lfun.boolean_string)
 # get the args and put into Ldir
