@@ -8,7 +8,7 @@ import numpy as np
 import sys
 
 from argparse import ArgumentParser
-from lo_tools import zfun, zrfun
+from lo_tools import Lfun, zfun, zrfun
 import xarray as xr
 from xarray import open_dataset, Dataset
 from numpy import nan, ones, diff
@@ -19,6 +19,7 @@ parser = ArgumentParser()
 parser.add_argument('-in_fn', type=str)             # path to history file
 parser.add_argument('-out_fn', type=str)            # path to outfile (temp directory)
 parser.add_argument('-lt', '--list_type', type=str) # list type: hourly, daily, weekly, lowpass
+parser.add_argument('-fb','--false_bottom', default = False, type = Lfun.boolean_string) # places 200m false bottom 
 args = parser.parse_args()
 
 tt0 = time()
@@ -48,8 +49,13 @@ sys.stdout.flush()
 
 tt0 = time()
 
+if args.false_bottom == True:
+    oxy = ds.oxygen.values.squeeze()
+    oxy[z_rho<-200] = 9999        # put big O2 value so that does not include in depths below 200m in the hyp vol calculation 
+elif args.false_bottom == False:
+    oxy = ds.oxygen.values.squeeze()
+    
 # hypoxia thresholds 
-oxy = ds.oxygen.values.squeeze()
 dzrm = np.ma.masked_where(oxy>106.6,dzr) 
 mild_dz = dzrm.sum(axis=0)
 

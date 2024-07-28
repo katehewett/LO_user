@@ -3,6 +3,10 @@ Code to extract hypoxic volumes from LO domain
 
 running testing code with two history files on kh personal mac, looks like:
 run extract_hypoxic_volume_rev1 -gtx cas7_t0_x4b -ro 1 -0 2017.12.12 -1 2017.12.13 -lt lowpass -test True
+run extract_hypoxic_volume_rev1 -gtx cas7_t0_x4b -ro 1 -0 2017.12.12 -1 2017.12.13 -lt lowpass -fb True
+
+apogee:
+python extract_hypoxic_volume_rev1 -gtx cas7_t0_x4b -ro 3 -0 2014.01.31 -1 2014.12.31 -lt lowpass > test.log &
 
 First created: January 2023
 July 2024, rev1: 
@@ -42,7 +46,7 @@ parser.add_argument('-0', '--ds0', type=str) # e.g. 2019.07.04
 parser.add_argument('-1', '--ds1', type=str) # e.g. 2019.07.06
 parser.add_argument('-lt', '--list_type', type=str) # list type: hourly, daily, weekly, lowpass
 # Optional args for testing and proc:
-#parser.add_argument('-false_bot', default = False, type = Lfun.boolean_string) # places 200m false bottom 
+parser.add_argument('-fb','--false_bottom', default = False, type = Lfun.boolean_string) # places 200m false bottom 
 parser.add_argument('-Nproc', type=int, default=10)
 parser.add_argument('-test', '--testing', default=False, type=Lfun.boolean_string)
 # get the args and put into Ldir
@@ -89,9 +93,12 @@ temp_vol_dir = out_dir / 'temp_vol_dir'
 
 Lfun.make_dir(out_dir, clean=False)
 Lfun.make_dir(temp_vol_dir, clean=True)
-        
-vol_fn_final = 'LO_hypoxic_volume_' + args.list_type + dd_str + '.nc'
 
+if args.false_bottom == True:
+    vol_fn_final = 'LO_hypoxic_volume_' + args.list_type + dd_str + '_false_bottom.nc'
+elif args.false_bottom == False:
+    vol_fn_final = 'LO_hypoxic_volume_' + args.list_type + dd_str + '.nc'
+        
 # get list of files to work on and check before entering loop over all files 
 fn_list = Lfun.get_fn_list(Ldir['list_type'], Ldir, Ldir['ds0'], Ldir['ds1'])
 
@@ -122,9 +129,9 @@ for ii in range(N):
     fn = fn_list[ii]
     ii_str = ('0000' + str(ii))[-5:]
     out_fn = temp_vol_dir / ('CC_' + ii_str + '.nc')
-    # use subprocesses
     cmd_list = ['python3', 'get_one_hypoxic_volume_rev1.py',
             '-lt',args.list_type,
+            '-fb',str(args.false_bottom),
             '-in_fn',str(fn),
             '-out_fn', str(out_fn)]
     proc = Po(cmd_list, stdout=Pi, stderr=Pi)
@@ -227,7 +234,7 @@ ds1['DA'] = (('eta_rho', 'xi_rho'),FF['DA'],{'units': 'm^2'})
 ds1['DA'].attrs['standard_name'] = 'cell area'
 ds1['DA'].attrs['long_name'] = 'cell horizontal area'
 ds1['DA'].attrs['grid'] =  args.gtagex
-
+    
 this_fn = out_dir / (vol_fn_final)
 ds1.to_netcdf(this_fn)
 
