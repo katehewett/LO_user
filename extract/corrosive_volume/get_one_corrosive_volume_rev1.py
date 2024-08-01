@@ -131,27 +131,33 @@ sys.stdout.flush()
 # 4. Form the map of the thickness of corrosive water [m].
 tt0 = time()
 dzrm = dzr.copy()
-dzrm[ARAG>1] = 0
-corrosive_1_dz = dzrm.sum(axis=0)
-CC['corrosive_1_dz'] = corrosive_dz
+dzrm[ARAG>0.5] = 0
+corrosive_severe_dz = dzrm.sum(axis=0)
+CC['corrosive_severe_dz'] = corrosive_severe_dz
+
+dzrm1 = dzr.copy()
+dzrm1[ARAG>1] = 0
+corrosive_int_dz = dzrm1.sum(axis=0)
+CC['corrosive_int_dz'] = corrosive_int_dz
 
 dzrm2 = dzr.copy()
-dzrm2[ARAG>0.5] = 0
-corrosive_05_dz = dzrm.sum(axis=0)
-CC['corrosive_05_dz'] = corrosive_dz
+dzrm2[ARAG>1.7] = 0
+corrosive_mild_dz = dzrm2.sum(axis=0)
+CC['corrosive_mild_dz'] =corrosive_mild_dz
 
 print('Time to get corrosive_dz = %0.2f sec' % (time()-tt0))
 sys.stdout.flush()
 
 # put them in a dataset, ds1
-NR, NC = CC['corrosive_1_dz'].shape        
+NR, NC = CC['corrosive_int_dz'].shape        
 ot = ds.ocean_time.values          # an array with dtype='datetime64[ns]'
 
 ds1 = Dataset()
 ds1['ocean_time'] = (('ocean_time'), ot, {'calendar':ds.ocean_time.calendar,'units':ds.ocean_time.units})
 
-ds1['corrosive_1_dz'] = (('ocean_time', 'eta_rho', 'xi_rho'), CC['corrosive_1_dz'].reshape(1,NR,NC), {'units':'m', 'long_name': 'Thickness of undersaturated layer <1'})
-ds1['corrosive_05_dz'] = (('ocean_time', 'eta_rho', 'xi_rho'), CC['corrosive_05_dz'].reshape(1,NR,NC), {'units':'m', 'long_name': 'Thickness of undersaturated layer <0.5'})
+ds1['corrosive_severe_dz'] = (('ocean_time', 'eta_rho', 'xi_rho'), CC['corrosive_severe_dz'].reshape(1,NR,NC), {'units':'m', 'long_name': 'Thickness of layer Oag<0.5'})
+ds1['corrosive_int_dz'] = (('ocean_time', 'eta_rho', 'xi_rho'), CC['corrosive_int_dz'].reshape(1,NR,NC), {'units':'m', 'long_name': 'Thickness of layer Oag<1'})
+ds1['corrosive_mild_dz'] = (('ocean_time', 'eta_rho', 'xi_rho'), CC['corrosive_mild_dz'].reshape(1,NR,NC), {'units':'m', 'long_name': 'Thickness of layer Oag<1.7'})
 
 ds1.to_netcdf(args.out_fn, unlimited_dims='ocean_time')
 
