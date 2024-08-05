@@ -5,7 +5,7 @@ running testing code with two history files on kh personal mac, looks like:
 run extract_corrosive_volume_rev1 -gtx cas7_t0_x4b -ro 1 -0 2017.12.12 -1 2017.12.13 -lt lowpass -test True
 
 apogee:
-python extract_corrosive_volume_rev1.py -gtx cas7_t0_x4b -ro 3 -0 2014.01.31 -1 2014.12.31 -lt lowpass > test.log & 
+python extract_corrosive_volume_rev1.py -gtx cas7_t0_x4b -ro 3 -0 2013.01.01 -1 2013.12.31 -lt lowpass > a_corr.log & 
 
 First created: January 2023
 July 2024, rev1: 
