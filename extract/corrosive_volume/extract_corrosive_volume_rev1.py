@@ -31,10 +31,13 @@ import argparse
 import pandas as pd
 import xarray as xr
 import numpy as np
+import datetime 
 
 pid = os.getpid()
 print('Calculating corrosive volumes '.center(60,'='))
 print('PID for this job = ' + str(pid))
+now = datetime.datetime.now()
+print('started process at: ' + str(now))
 
 # command line arugments
 parser = argparse.ArgumentParser()
@@ -155,12 +158,15 @@ for ii in range(N):
     # Print screen output about progress.
     if (np.mod(ii,10) == 0) and ii>0:
         print(str(ii), end=', ')
+        print('Time spent calculating corrosive vol = %0.2f sec' % (time()-tt0))
         sys.stdout.flush()
     if (np.mod(ii,50) == 0) and (ii > 0):
         print('') # line feed
+        print('Time spent calculating corrosive vol = %0.2f sec' % (time()-tt0))
         sys.stdout.flush()
     if (ii == N-1):
         print(str(ii))
+        print('Time spent calculating corrosive vol = %0.2f sec' % (time()-tt0))
         sys.stdout.flush()
 
 print('Total processing vol calculations = %0.2f sec' % (time()-tt0))
@@ -184,6 +190,7 @@ if len(stderr) > 0:
     sys.stdout.flush()
  
 print('Time to concat = %0.2f sec' % (time()-tt0))     
+sys.stdout.flush()
   
 """
 Next we want to repackage these results into one NetCDF file per section, with all times.
@@ -239,10 +246,10 @@ this_fn = out_dir / (vol_fn_final)
 ds1.to_netcdf(this_fn)
 
 # clean up 
-Lfun.make_dir(temp_vol_dir, clean=True)
-temp_vol_dir.rmdir()
+#Lfun.make_dir(temp_vol_dir, clean=True)
+#temp_vol_dir.rmdir()
 
 print('Time to save and clean-up = %0.2f sec' % (time()-tt0)) 
-
+sys.stdout.flush()
 
 

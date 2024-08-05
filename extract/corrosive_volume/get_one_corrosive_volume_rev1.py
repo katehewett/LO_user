@@ -27,7 +27,7 @@ args = parser.parse_args()
 testing = False # True => process fewer layers for ARAG
 
 # 1. Get some grid information
-tt0 = time()
+#tt0 = time()
 ds = xr.open_dataset(args.in_fn, decode_times=False)
 G, S, T = zrfun.get_basic_info(args.in_fn)
 lon = ds.lon_rho.values
@@ -45,11 +45,11 @@ mask_rho = ds.mask_rho.values
 CC['mask_rho']=mask_rho
 z_rho, z_w = zrfun.get_z(h, 0*h, S) # use 0 for SSH
 dzr = np.diff(z_w, axis=0) # vertical thickness of all celle [m]
-print('Time to get initial fields = %0.2f sec' % (time()-tt0))
-sys.stdout.flush()
+#print('Time to get initial fields = %0.2f sec' % (time()-tt0))
+#sys.stdout.flush()
 
 # 2. Prepare for carbon variable calculations
-tt0 = time()
+#tt0 = time()
 p = gsw.p_from_z(z_rho, lat) # pressure [dbar]
 SP = ds.salt.values.squeeze() # practical salinity
 # Note: SP and other fields loaded this way will be packed z,y,x
@@ -73,13 +73,13 @@ TIC1 = 1000 * TIC / rho
 # caused big slowdowns in the MATLAB version of CO2SYS.
 ALK1[ALK1 < 100] = 100
 TIC1[TIC1 < 100] = 100
-print('Time to load and prepare carbon fields = %0.2f sec' % (time()-tt0))
-sys.stdout.flush()
+#print('Time to load and prepare carbon fields = %0.2f sec' % (time()-tt0))
+#sys.stdout.flush()
 
 # 3. Calculate aragonite saturation and a map of corrosive thickness.
 # We do this one layer at a time because pyco2 got bogged down if we fed it
 # the whole 3-D arrays at once.
-tt0 = time()
+#tt0 = time()
 ARAG = np.nan * np.ones(SP.shape) # Initialize array (z,y,z) to hold results.
 nz, nr, nc = SP.shape # handy dimension sizes
 amat = np.nan * np.ones((nr,nc)) # Initialize array (y,x) for single layer.
@@ -124,12 +124,12 @@ for ii in range(nlay):
     #print('  ii = %d' % (ii))
     #print('  Time to get one slice = %0.2f sec' % (time()-tt00))
     sys.stdout.flush()
-print('Time to calculate ARAG for all layers = %0.2f sec' % (time()-tt0))
-print('saving:', args.in_fn)
-sys.stdout.flush()
+#print('Time to calculate ARAG for all layers = %0.2f sec' % (time()-tt0))
+#print('saving:', args.in_fn)
+#sys.stdout.flush()
 
 # 4. Form the map of the thickness of corrosive water [m].
-tt0 = time()
+#tt0 = time()
 dzrm = dzr.copy()
 dzrm[ARAG>0.5] = 0
 corrosive_severe_dz = dzrm.sum(axis=0)
@@ -145,8 +145,8 @@ dzrm2[ARAG>1.7] = 0
 corrosive_mild_dz = dzrm2.sum(axis=0)
 CC['corrosive_mild_dz'] =corrosive_mild_dz
 
-print('Time to get corrosive_dz = %0.2f sec' % (time()-tt0))
-sys.stdout.flush()
+#print('Time to get corrosive_dz = %0.2f sec' % (time()-tt0))
+#sys.stdout.flush()
 
 # put them in a dataset, ds1
 NR, NC = CC['corrosive_int_dz'].shape        
