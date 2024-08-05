@@ -10,6 +10,17 @@ very long time to run on apogee (and would stop on day 100 - 189).
 running testing code with two history files on kh personal mac, looks like:
 run extract_corrosive_box -gtx cas7_t0_x4b -ro 1 -0 2017.12.12 -1 2017.12.13 -lt lowpass -job OA_indicators -test True
 
+15 seconds total for 2 history files 
+
+each arag calc: 
+get_one_cline messages:
+Time to get initial fields = 0.46 sec
+Time to load and prepare carbon fields = 1.31 sec
+Time to calculate ARAG for all layers = 9.08 sec
+Time to get corrosive_dz = 0.04 sec
+
+
+python extract_corrosive_box.py -gtx cas7_t0_x4b -ro 3 -0 2017.12.12 -1 2017.12.13 -lt lowpass -job OA_indicators -test True > test.log &
 """
 import sys
 import argparse
