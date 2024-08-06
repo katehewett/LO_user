@@ -10,17 +10,24 @@ very long time to run on apogee (and would stop on day 100 - 189).
 running testing code with two history files on kh personal mac, looks like:
 run extract_corrosive_box -gtx cas7_t0_x4b -ro 1 -0 2017.12.12 -1 2017.12.13 -lt lowpass -job OA_indicators -test True
 
-15 seconds total for 2 history files 
-
-each arag calc: 
-get_one_cline messages:
+12 seconds total for 2 history files on personal computer 
+And, each arag calc looks ~like: 
+get_one_cline::
 Time to get initial fields = 0.46 sec
 Time to load and prepare carbon fields = 1.31 sec
 Time to calculate ARAG for all layers = 9.08 sec
 Time to get corrosive_dz = 0.04 sec
 
-
+apogee 
 python extract_corrosive_box.py -gtx cas7_t0_x4b -ro 3 -0 2017.12.12 -1 2017.12.13 -lt lowpass -job OA_indicators -test True > test.log &
+
+takes 153 seconds total for 2 history files on apogee
+And, each arag calc looks ~like: 
+get_one_cline messages:
+Time to get initial fields = 1.96 sec
+Time to load and prepare carbon fields = 3.30 sec
+Time to calculate ARAG for all layers = 140.55 sec
+Time to get corrosive_dz and save = 0.55 sec
 
 """
 import sys
@@ -39,7 +46,7 @@ import gsw
 tti = time()
 
 pid = os.getpid()
-print(' Finding pycnocline '.center(60,'='))
+print(' Finding corrosive volume '.center(60,'='))
 print('PID for this job = ' + str(pid))
 print('started process at: ' + str(datetime.datetime.now()))
 
@@ -250,8 +257,7 @@ for ii in range(NFN):
         print(' = %0.2f sec' % (time()- tt1)) 
         sys.stdout.flush()
     
-    # TODO check on this, i think that the ARAG times etc in get one cor vol are 
-    # posting for each 10 file group and not 1/per ::
+    # TODO check on the time postings
     
     # Nproc controls how many ncks subprocesses we allow to stack up
     # before we require them all to finish.
@@ -338,11 +344,11 @@ ds1['DA'].attrs['grid'] =  args.gtagex
 ds1.to_netcdf(vol_fn_final, unlimited_dims='ocean_time')
 
 ## clean up
-#Lfun.make_dir(temp_box_dir, clean=True)
-#temp_box_dir.rmdir()
+Lfun.make_dir(temp_box_dir, clean=True)
+temp_box_dir.rmdir()
 
-#Lfun.make_dir(temp_vol_dir, clean=True)
-#temp_vol_dir.rmdir()
+Lfun.make_dir(temp_vol_dir, clean=True)
+temp_vol_dir.rmdir()
 
 print('Time open and save time independent vars = %0.2f sec' % (time()-tt1))
 print('Total processing time = %0.2f sec' % (time()-tti))
