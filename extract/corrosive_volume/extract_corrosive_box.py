@@ -21,6 +21,7 @@ Time to get corrosive_dz = 0.04 sec
 
 
 python extract_corrosive_box.py -gtx cas7_t0_x4b -ro 3 -0 2017.12.12 -1 2017.12.13 -lt lowpass -job OA_indicators -test True > test.log &
+
 """
 import sys
 import argparse
@@ -30,15 +31,17 @@ from subprocess import PIPE as Pi
 import os
 import xarray as xr
 import numpy as np
+import datetime 
 from time import time
 
 import gsw
 
-tt0 = time()
+tti = time()
 
 pid = os.getpid()
 print(' Finding pycnocline '.center(60,'='))
 print('PID for this job = ' + str(pid))
+print('started process at: ' + str(datetime.datetime.now()))
 
 # command line arugments
 parser = argparse.ArgumentParser()
@@ -168,7 +171,6 @@ proc_list2 = []
 print('Working on ' + vol_fn_final.name + ' (' + str(NFN) + ' times)')
 for ii in range(NFN):
     fn = fn_list[ii]
-    sys.stdout.flush()
     # extract one day at a time using ncks
     count_str = ('000000' + str(ii))[-6:]
     box_out_fn = temp_box_dir / ('box_' + count_str + '.nc')
@@ -186,12 +188,15 @@ for ii in range(NFN):
     # screen output about progress
     if (np.mod(ii,10) == 0) and ii>0:
         print(str(ii), end=', ')
+        print('time check: ' + str(datetime.datetime.now()))
         sys.stdout.flush()
     if (np.mod(ii,50) == 0) and (ii > 0):
         print('') # line feed
+        print('time check: ' + str(datetime.datetime.now()))
         sys.stdout.flush()
     if (ii == NFN-1):
         print(str(ii))
+        print('time check: ' + str(datetime.datetime.now()))
         sys.stdout.flush()
         
     # Nproc controls how many ncks subprocesses we allow to stack up
@@ -205,13 +210,15 @@ for ii in range(NFN):
     
     ii += 1
 
-print(' - Time for clipping box; calculating layers = %0.2f sec' % (time()- tt1))   
-    
+print(' - Time for clipping box = %0.2f sec' % (time()- tt1))   
+sys.stdout.flush() 
+
+# calc corrosive volumes from the box files 
 tt1 = time()
 print('Working on corrosive volumes ...')
 for ii in range(NFN):
     fn = fn_list[ii]
-    sys.stdout.flush()
+
     # extract one day at a time using ncks
     count_str = ('000000' + str(ii))[-6:]
     box_out_fn = temp_box_dir / ('box_' + count_str + '.nc')
@@ -229,14 +236,23 @@ for ii in range(NFN):
     # screen output about progress
     if (np.mod(ii,10) == 0) and ii>0:
         print(str(ii), end=', ')
+        print('time check: ' + str(datetime.datetime.now()))
+        print(' = %0.2f sec' % (time()- tt1)) 
         sys.stdout.flush()
     if (np.mod(ii,50) == 0) and (ii > 0):
         print('') # line feed
+        print('time check: ' + str(datetime.datetime.now()))
+        print(' = %0.2f sec' % (time()- tt1)) 
         sys.stdout.flush()
     if (ii == NFN-1):
         print(str(ii))
+        print('time check: ' + str(datetime.datetime.now()))
+        print(' = %0.2f sec' % (time()- tt1)) 
         sys.stdout.flush()
-        
+    
+    # TODO check on this, i think that the ARAG times etc in get one cor vol are 
+    # posting for each 10 file group and not 1/per ::
+    
     # Nproc controls how many ncks subprocesses we allow to stack up
     # before we require them all to finish.
     if ((np.mod(ii,Ldir['Nproc']) == 0) and (ii > 0)) or (ii == NFN-1):
@@ -249,6 +265,8 @@ for ii in range(NFN):
     ii += 1
 
 print(' - Time for calculating all corrosive volumes = %0.2f sec' % (time()- tt1)) 
+print('time check: ' + str(datetime.datetime.now()))
+sys.stdout.flush()
 
 tt1 = time()
 print('concatenating files...')
@@ -327,5 +345,6 @@ ds1.to_netcdf(vol_fn_final, unlimited_dims='ocean_time')
 #temp_vol_dir.rmdir()
 
 print('Time open and save time independent vars = %0.2f sec' % (time()-tt1))
-print('Total processing time = %0.2f sec' % (time()-tt0))
+print('Total processing time = %0.2f sec' % (time()-tti))
+print('FINISHED at: ' + str(datetime.datetime.now()))
 

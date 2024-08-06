@@ -119,7 +119,6 @@ for ii in range(nlay):
     #print('  Time to get one slice = %0.2f sec' % (time()-tt00))
     sys.stdout.flush()
 print('Time to calculate ARAG for all layers = %0.2f sec' % (time()-tt0))
-
 sys.stdout.flush()
 
 # 4. Form the map of the thickness of corrosive water [m].
@@ -141,9 +140,6 @@ dzrm2[ARAG>1.7] = 0
 corrosive_mild_dz = dzrm2.sum(axis=0)
 CC['corrosive_mild_dz'] =corrosive_mild_dz
 
-print('Time to get corrosive_dz = %0.2f sec' % (time()-tt0))
-sys.stdout.flush()
-
 # put them in a dataset, ds1
 NR, NC = CC['corrosive_int_dz'].shape        
 ot = ds.ocean_time.values          # an array with dtype='datetime64[ns]'
@@ -157,3 +153,5 @@ ds1['corrosive_mild_dz'] = (('ocean_time', 'eta_rho', 'xi_rho'), CC['corrosive_m
 
 ds1.to_netcdf(args2.output_vol_files, unlimited_dims='ocean_time')
 
+print('Time to get corrosive_dz and save = %0.2f sec' % (time()-tt0))
+sys.stdout.flush()
