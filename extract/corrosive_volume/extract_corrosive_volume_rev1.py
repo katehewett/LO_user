@@ -36,8 +36,7 @@ import datetime
 pid = os.getpid()
 print('Calculating corrosive volumes '.center(60,'='))
 print('PID for this job = ' + str(pid))
-now = datetime.datetime.now()
-print('started process at: ' + str(now))
+print('started process at: ' + str(datetime.datetime.now()))
 
 # command line arugments
 parser = argparse.ArgumentParser()
@@ -106,7 +105,7 @@ elif args.false_bottom == False:
 fn_list = Lfun.get_fn_list(Ldir['list_type'], Ldir, Ldir['ds0'], Ldir['ds1'])
 
 # put the fields that do not change with time to a dictionary 
-tt0 = time()
+tt00 = time()
 
 FF = dict()
 G, S, T = zrfun.get_basic_info(fn_list[0])
@@ -121,6 +120,7 @@ FF['mask_rho']=mask_rho
 del ds, h, mask_rho
 
 print('Time to get initial fields = %0.2f sec' % (time()-tt0))
+print('Time check: ' + str(datetime.datetime.now()))
 sys.stdout.flush()
 
 # loop over all jobs
@@ -159,14 +159,17 @@ for ii in range(N):
     if (np.mod(ii,10) == 0) and ii>0:
         print(str(ii), end=', ')
         print('Time spent calculating corrosive vol = %0.2f sec' % (time()-tt0))
+        print('Time check: ' + str(datetime.datetime.now()))
         sys.stdout.flush()
     if (np.mod(ii,50) == 0) and (ii > 0):
         print('') # line feed
         print('Time spent calculating corrosive vol = %0.2f sec' % (time()-tt0))
+        print('Time check: ' + str(datetime.datetime.now()))
         sys.stdout.flush()
     if (ii == N-1):
         print(str(ii))
         print('Time spent calculating corrosive vol = %0.2f sec' % (time()-tt0))
+        print('Time check: ' + str(datetime.datetime.now()))
         sys.stdout.flush()
 
 print('Total processing vol calculations = %0.2f sec' % (time()-tt0))
@@ -250,6 +253,10 @@ ds1.to_netcdf(this_fn)
 #temp_vol_dir.rmdir()
 
 print('Time to save and clean-up = %0.2f sec' % (time()-tt0)) 
+sys.stdout.flush()
+
+print('Time to run extract_corrosive_volume_rev1.py = %0.2f sec' % (time()-tt00)) 
+print('Time check finish: ' + str(datetime.datetime.now()))
 sys.stdout.flush()
 
 
