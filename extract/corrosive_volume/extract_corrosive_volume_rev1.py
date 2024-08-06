@@ -119,7 +119,7 @@ mask_rho = ds.mask_rho.values
 FF['mask_rho']=mask_rho
 del ds, h, mask_rho
 
-print('Time to get initial fields = %0.2f sec' % (time()-tt0))
+print('Time to get initial fields = %0.2f sec' % (time()-tt00))
 print('Time check: ' + str(datetime.datetime.now()))
 sys.stdout.flush()
 
