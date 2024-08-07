@@ -40,8 +40,8 @@ import xarray as xr
 import numpy as np
 import datetime 
 from time import time
-
-import gsw
+import posixpath
+import shutil
 
 tti = time()
 
@@ -300,8 +300,9 @@ print('saving vars')
 """
 Saving variables that don't change over time - this is here to make the cat step faster
 - h is bathymetric depth 
-- ocean_time is a vector of time; [lowpass is converted to UTC and centered at 1200 UTC; daily is diff] 
 - Lat and Lon on rho points 
+- mask_rho and DA (cell area)
+ocean_time is a vector of time; [lowpass is converted to UTC and centered at 1200 UTC; daily is diff] 
 """
 tt1 = time()
 
@@ -342,6 +343,39 @@ ds1['DA'].attrs['long_name'] = 'cell horizontal area'
 ds1['DA'].attrs['grid'] =  args.gtagex
 
 ds1.to_netcdf(vol_fn_final, unlimited_dims='ocean_time')
+ds1.close()
+
+print('Time to format and save time independent vars = %0.2f sec' % (time()-tt1))
+
+# compress the resulting file
+file_size0 = os.path.getsize(vol_fn_final)
+print('Original filesize: ', file_size0, ' bytes')
+
+temp_fn2 = posixpath.join(posixpath.dirname(vol_fn_final),'temp_fn2.nc')
+
+# TODO move this out of the main code 
+def copy_and_replace(source_path, destination_path):
+    if os.path.exists(destination_path):
+        os.remove(destination_path)
+    shutil.copy2(source_path, destination_path)
+    
+try:
+    tt1 = time()
+    ds = xr.open_dataset(vol_fn_final)
+    enc_dict = {'zlib':True, 'complevel':1, '_FillValue':1e20}
+    Enc_dict = {vn:enc_dict for vn in ds.data_vars if 'ocean_time' in ds[vn].dims}
+    ds.to_netcdf(temp_fn2, encoding=Enc_dict)
+    ds.close()
+    copy_and_replace(temp_fn2, vol_fn_final)
+    print(' Time to compress = %0.2f sec' % (time()- tt1))
+    sys.stdout.flush()
+except Exception as e:
+    print(' * Exception compress step')
+    print(e)
+
+file_size1 = os.path.getsize(vol_fn_final)
+diff_size = file_size0-file_size1
+print('Compression saved: ', diff_size, ' bytes')
 
 ## clean up
 Lfun.make_dir(temp_box_dir, clean=True)
@@ -350,7 +384,20 @@ temp_box_dir.rmdir()
 Lfun.make_dir(temp_vol_dir, clean=True)
 temp_vol_dir.rmdir()
 
-print('Time open and save time independent vars = %0.2f sec' % (time()-tt1))
-print('Total processing time = %0.2f sec' % (time()-tti))
+os.remove(temp_fn2)
+
+# Finale
+print('\nSize of full rho-grid = %s' % (str(np.shape(lon_rho))))
+print(' \nContents of extracted box file: '.center(60,'-'))
+# check on the results
+ds = xr.open_dataset(vol_fn_final)
+for vn in ds.data_vars:
+    print('%s %s' % (vn, str(ds[vn].shape)))
+ds.close()
+print('\nPath to file:\n%s' % (str(vol_fn_final)))
+print('\nTotal processing time = %0.2f sec' % (time()- tti))
 print('FINISHED at: ' + str(datetime.datetime.now()))
+
+
+
 

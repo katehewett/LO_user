@@ -5,10 +5,10 @@ kh: LO_user
 """
 
 def get_cbox(job, Lon, Lat):
-    vn_list = 'h,f,pm,pn,mask_rho,salt,temp,zeta' # default list
+    vn_list = 'h,pm,pn,zeta,mask_rho,salt,temp,zeta' # default list
     # specific jobs
     if job == 'OA_indicators':
         aa = [-125.5, -123.5, 42.75, 48.75]
-        vn_list = 'h,f,pm,pn,lat_rho,lon_rho,mask_rho,salt,temp,alkalinity,TIC,zeta'
+        vn_list = 'h,pm,pn,mask_rho,salt,temp,alkalinity,TIC'
 
     return aa, vn_list

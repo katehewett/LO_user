@@ -33,10 +33,11 @@ h = ds.h.values
 mask_rho = ds.mask_rho.values
 
 G, S, T = zrfun.get_basic_info(args2.input_his_file)
+#z_rho, z_w = zrfun.get_z(h, zeta, S)  # we saved zeta 
 z_rho, z_w = zrfun.get_z(h, 0*h, S) # use 0 for SSH
-dzr = np.diff(z_w, axis=0) # vertical thickness of all celle [m]
+dzr = np.diff(z_w, axis=0) # vertical thickness of all cell [m]
 
-lon = np.nanmean(G['lon_rho']) # it's just for the GSW calcs and faster than passing vars in here
+lon = np.nanmean(G['lon_rho']) # it's just for the GSW calcs and faster than passing args and clipping 
 lat = np.nanmean(G['lat_rho'])
 
 print('Time to get initial fields = %0.2f sec' % (time()-tt0))
