@@ -274,6 +274,7 @@ print(' - Time for calculating all corrosive volumes = %0.2f sec' % (time()- tt1
 print('time check: ' + str(datetime.datetime.now()))
 sys.stdout.flush()
 
+sys.exit()
 tt1 = time()
 print('concatenating files...')
 # concatenate the records into one file

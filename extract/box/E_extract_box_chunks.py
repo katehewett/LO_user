@@ -25,6 +25,8 @@ run extract_box_chunks.py -gtx cas6_v0_live -job byrd -surf True -uv_to_rho True
 Production run:
 python extract_box_chunks.py -gtx cas6_v0_live -ro 0 -lt hourly -0 2019.01.01 -1 2019.12.31 -job byrd -surf True -uv_to_rho True > byrd.log &
 
+Edits: 
+
 """
 
 # imports
@@ -178,7 +180,14 @@ NFN = len(fn_list)
 cca = np.arange(NFN)
 # The number of "chunks" is the "12" in this call.  The function np.array_split() is a
 # really handy way to split a vectory into a number of approximatly equal-length sub vectors.
-ccas = np.array_split(cca, 12)
+
+# kmh edit: if we don't request enough days (hours, etc) in the box extraction and NFN < 12 then 
+# we will get an error msgs when trying to step thru the this_cca loop. To address this, try
+# replacing ccas = np.array_split(cca, 12) with:
+if (NFN<12): 
+    ccas = np.array_split(cca, NFN)
+else: 
+    ccas = np.array_split(cca, 12)
 
 counter = 0
 for this_cca in ccas:
@@ -424,7 +433,7 @@ for vn in vn_list:
     except KeyError:
         pass
 ds.close()
-ds0.close()q
+ds0.close()
 
 # Finale
 print('\nSize of full rho-grid = %s' % (str(G['lon_rho'].shape)))
