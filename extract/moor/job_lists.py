@@ -91,18 +91,10 @@ def get_sta_dict(job_name):
             'CE065': (-124.5669, 47.3528)
         }
     
-    elif job_name == 'CHABA':
+    elif job_name == 'Sutton_etal_2019':
         sta_dict = {
-            'CHABA': (-125.958,47.936)
-        }
-        
-    elif job_name == 'CAPEELIZABETH':
-        sta_dict = {
-            'CAPEELIZABETH': (-124.731,47.353)
-        }
-        
-    elif job_name == 'CAPEARAGO':
-        sta_dict = {
+            'CHABA': (-125.958,47.936),
+            'CAPEELIZABETH': (-124.731,47.353),
             'CAPEARAGO': (-124.500,43.320)
         }
         
