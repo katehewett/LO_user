@@ -97,7 +97,12 @@ def get_sta_dict(job_name):
             'CAPEELIZABETH': (-124.731,47.353),
             'CAPEARAGO': (-124.500,43.320)
         }
-        
+    
+    elif job_name == 'CHABA': # note chaba mooring correction from text file 
+        sta_dict = {
+            'CHABA': (-124.95,47.97), 
+        }
+            
     elif job_name == 'willapa_bc': # Willapa Bay Center PCSGA Mooring
         sta_dict = {
             'wbc': (-123.9516, 46.6290)
