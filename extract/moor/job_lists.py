@@ -91,9 +91,9 @@ def get_sta_dict(job_name):
             'CE065': (-124.5669, 47.3528)
         }
     
-    elif job_name == 'Sutton_etal_2019':
+    elif job_name == 'Sutton_etal_2019': # note chaba mooring correction from text file 
         sta_dict = {
-            'CHABA': (-125.958,47.936),
+            'CHABA': (-124.95,47.97), 
             'CAPEELIZABETH': (-124.731,47.353),
             'CAPEARAGO': (-124.500,43.320)
         }
