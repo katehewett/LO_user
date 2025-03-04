@@ -100,6 +100,15 @@ def get_box(job, Lon, Lat):
     elif job == 'aakritiv': # student extraction for surface nitrate
         aa = [-125.3, -123.8, 46.5, 48]
         vn_list = 'h,pm,pn,mask_rho,NO3'
+    elif job == 'CE_transect':
+        aa = [-124.731, -124.348, 47.353, 47.353]  
+        vn_list = 'h,pm,pn,mask_rho,zeta,u,v,w,salt,temp,AKv,oxygen,alkalinity,TIC'
+    elif job == 'CE_transect_surf':
+        aa = [-124.731, -124.348, 47.353, 47.353]  
+        vn_list = 'h,pm,pn,mask_rho,zeta,sustr,svstr,Uwind,Vwind'
+    elif job == 'CE_transect_bio':
+        aa = [-124.731, -124.348, 47.353, 47.353]  
+        vn_list = 'h,pm,pn,mask_rho,zeta,NO3,NH4,phytoplankton,zooplankton,SdetritusN,LdetritusN,SdetritusC,LdetritusC'
     elif job == 'tester':
         aa = [-125, -124, 47, 49]  
         vn_list = 'h,pm,pn,mask_rho,salt,zeta'
