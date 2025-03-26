@@ -267,6 +267,9 @@ def get_sta_dict(job_name):
         'CHEST': (-125.91918457507,49.0886502314732)
         }
 
+    elif job_name == 'Ritger_2':
+        sta_dict = {'KALA': (-124.425,47.572)}
+
     else:
         print('Unsupported job name!')
         a = dict()
