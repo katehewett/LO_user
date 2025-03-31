@@ -71,7 +71,13 @@ def get_sta_dict(job_name):
             'CE015': (-124.3481, 47.3568),
             'CE042': (-124.4887, 47.3531),
         }
-        
+
+    elif job_name == 'OCNMS_CE_moorings':    # Mooring deployments for LO years: 2017 - 202(3) 
+        sta_dict = {
+            'CE015': (-124.3481, 47.3568),
+            'CE042': (-124.4887, 47.3531),
+        }
+
     elif job_name == 'OCNMS_moorings_historical': # All OCNMS mooring locations; depths >42m are not part of current operations
         sta_dict = {
             'MB015': (-124.6768, 48.3254),	
