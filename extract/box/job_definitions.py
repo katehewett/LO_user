@@ -97,6 +97,9 @@ def get_box(job, Lon, Lat):
     elif job == 'OA_indicators':
         aa = [-125.5, -123.5, 42.75, 48.75]
         vn_list = 'h,pm,pn,mask_rho,salt,temp,alkalinity,TIC'
+    elif job == 'OA_indicators_phys':
+        aa = [-125.5, -123.5, 42.75, 48.75]
+        vn_list = 'h,pm,pn,mask_rho,zeta,u,v,sustr,svstr,bustr,bvstr,Uwind,Vwind'
     elif job == 'aakritiv': # student extraction for surface nitrate
         aa = [-125.3, -123.8, 46.5, 48]
         vn_list = 'h,pm,pn,mask_rho,NO3'
