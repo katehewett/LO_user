@@ -21,6 +21,13 @@ LOo = parent / 'LO_output'
 LOu = parent / 'LO_user'
 data = parent / 'LO_data'
 
+# This is a new piece of information, to help with integration of
+# Aurora Leeson's new LO_traps repo, 2023.11.03.
+traps_name = 'traps00'
+# In order for this to be more useful it would have to be integrated
+# into Aurora's code.
+# I'm not sure this is the best way to solve this problem.
+
 # This is where the ROMS source code, makefiles, and executables are
 roms_code = parent / 'LiveOcean_roms'
 
@@ -37,8 +44,8 @@ remote_machine = 'BLANK'
 remote_dir0 = 'BLANK'
 local_user = 'BLANK'
 
-# default for linux machines
-which_matlab = '/usr/local/bin/matlab'
+## default for linux machines
+#which_matlab = '/usr/local/bin/matlab'
 
 HOME = Path.home()
 try:
@@ -51,9 +58,10 @@ except KeyError:
 # print('HOME = ' + str(HOME))
 # print('HOSTNAME = ' + HOSTNAME)
 
-if str(HOME) == '/Users/pm8':
-    lo_env = 'pm_mac'
-    which_matlab = '/Applications/MATLAB_R2020a.app/bin/matlab'
+elif (str(HOME) == '/Users/katehewett'):
+    lo_env = 'kh_mac'
+    #which_matlab = '/Applications/MATLAB_R2020a.app/bin/matlab'
+    roms_out1 = Path(parent /'LO_roms') # beeecareful!
 
 elif (str(HOME) == '/home/parker') & ('perigee' in HOSTNAME):
     lo_env = 'pm_perigee'
@@ -67,6 +75,7 @@ elif (str(HOME) == '/home/parker') & ('apogee' in HOSTNAME):
     roms_out1 = Path('/pgdat1/parker/LO_roms')
     roms_out2 = Path('/pgdat2/parker/LO_roms')
 
+'''
 elif (str(HOME) == '/usr/lusers/pmacc'):
     lo_env = 'pm_mox'
     remote_user = 'parker'
@@ -75,6 +84,7 @@ elif (str(HOME) == '/usr/lusers/pmacc'):
     remote_machine = 'apogee.ocean.washington.edu'
     remote_dir0 = '/dat1/parker'
     local_user = 'pmacc'
+'''
 
 elif ((str(HOME) == '/mmfs1/home/pmacc') or (str(HOME) == '/mmfs1/home/darrd')):
     lo_env = 'pm_klone'
@@ -84,10 +94,6 @@ elif ((str(HOME) == '/mmfs1/home/pmacc') or (str(HOME) == '/mmfs1/home/darrd')):
     local_user = 'pmacc'
 
 # kate
-elif (str(HOME) == '/Users/katehewett'):
-    lo_env = 'kh_mac'
-    which_matlab = '/Applications/MATLAB_R2020a.app/bin/matlab'
-    roms_out1 = Path('/Users/katehewett/Documents/LO_roms') # beeecareful!
     
 elif (str(HOME) == '/home/kmhewett') & ('perigee' in HOSTNAME):
     lo_env = 'kh_perigee'
@@ -103,13 +109,13 @@ elif (str(HOME) == '/home/kmhewett') & ('apogee' in HOSTNAME):
     roms_out2 = Path('/dat2/parker/LO_roms')
     roms_out3 = Path('/dat1/parker/LO_roms')
 
-
-elif (str(HOME) == '/mmfs1/home/kmhewett'):
+elif (str(HOME) == '/mmfs1/gscratch/macc/kmhewett'):
     lo_env = 'kh_klone'
     remote_user = 'kmhewett'
     remote_machine = 'apogee.ocean.washington.edu'
     remote_dir0 = '/dat1/kmhewett'
     local_user = 'kmhewett'
+
     
 Ldir0 = dict()
 Ldir0['lo_env'] = lo_env
@@ -124,11 +130,11 @@ Ldir0['roms_out1'] = roms_out1
 Ldir0['roms_out2'] = roms_out2
 Ldir0['roms_out3'] = roms_out3
 Ldir0['roms_out4'] = roms_out4
-Ldir0['which_matlab'] = which_matlab
+#Ldir0['which_matlab'] = which_matlab
 #
 Ldir0['remote_user'] = remote_user
 Ldir0['remote_machine'] = remote_machine
 Ldir0['remote_dir0'] = remote_dir0
 Ldir0['local_user'] = local_user
-
-
+#
+Ldir0['traps_name'] = traps_name
