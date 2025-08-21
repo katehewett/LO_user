@@ -104,10 +104,10 @@ elif (str(HOME) == '/home/kmhewett') & ('perigee' in HOSTNAME):
     
 elif (str(HOME) == '/home/kmhewett') & ('apogee' in HOSTNAME):
     lo_env = 'kh_apogee'
-    roms_out1 = Path('/pgdat1/parker/LO_roms')
+    roms_out = Path('/dat1/kmhewett/LO_roms')
     #roms_out2 = Path('/pgdat2/parker/LO_roms')
-    roms_out2 = Path('/dat2/parker/LO_roms')
-    roms_out3 = Path('/dat1/parker/LO_roms')
+    #roms_out2 = Path('/dat2/parker/LO_roms')
+    #roms_out3 = Path('/dat1/parker/LO_roms')
 
 elif (str(HOME) == '/mmfs1/gscratch/macc/kmhewett'):
     lo_env = 'kh_klone'
