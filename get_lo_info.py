@@ -99,7 +99,7 @@ elif (str(HOME) == '/home/kmhewett') & ('apogee' in HOSTNAME):
     roms_out4 = Path('/pgdat2/parker/LO_roms')
     roms_out5 = Path('/dat1/kmhewett/LO_roms')
 
-elif ((str(HOME) == '/mmfs1/home/kmhewett') or (str(HOME) == '/mmfs1/home/darrd')):
+elif ((str(HOME) == '/mmfs1/home/kmhewett'):
     lo_env = 'kh_klone'
     remote_user = 'kmhewett'
     remote_machine = 'apogee.ocean.washington.edu'
