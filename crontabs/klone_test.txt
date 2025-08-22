@@ -2,14 +2,11 @@ LANG=en-US.UTF-8
 LOd="/gscratch/macc/kmhewett/LO/driver"
 
 #main forecast
-30 21 21 8 * * * source ~/.bashrc; mail -s 'Kate wgh forecast klone' kmhewett@uw.edu < $LOd/forecast_t02.log
+30 21 21 08 * * * source ~/.bashrc; mail -s 'Kate wgh forecast klone' kmhewett@uw.edu < $LOd/forecast_t02.log
 
 # nested forecasts (testing restart as Kate)
-30 22 21 8 * * * source ~/.bashrc; python3 $LOd/driver_roms4.py -g wgh2 -t t1 -x xn11b -r forecast -s continuation --get_forcing False --group_choice macc --cpu_choice compute -np 200 -N 40 < /dev/null > $LOd/wgh2_forecast.log
-00 03 22 8 * * * source ~/.bashrc; mail -s 'Kate wgh forecast klone' kmhewett@uw.edu < $LOd/wgh2_forecast.log
+30 22 21 08 * * * source ~/.bashrc; python3 $LOd/driver_roms4.py -g wgh2 -t t1 -x xn11b -r forecast -s continuation --get_forcing False --group_choice macc --cpu_choice compute -np 200 -N 40 < /dev/null > $LOd/wgh2_forecast.log
+00 03 22 08 * * * source ~/.bashrc; mail -s 'Kate wgh forecast klone' kmhewett@uw.edu < $LOd/wgh2_forecast.log
 
-00 02 22 8 * * * source ~/.bashrc; python3 $LOd/driver_roms4.py -g oly2 -t t1 -x xn11b -r forecast -s continuation -0 2025.08.21 --get_forcing False --group_choice macc --cpu_choice compute -np 200 -N 40 < /dev/null > $LOd/oly2_forecast.log
-00 07 22 8 * * * source ~/.bashrc; mail -s 'Kate oly forecast klone' kmhewett@uw.edu < $LOd/oly2_forecast.log
-
-# refresh this crontab
-00 12 * * * crontab <<< $(crontab -l)
+00 02 22 08 * * * source ~/.bashrc; python3 $LOd/driver_roms4.py -g oly2 -t t1 -x xn11b -r forecast -s continuation -0 2025.08.21 --get_forcing False --group_choice macc --cpu_choice compute -np 200 -N 40 < /dev/null > $LOd/oly2_forecast.log
+00 07 22 08 * * * source ~/.bashrc; mail -s 'Kate oly forecast klone' kmhewett@uw.edu < $LOd/oly2_forecast.log
