@@ -1,5 +1,5 @@
 LANG=en-US.UTF-8
-LOd=/gscratch/macc/kmhewett/LO/driver
+LOd="/gscratch/macc/kmhewett/LO/driver"
 
 #main forecast
 30 21 21 8 * * * source ~/.bashrc; mail -s 'Kate wgh forecast klone' kmhewett@uw.edu < $LOd/forecast_t02.log
