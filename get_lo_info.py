@@ -28,9 +28,6 @@ traps_name = 'traps00'
 # into Aurora's code.
 # I'm not sure this is the best way to solve this problem.
 
-# This is where the ROMS source code, makefiles, and executables are
-roms_code = parent / 'LiveOcean_roms'
-
 # These are places where the ROMS history files are kept
 roms_out = parent / 'LO_roms'
 roms_out1 = parent / 'BLANK' # placeholder
@@ -38,14 +35,11 @@ roms_out2 = parent / 'BLANK'
 roms_out3 = parent / 'BLANK'
 roms_out4 = parent / 'BLANK'
 
-# these are for mox and klone, other hyak mackines
+# these are for klone
 remote_user = 'BLANK'
 remote_machine = 'BLANK'
 remote_dir0 = 'BLANK'
 local_user = 'BLANK'
-
-## default for linux machines
-#which_matlab = '/usr/local/bin/matlab'
 
 HOME = Path.home()
 try:
@@ -63,6 +57,7 @@ elif (str(HOME) == '/Users/katehewett'):
     #which_matlab = '/Applications/MATLAB_R2020a.app/bin/matlab'
     roms_out1 = Path(parent /'LO_roms') # beeecareful!
 
+# parker 
 elif (str(HOME) == '/home/parker') & ('perigee' in HOSTNAME):
     lo_env = 'pm_perigee'
     roms_out1 = Path('/agdat1/parker/LO_roms')
@@ -75,17 +70,6 @@ elif (str(HOME) == '/home/parker') & ('apogee' in HOSTNAME):
     roms_out1 = Path('/pgdat1/parker/LO_roms')
     roms_out2 = Path('/pgdat2/parker/LO_roms')
 
-'''
-elif (str(HOME) == '/usr/lusers/pmacc'):
-    lo_env = 'pm_mox'
-    remote_user = 'parker'
-    # remote_machine = 'perigee.ocean.washington.edu'
-    # remote_dir0 = '/data1/parker'
-    remote_machine = 'apogee.ocean.washington.edu'
-    remote_dir0 = '/dat1/parker'
-    local_user = 'pmacc'
-'''
-
 elif ((str(HOME) == '/mmfs1/home/pmacc') or (str(HOME) == '/mmfs1/home/darrd')):
     lo_env = 'pm_klone'
     remote_user = 'parker'
@@ -94,7 +78,6 @@ elif ((str(HOME) == '/mmfs1/home/pmacc') or (str(HOME) == '/mmfs1/home/darrd')):
     local_user = 'pmacc'
 
 # kate
-    
 elif (str(HOME) == '/home/kmhewett') & ('perigee' in HOSTNAME):
     lo_env = 'kh_perigee'
     roms_out1 = Path('/agdat1/parker/LO_roms')
@@ -104,7 +87,7 @@ elif (str(HOME) == '/home/kmhewett') & ('perigee' in HOSTNAME):
     
 elif (str(HOME) == '/home/kmhewett') & ('apogee' in HOSTNAME):
     lo_env = 'kh_apogee'
-    roms_out = Path('/dat1/kmhewett/LO_roms')
+    roms_out1 = Path('/dat1/kmhewett/LO_roms')
     #roms_out2 = Path('/pgdat2/parker/LO_roms')
     #roms_out2 = Path('/dat2/parker/LO_roms')
     #roms_out3 = Path('/dat1/parker/LO_roms')
