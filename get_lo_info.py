@@ -92,13 +92,12 @@ elif (str(HOME) == '/home/kmhewett') & ('apogee' in HOSTNAME):
     #roms_out2 = Path('/dat2/parker/LO_roms')
     #roms_out3 = Path('/dat1/parker/LO_roms')
 
-elif (str(HOME) == '/mmfs1/gscratch/macc/kmhewett'):
+elif (str(HOME) == '/mmfs1/home/kmhewett'):
     lo_env = 'kh_klone'
     remote_user = 'kmhewett'
     remote_machine = 'apogee.ocean.washington.edu'
     remote_dir0 = '/dat1/kmhewett'
     local_user = 'kmhewett'
-
     
 Ldir0 = dict()
 Ldir0['lo_env'] = lo_env
