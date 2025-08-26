@@ -336,7 +336,33 @@ def make_initial_info(gridname=gridname):
             track_df['lat'] = np.linspace(45,44,NTR) # South to North river
         track_df.to_pickle(track_fn)
         # *** NOTE: TRACKS MUST GO FROM OCEAN TO LAND ***
+
+    elif gridname == 'bsa':
+        # barkleySound and port alberni
+        dch = gfun.default_choices()
+        aa = [-125.6,-124.7,48.73,49.3]
+        res = 150 # target resolution (m)
+        Lon_vec, Lat_vec = gfu.simple_grid(aa, res)
+
+        dch['z_offset'] = -2  # copied from oly2 and wgh2
+        dch['nudging_edges'] = ['south', 'west', 'east']  
+        dch['nudging_days'] = (0.1, 1.0)
         
+        # by setting a small min_depth were are planning to use
+        # WET_DRY in ROMS, but maintaining positive depth
+        # for all water cells
+        dch['min_depth'] = 0.2 # meters (positive down)
+        
+        # Make the rho grid.
+        lon, lat = np.meshgrid(Lon_vec, Lat_vec)
+        
+        # Initialize bathymetry
+        dch['t_list'] = ['nw_pacific','barkley_sound','alberni_inlet']
+        z = gfu.combine_bathy_from_sources(lon, lat, dch)
+                
+        if dch['use_z_offset']:
+            z = z + dch['z_offset']
+
     else:
         print('Error from make_initial_info: unsupported gridname')
         return
@@ -356,5 +382,3 @@ def make_initial_info(gridname=gridname):
             z = z[:,:-1]
             
     return lon, lat, z, dch
-    
-
