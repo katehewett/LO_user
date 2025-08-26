@@ -16,7 +16,7 @@ import gfun_utility as gfu
 import gfun
 
 # This is the name of the grid that you are working on.
-gridname = 'ae0'
+gridname = 'bsa3'
 
 # default s-coordinate info (could override below)
 s_dict = {'THETA_S': 4, 'THETA_B': 2, 'TCLINE': 10, 'N': 30,
@@ -341,7 +341,7 @@ def make_initial_info(gridname=gridname):
         # barkleySound and port alberni
         dch = gfun.default_choices()
         aa = [-125.6,-124.7,48.73,49.3]
-        res = 150 # target resolution (m)
+        res = 100 # target resolution (m)
         Lon_vec, Lat_vec = gfu.simple_grid(aa, res)
 
         dch['z_offset'] = -2  # copied from oly2 and wgh2
@@ -357,7 +357,59 @@ def make_initial_info(gridname=gridname):
         lon, lat = np.meshgrid(Lon_vec, Lat_vec)
         
         # Initialize bathymetry
-        dch['t_list'] = ['nw_pacific','barkley_sound','alberni_inlet']
+        dch['t_list'] = ['nw_pacific','barkley_sound','port_alberni']
+        z = gfu.combine_bathy_from_sources(lon, lat, dch)
+                
+        if dch['use_z_offset']:
+            z = z + dch['z_offset']
+
+    elif gridname == 'bsa2': #brought in western limit (work in progress)
+        # barkleySound and port alberni, but use cas7
+        dch = gfun.default_choices()
+        aa = [-125.57,-124.7,48.73,49.3]
+        res = 100 # target resolution (m)
+        Lon_vec, Lat_vec = gfu.simple_grid(aa, res)
+
+        dch['z_offset'] = -2  # copied from oly2 and wgh2
+        dch['nudging_edges'] = ['south', 'west', 'east']  
+        dch['nudging_days'] = (0.1, 1.0)
+        
+        # by setting a small min_depth were are planning to use
+        # WET_DRY in ROMS, but maintaining positive depth
+        # for all water cells
+        dch['min_depth'] = 0.2 # meters (positive down)
+        
+        # Make the rho grid.
+        lon, lat = np.meshgrid(Lon_vec, Lat_vec)
+        
+        # Initialize bathymetry
+        dch['t_list'] = ['nw_pacific','barkley_sound','port_alberni']
+        z = gfu.combine_bathy_from_sources(lon, lat, dch)
+                
+        if dch['use_z_offset']:
+            z = z + dch['z_offset']
+
+    elif gridname == 'bsa3': #bsa limits, nw_pacific grid (only)
+        # barkleySound and port alberni, but use cas7
+        dch = gfun.default_choices()
+        aa=[-125.6,-124.7,48.73,49.3]
+        res = 100 # target resolution (m)
+        Lon_vec, Lat_vec = gfu.simple_grid(aa, res)
+
+        dch['z_offset'] = -2  # copied from oly2 and wgh2
+        dch['nudging_edges'] = ['south', 'west', 'east']  
+        dch['nudging_days'] = (0.1, 1.0)
+        
+        # by setting a small min_depth were are planning to use
+        # WET_DRY in ROMS, but maintaining positive depth
+        # for all water cells
+        dch['min_depth'] = 0.2 # meters (positive down)
+        
+        # Make the rho grid.
+        lon, lat = np.meshgrid(Lon_vec, Lat_vec)
+        
+        # Initialize bathymetry
+        dch['t_list'] = ['nw_pacific']
         z = gfu.combine_bathy_from_sources(lon, lat, dch)
                 
         if dch['use_z_offset']:
