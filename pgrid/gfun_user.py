@@ -16,7 +16,7 @@ import gfun_utility as gfu
 import gfun
 
 # This is the name of the grid that you are working on.
-gridname = 'bsa3'
+gridname = 'bsa2'
 
 # default s-coordinate info (could override below)
 s_dict = {'THETA_S': 4, 'THETA_B': 2, 'TCLINE': 10, 'N': 30,
@@ -383,7 +383,7 @@ def make_initial_info(gridname=gridname):
         lon, lat = np.meshgrid(Lon_vec, Lat_vec)
         
         # Initialize bathymetry
-        dch['t_list'] = ['nw_pacific','barkley_sound','port_alberni']
+        dch['t_list'] = ['barkley_sound','port_alberni']
         z = gfu.combine_bathy_from_sources(lon, lat, dch)
                 
         if dch['use_z_offset']:
