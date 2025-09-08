@@ -333,7 +333,7 @@ def get_sta_dict(job_name):
         'NDBC_46207': (-129.92,50.87)
 	    }
 
-    elif job_name == 'PNW_NDBC_met_stations2':
+    elif job_name == 'PNW_NDBC_met_stations2': # extraction stopped; these are the remainder
 	    sta_dict = {
         'NDBC_46089': (-125.815,45.928),
         'NDBC_46132': (-127.89,49.78),
