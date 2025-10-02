@@ -353,7 +353,7 @@ def get_sta_dict(job_name):
 	    }
     
     elif job_name == 'Ritger_beaches':
-    sta_dict = {
+        sta_dict = {
         'CHES_BC': (-125.949722, 49.154444),
         'MACK_BC': (-125.908611, 49.093056),
         'LONG_BC': (-125.696111, 49.015),
