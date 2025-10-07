@@ -113,7 +113,7 @@ def get_box(job, Lon, Lat):
         aa = [-124.731, -124.348, 47.353, 47.353]  
         vn_list = 'h,pm,pn,mask_rho,zeta,NO3,NH4,phytoplankton,zooplankton,SdetritusN,LdetritusN,SdetritusC,LdetritusC'
     elif job == 'test_OMEGAimp':
-        aa = [-124.5, -122, 48, 50]  
+        aa = [-124.5, -122.2, 48, 50]  
         vn_list = 'h,pm,pn,mask_rho,zeta,u,v,w,AKs,AKv,Uwind,Vwind'
     elif job == 'tester':
         aa = [-125, -124, 47, 49]  
