@@ -115,6 +115,9 @@ def get_box(job, Lon, Lat):
     elif job == 'test_OMEGAimp':
         aa = [-124.5, -122.2, 48, 50]  
         vn_list = 'h,pm,pn,mask_rho,zeta,u,v,w,AKs,AKv,Uwind,Vwind'
+    elif job == 'Shima':
+        aa = [-125, -122.2, 48, 49]  
+        vn_list = 'h,pm,pn,mask_rho,zeta,u,v,Uwind,Vwind'
     elif job == 'tester':
         aa = [-125, -124, 47, 49]  
         vn_list = 'h,pm,pn,mask_rho,salt,zeta'
