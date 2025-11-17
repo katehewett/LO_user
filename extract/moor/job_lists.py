@@ -378,6 +378,11 @@ def get_sta_dict(job_name):
         'MEYR_OR': (-124.431111, 42.315833)
         }
     
+    elif job_name == 'CRITFC':
+        sta_dict = {
+        'SAT03': (-123.94, 46.1997),
+        }
+
     else:
         print('Unsupported job name!')
         a = dict()
