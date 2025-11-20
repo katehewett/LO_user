@@ -383,7 +383,7 @@ def get_sta_dict(job_name):
         'SAT03': (-123.94, 46.1997),
         }
 
-    elif job_name == 'chinook_receivers': # Wes 
+    elif job_name == 'chinook_receivers_1': # Wes 
         sta_dict = {
         'chef_creek': (-124.74061, 49.458032), 
         'active_pass_1': (-123.29558, 48.8765),
@@ -410,7 +410,11 @@ def get_sta_dict(job_name):
         'ios_renfrew': (-124.51558, 48.50452),
         'ios_sog_central': (-123.34697, 49.19222),
         'ios_sog_southeast': (-123.17125, 48.88992),
-        'ios_sooke': (-123.65202, 48.28925),
+        'ios_sooke': (-123.65202, 48.28925)
+        }
+
+    elif job_name == 'chinook_receivers_2': # Wes / split b/c apogee kept timing out on job
+        sta_dict = {
         'js_e_01': (-126.13242, 50.48112),
         'js_w_01': (-126.16003, 50.48378),
         'newqcs009': (-127.39371, 50.86454),
@@ -435,7 +439,11 @@ def get_sta_dict(job_name):
         'njdf015': (-124.02024, 48.30078),
         'njdf020': (-124.05351, 48.27354),
         'njdf021': (-124.06038, 48.26837),
-        'north_denman_90': (-124.80715, 49.63457),
+        'north_denman_90': (-124.80715, 49.63457)
+        }
+    
+    elif job_name == 'chinook_receivers_3': # Wes 
+        sta_dict = {
         'nsog002p': (-124.53418, 49.7967),
         'nsog003p': (-124.54497, 49.79569),
         'nsog008p': (-124.63588, 49.72908),
@@ -460,7 +468,11 @@ def get_sta_dict(job_name):
         'nsog028p': (-124.83668, 49.70459),
         'nsog029p': (-124.84681, 49.70356),
         'oak_bay_2': (-123.26594, 48.39763),
-        'salmon_pt': (-125.08878, 49.88165),
+        'salmon_pt': (-125.08878, 49.88165)
+        }
+
+    elif job_name == 'chinook_receivers_4': # Wes 
+        sta_dict = {
         'sangster_i': (-124.22781, 49.43427),
         'sutil_01': (-125.06079, 50.1304),
         'sutil_02': (-125.0701, 50.13438),
