@@ -380,7 +380,7 @@ def get_sta_dict(job_name):
     
     elif job_name == 'CRITFC':
         sta_dict = {
-        'SAT03': (-123.94, 46.1997),
+        'SAT03': (-123.94, 46.1997)
         }
 
     elif job_name == 'chinook_receivers_1': # Wes 
@@ -488,7 +488,24 @@ def get_sta_dict(job_name):
         'v4lpsf_js_w_03': (-126.16595, 50.47103),
         'v4lpsf_js_w_04': (-126.16877, 50.46478)
         }
+    
+    elif job_name == 'Viola_adcp':
+        sta_dict = {
+            'guemes_w': (-122.65218353271484, 48.521240234375),
+            'guemes_e': (-122.60601043701172, 48.52769088745117),
+            'saddle_bag': (-122.56391143798828, 48.535919189453125),
+            'bham_channel': (-122.68343353271484, 48.53963088989258)
+        }
 
+    elif job_name == 'Viola_padillabay':
+        sta_dict = {
+            'G1': (-122.66993, 48.51955), 
+            'G2': (-122.5857, 48.521317),
+            'S1': (-122.59225, 48.578567), 
+            'S2': (-122.56412, 48.553467),
+            'B': (-122.54878, 48.506617)
+        }
+    
     else:
         print('Unsupported job name!')
         a = dict()
