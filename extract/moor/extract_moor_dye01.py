@@ -1,7 +1,6 @@
 """
 This code is a replicate of extract_moor.py (16Feb2026)
-and was made to add on dye01 to mooring extractions, and then has a quick modificaiton on 
-vn list because they need salt to work. 
+and was made to add on dye01 to mooring extractions
 
 This is code for doing mooring extractions.
 
@@ -53,7 +52,7 @@ parser.add_argument('-get_vel', type=zfun.boolean_string, default=False)
 parser.add_argument('-get_bio', type=zfun.boolean_string, default=False)
 parser.add_argument('-get_surfbot', type=zfun.boolean_string, default=False)
 parser.add_argument('-get_pressure', type=zfun.boolean_string, default=False)
-parser.add_argument('-get_dye01', type=zfun.boolean_string, default=True)
+parser.add_argument('-get_dye01', type=zfun.boolean_string, default=False)
 # OR select all of them
 parser.add_argument('-get_all', type=zfun.boolean_string, default=False)
 # Optional: set max number of subprocesses to run at any time
@@ -96,6 +95,7 @@ if Ldir['get_all']:
     Ldir['get_vel'] = True
     Ldir['get_bio'] = True
     Ldir['get_surfbot'] = True
+    Ldir['get_dye01'] = True
 
 # do the extraction
 tt00 = time()
@@ -186,7 +186,7 @@ if Ldir['get_bio']:
 if Ldir['get_surfbot']:
     vn_list += ',Pair,Uwind,Vwind,shflux,ssflux,latent,sensible,lwrad,swrad,sustr,svstr,bustr,bvstr'
 if Ldir['get_dye01']:
-    vn_list += ',salt,dye01'
+    vn_list += ',dye01'
 # The choice below is a custom job that is not part of get_all.  It is problematic to add such jobs becasue
 # you also have to add them to the args at the top of this code and the multi_mooring_driver.
 if Ldir['get_pressure']: # fields used for 1-D pressure analysis
