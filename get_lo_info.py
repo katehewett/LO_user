@@ -95,7 +95,8 @@ elif (str(HOME) == '/home/kmhewett') & ('apogee' in HOSTNAME):
     lo_env = 'kh_apogee'
     roms_out1 = Path('/dat1/parker/LO_roms')
     roms_out2 = Path('/dat2/parker/LO_roms')
-    roms_out3 = Path('/pgdat1/parker/LO_roms')
+    #roms_out3 = Path('/pgdat1/parker/LO_roms')
+    roms_out3 = Path('/dat1/auroral/LO_roms')
     roms_out4 = Path('/pgdat2/parker/LO_roms')
     roms_out5 = Path('/dat1/kmhewett/LO_roms')
 
