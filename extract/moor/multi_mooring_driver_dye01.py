@@ -130,7 +130,7 @@ for sn in sta_dict.keys():
     sys.stdout.flush()
     x = ' ' + str(sta_dict[sn][0])
     y = ' ' + str(sta_dict[sn][1])
-    cmd_list = ['python','extract_moor.py',
+    cmd_list = ['python','extract_moor_dye01.py',
         '-gtx', Ldir['gtagex'], '-ro', str(Ldir['roms_out_num']),
         '-0', Ldir['ds0'], '-1', Ldir['ds1'], '-lt', Ldir['list_type'],
         '-sn', sn, '-lon', x, '-lat', y, '-Nproc', str(Ldir['Nproc']),
