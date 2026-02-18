@@ -1,19 +1,23 @@
 """
-This code is a replicate of multi_mooring_driver.py (16Feb2026)
-and was made to add on dye01 to mooring extractions
+This code is a replicate of multi_mooring_driver.py (16Feb2026) that was then modified
+to make a custom dye extraction test to help Aleeson with her dye test for CREST 
 
-This is a driver for doing multiple mooring extractions.  It reads in
-a dict from LO_user/extract/moor/job_lists.py and uses this to run extract_moor.py as a
+This is a driver for doing multiple mooring extractions.  Just like before, it reads in
+a dict from LO_user/extract/moor/job_lists.py and uses this to run extract_moor_dye01.py as a
 series of subprocesses.
 
-2021.11.24 Now it should move the output to a folder named after the job.
+This is code will complete a mooring extraction and include dye_01, and can build 
+to extract dye_02 (etc, as added). For now is just one dye tracer. 
 
-Run from the command line like:
-python multi_mooring_driver.py -gtx cas6_v3_lo8b -test True > mmd.log &
+NOTE: Kate's testing flag will point to a folder that is on her laptop. Which is where 
+some of Aurora's LO_roms were stored to test. 
+Aleeson: You can execute on apogee as-is, but if testing True, you will need to modify 
+line XX on your machine to point to your roms out, which is probably just 
+commenting my path line XX and 
+uncommenting line XX to reset to (your) -ro 0 
 
-The same job would be run with flags as:
-python multi_mooring_driver.py -gtx cas6_v3_lo8b -ro 2 -0 2019.07.04 -1 2019.07.06 -lt hourly -job mickett_2 -get_all True > mmd.log &
-NOTE: naming the log as "*.log" means that is it automatically ignored by git (as specifed in LO/.gitignore)
+Familarize yourself with the new tags snapshot and hourly0. 
+
 """
 
 # imports
@@ -26,6 +30,8 @@ from subprocess import PIPE as Pi
 import os
 from time import time
 import shutil
+
+from pathlib import Path
 
 pid = os.getpid()
 print(' multi_mooring_driver '.center(60,'='))
@@ -48,7 +54,7 @@ parser.add_argument('-get_vel', type=Lfun.boolean_string, default=False)
 parser.add_argument('-get_bio', type=Lfun.boolean_string, default=False)
 parser.add_argument('-get_surfbot', type=Lfun.boolean_string, default=False)
 parser.add_argument('-get_pressure', type=Lfun.boolean_string, default=False)
-parser.add_argument('-get_dye01', type=Lfun.boolean_string, default=False)
+parser.add_argument('-get_dye01', type=Lfun.boolean_string, default=True)
 # OR select all of them
 parser.add_argument('-get_all', type=Lfun.boolean_string, default=False)
 # Optional: set max number of subprocesses to run at any time
@@ -72,12 +78,16 @@ for a in argsd.keys():
         Ldir[a] = argsd[a]
 # testing
 if Ldir['testing']:
-    Ldir['roms_out_num'] = 0
-    Ldir['ds0'] = '2019.07.04'
-    Ldir['ds1'] = '2019.07.06'
-    Ldir['list_type'] = 'daily'
-    Ldir['job'] = 'scoot'
-    Ldir['get_all'] = True
+    #Ldir['roms_out_num'] = 0
+    Ldir['roms_out_num'] = 3    # this points to Aleeson LO_roms files on Kate's laptop
+    Ldir['ds0'] = '2020.02.07'
+    Ldir['ds1'] = '2020.02.09'
+    Ldir['list_type'] = 'snapshot'
+    Ldir['his_num'] = 2
+    Ldir['job'] = 'whidbey_test'
+    Ldir['get_all'] = False
+    print('HELLO IN TESTING mmd')
+
 # set where to look for model output
 if Ldir['roms_out_num'] == 0:
     pass

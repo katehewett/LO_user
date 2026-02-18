@@ -59,6 +59,8 @@ if (str(HOME) == '/Users/katehewett'):
     lo_env = 'kh_mac'
     which_matlab = '/Applications/MATLAB_R2023b.app/bin/matlab'
     roms_out1 = Path('/Users/katehewett/Documents/LO_roms') # beeecareful!
+    roms_out2 = Path('/Users/katehewett/Documents/apogee_parker/LO_roms') # special case
+    roms_out3 = Path('/Users/katehewett/Documents/apogee_auroral/LO_roms') # special case
 
 # parker
 elif (str(HOME) == '/home/parker') & ('perigee' in HOSTNAME):
