@@ -1,18 +1,26 @@
 """
 This code is a replicate of extract_moor.py (16Feb2026) that was then modified
-to make a custom dye extraction test to help Aleeson with her dye test for CREST 
+to add on a custom dye extraction test to help Aleeson with her dye test for CREST 
 
 This is code will complete a mooring extraction and include dye_01, and can build 
 to extract dye_02 (etc, as added). For now is just one dye tracer. 
 
-NOTE: Kate's testing flag will point to a folder that is on her laptop. Which is where 
-some of Aurora's LO_roms were stored to test. 
-Aleeson: You can execute on apogee as-is, but if testing True, you will need to modify 
-line XX on your machine to point to your roms out, which is probably just 
-commenting my path line XX and 
-uncommenting line XX to reset to (your) -ro 0 
+NOTE: 
+This can run on your laptop (or apogee). Just be mindful of your -ro 
 
-Familarize yourself with the new tags snapshot and hourly0. 
+This works just like extract_moor.py (but has a get_dye flag):
+For example, in python the first prompt will get all + dye_01. The second will grab salt and dye_01 etc. See vn_list below.
+run extract_moor_dye01.py -gtx cas7_t1d_x11ad -0 2020.02.08 -1 2020.02.10 -get_all True -lt hisX -ro 3 -sn whidbey_test -lon ' -122.5686451' -lat 48.2029465
+run extract_moor_dye01.py -gtx cas7_t1d_x11ad -0 2020.02.08 -1 2020.02.10 -get_dye True -lt hisX -ro 3 -sn whidbey_test -lon ' -122.5686451' -lat 48.2029465
+
+Familarize yourself with the new tags hisX
+-lt average will pull average files
+-lt hisX will pull all ocean_his_002.nc for the input date range; his_num default is 2 but can modify (see Lfun)
+
+The same job would be run with flags as:
+python extract_moor_dye01.py -gtx cas7_t0_x4b -ro 0 -0 2017.07.04 -1 2017.07.06 -lt hourly -sn test -lon ' -125' -lat 47 -get_all True > test.log &
+
+NOTE: the quotes and space are required to feed it a negative longitude.
 
 """
 
@@ -41,7 +49,7 @@ parser.add_argument('-1', '--ds1', type=str) # e.g. 2017.07.06
 # is to start with ocean_his_0025.nc on the day before. This is identical to passing his_num = 1, 
 # but may be more convenient, especially as we move to "continuation" start_type, which always writes an 0001 file.
 # (B) snapshot with hisnum = 2, will grab Aurora's initial file (saved as an _002.nc) for a test run (I think)
-parser.add_argument('-lt', '--list_type', type=str, default = 'dailyX') 
+parser.add_argument('-lt', '--list_type', type=str) 
 parser.add_argument('-hisnum', '--his_num', type=int, default = 2) 
 # select mooring location and name
 parser.add_argument('-lon', type=float) # longitude
@@ -79,36 +87,21 @@ for a in argsd.keys():
 # testing
 if Ldir['testing']:
     #Ldir['roms_out_num'] = 0
-    Ldir['roms_out_num'] = 3    # this points to Aleeson LO_roms files on Kate's laptop
+    #Ldir['roms_out_num'] = 3    
     Ldir['ds0'] = '2020.02.08'
     Ldir['ds1'] = '2020.02.09'
-    #Ldir['list_type'] = 'dailyX'
-    #Ldir['his_num'] = 2
+    Ldir['list_type'] = 'hisX'
+    #dir['his_num'] = 2
     Ldir['lon'] = -122.5686451
     Ldir['lat'] = 48.2029465
     Ldir['sn'] = 'whidbey_test'
     Ldir['get_all'] = False
-    print('HELLO IN TESTING MD')
 
-# This is some atypical pointing...
-# It's a special case of testing on Kate's mac, while looking at Aurora's LO_roms dye_test files 
-# no need to comment or change, it will skip to the first else if you're not Kate
-if Ldir['testing'] and Ldir['lo_env'] == 'kh_mac': 
-    if Ldir['roms_out_num'] == 0:
-        pass
-    elif Ldir['roms_out_num'] == 3:
-        Ldir['roms_out'] = Ldir['parent'] / 'apogee_auroral' / 'LO_roms'
-    else: 
-        print('\n********************************\n')
-        print('special case testing not entered correctly, exiting mooring extraction')
-        print('\n********************************\n')
-        sys.exit() 
-else: 
-    # set where to look for model output (normal pointing for setting Ldir roms_out_num)
-    if Ldir['roms_out_num'] == 0:
-        pass
-    elif Ldir['roms_out_num'] > 0:
-        Ldir['roms_out'] = Ldir['roms_out' + str(Ldir['roms_out_num'])]
+# set where to look for model output (normal pointing for setting Ldir roms_out_num)
+if Ldir['roms_out_num'] == 0:
+    pass
+elif Ldir['roms_out_num'] > 0:
+    Ldir['roms_out'] = Ldir['roms_out' + str(Ldir['roms_out_num'])]
 
 # set variable list flags
 if Ldir['get_all']:
@@ -177,7 +170,7 @@ def find_good(ilat, ilon, mask):
         print('ERROR: no good nearby point found on mask for ' + mask)
         sys.exit()
 
-fn_list = Lfun.get_fn_list(Ldir['list_type'], Ldir, Ldir['ds0'], Ldir['ds1'])
+fn_list = Lfun.get_fn_list(Ldir['list_type'], Ldir, Ldir['ds0'], Ldir['ds1'], Ldir['his_num'])
 
 # check to see if we are working with the old or new NPZDOC variables
 ds = xr.open_dataset(fn_list[0])
@@ -207,7 +200,10 @@ if Ldir['get_bio']:
 if Ldir['get_surfbot']:
     vn_list += ',Pair,Uwind,Vwind,shflux,ssflux,latent,sensible,lwrad,swrad,sustr,svstr,bustr,bvstr'
 if Ldir['get_dye01']:
-    vn_list += ',salt,dye_01'
+    if Ldir['get_all']:
+        vn_list += ',salt,dye_01'
+    else:
+        vn_list += ',dye_01'
 # The choice below is a custom job that is not part of get_all.  It is problematic to add such jobs becasue
 # you also have to add them to the args at the top of this code and the multi_mooring_driver.
 if Ldir['get_pressure']: # fields used for 1-D pressure analysis

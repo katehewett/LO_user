@@ -9,14 +9,21 @@ series of subprocesses.
 This is code will complete a mooring extraction and include dye_01, and can build 
 to extract dye_02 (etc, as added). For now is just one dye tracer. 
 
-NOTE: Kate's testing flag will point to a folder that is on her laptop. Which is where 
-some of Aurora's LO_roms were stored to test. 
-Aleeson: You can execute on apogee as-is, but if testing True, you will need to modify 
-line XX on your machine to point to your roms out, which is probably just 
-commenting my path line XX and 
-uncommenting line XX to reset to (your) -ro 0 
+Included from multi_mooring_driver.py: 
+2021.11.24 Now it should move the output to a folder named after the job.
 
-Familarize yourself with the new tags snapshot and hourly0. 
+Run from the command line just like multi_mooring_driver.py
+For example, the first prompt will get all + dye_01. The second will grab salt and dye_01 etc. See vn_list in extract_moor_dye01.py
+run multi_mooring_driver_dye01.py -gtx cas7_t1d_x11ad -0 2020.02.08 -1 2020.02.10 -get_all True -lt hisX -ro 3 -job whidbey_test
+run multi_mooring_driver_dye01.py -gtx cas7_t1d_x11ad -0 2020.02.08 -1 2020.02.10 -get_dye01 True -lt hisX -ro 3 -job whidbey_test
+
+or :
+python multi_mooring_driver_dye01.py -gtx cas7_t1d_x11ad -0 2020.02.08 -1 2020.02.10 -get_dye01 True -lt hisX -ro 3 -job whidbey_test > mmd.log &
+
+NOTE: from multi_mooring_driver.py: naming the log as "*.log" means that is it automatically ignored by git (as specifed in LO/.gitignore)
+
+On Kate's computer it took 3 seconds to run:
+run multi_mooring_driver_dye01.py -gtx cas7_t1d_x11ad -0 2020.02.07 -1 2020.02.21 -get_all True -lt hisX -ro 3 -job whidbey_test
 
 """
 
@@ -79,20 +86,20 @@ for a in argsd.keys():
 # testing
 if Ldir['testing']:
     #Ldir['roms_out_num'] = 0
-    Ldir['roms_out_num'] = 3    # this points to Aleeson LO_roms files on Kate's laptop
+    #Ldir['roms_out_num'] = 3    # this points to Aleeson LO_roms files on Kate's laptop
     Ldir['ds0'] = '2020.02.07'
     Ldir['ds1'] = '2020.02.09'
-    Ldir['list_type'] = 'snapshot'
-    Ldir['his_num'] = 2
+    Ldir['list_type'] = 'hisX'
+    #Ldir['his_num'] = 2
     Ldir['job'] = 'whidbey_test'
     Ldir['get_all'] = False
-    print('HELLO IN TESTING mmd')
 
 # set where to look for model output
 if Ldir['roms_out_num'] == 0:
     pass
 elif Ldir['roms_out_num'] > 0:
     Ldir['roms_out'] = Ldir['roms_out' + str(Ldir['roms_out_num'])]
+
 # set variable list flags
 if Ldir['get_all']:
     Ldir['get_tsa'] = True
