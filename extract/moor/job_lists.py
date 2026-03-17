@@ -507,6 +507,12 @@ def get_sta_dict(job_name):
             'whidbey_test': (-122.5686451, 48.2029465)
         }
     
+    elif job_name == 'CHOKE_model_eval':
+        # Info from Yayla Sezginer <yayla.sezginer@cioospacific.ca> for 2015 - 2022 Sensor stations
+        sta_dict = {
+            'SoG_East': (-123.41742662750096,49.04686630066777)
+        }
+    
     else:
         print('Unsupported job name!')
         a = dict()
