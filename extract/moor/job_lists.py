@@ -512,7 +512,13 @@ def get_sta_dict(job_name):
         sta_dict = {
             'SoG_East': (-123.41742662750096,49.04686630066777)
         }
-    
+
+    elif job_name == 'wwtp_test':
+        # testing
+        sta_dict = {
+            'WestPoint': (-122.4486111,47.6605556)
+        }
+
     else:
         print('Unsupported job name!')
         a = dict()
