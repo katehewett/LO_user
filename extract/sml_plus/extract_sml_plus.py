@@ -26,11 +26,13 @@ Time to calc BML + assign T/S= 0.66 sec
 Time to calc max dT/dz(drho/dz) and assign SA(CT)= 0.69 sec
 Time to calc interior gradients and T/S= 1.06 sec
 
+on apogee ::
+python extract_sml_plus -gtx cas7_t1_x11ab -ro 1 -0 2025.04.01 -1 2025.04.04 -lt average -job LO_domain
 
 And then the total time for extract clines (1 year of averaged files data):
 Total processing time = XX sec 
 
-~XX  minutes for a year, which makes a XX GB file 
+~92  minutes for a year, which makes a 6.74 GB file 
 
 ---- 
 Notes: * after the cat step... we open and reassign time independent vars and delete the temp folders. 

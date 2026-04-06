@@ -201,9 +201,9 @@ if Ldir['get_surfbot']:
     vn_list += ',Pair,Uwind,Vwind,shflux,ssflux,latent,sensible,lwrad,swrad,sustr,svstr,bustr,bvstr'
 if Ldir['get_dye01']:
     if Ldir['get_all']:
-        vn_list += ',salt,dye_01'
-    else:
         vn_list += ',dye_01'
+    else:
+        vn_list += ',salt,dye_01'
 # The choice below is a custom job that is not part of get_all.  It is problematic to add such jobs becasue
 # you also have to add them to the args at the top of this code and the multi_mooring_driver.
 if Ldir['get_pressure']: # fields used for 1-D pressure analysis
