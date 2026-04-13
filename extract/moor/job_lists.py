@@ -513,6 +513,18 @@ def get_sta_dict(job_name):
             'SoG_East': (-123.41742662750096,49.04686630066777)
         }
 
+    elif job_name == 'CHOKE_model_eval2':
+        # Info from Yayla Sezginer <yayla.sezginer@cioospacific.ca> for 2015 - 2022
+        sta_dict = {
+            ‘ORCA1_Twanoh’: (-123.0083333, 47.375)
+            ‘ORCA2_Hoodsport’: (-123.11258333, 47.42181666)
+            ‘ORCA3_Hansville’: (-122.62708333, 47.90733333)
+            ‘ORCA4_DabobBay’: (-122.80291666, 47.80341666)
+            ‘e01’: (-126.614685, 49.28333)
+            ‘scott2’: (-129.47609, 51.12835)
+            ‘quat1’: (-128.00562, 50.41325)
+        }
+
     elif job_name == 'wwtp_test':
         # testing
         sta_dict = {
