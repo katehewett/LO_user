@@ -519,7 +519,9 @@ def get_sta_dict(job_name):
             'ORCA1_Twanoh': (-123.0083333, 47.375),
             'ORCA2_Hoodsport': (-123.11258333, 47.42181666),
             'ORCA3_Hansville': (-122.62708333, 47.90733333),
-            'ORCA4_DabobBay': (-122.80291666, 47.80341666),
+            'ORCA4_DabobBay': (-122.80291666, 47.80341666)
+            
+    elif job_name == 'CHOKE_model_eval3':
             'PISCES1_South': (-122.873272, 47.665112),
             'PISCES2_North': (-122.865058, 47.692312),
             'NPBY2_CarrInlet': (-122.73, 47.28),
