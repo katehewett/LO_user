@@ -524,7 +524,7 @@ def get_sta_dict(job_name):
 
     elif job_name == 'CHOKE_model_eval3':
         sta_dict = {
-'''            'PISCES1_South': (-122.873272, 47.665112),
+         ''''PISCES1_South': (-122.873272, 47.665112),
             'PISCES2_North': (-122.865058, 47.692312),
             'NPBY2_CarrInlet': (-122.73, 47.28),
             'NPBY1_PtWells': (-122.39716666, 47.76116666),
