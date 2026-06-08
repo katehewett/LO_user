@@ -1,0 +1,58 @@
+name: loenv
+channels:
+  - conda-forge
+dependencies:
+  # for icechunk 5/2026
+  - icechunk
+  - obspec_utils
+  - obstore
+  - virtualizarr
+  # from Rob Hetland
+  - cf_xarray
+  - dask
+  - bottleneck
+  # - jupyter
+  - jupyterlab
+  - netcdf4
+  # - numba >= 0.49
+  - numpy
+  - xarray
+  # - xgcm
+  - cartopy
+  - cmocean
+  # - datashader
+  # - geoviews
+  # - holoviews
+  # - hvplot
+  - matplotlib
+  - zarr
+  - nodejs
+  # - dask-labextension
+  # my additions
+  - requests
+  - aiohttp
+  - s3fs
+  - ipython
+  - cmcrameri
+  - seawater
+  - gsw
+  - ephem
+  - UTide
+  - beautifulsoup4
+  - lxml
+  - xlrd
+  - openpyxl
+  - copernicusmarine
+  - pyco2sys
+  # pytide
+  - sqlalchemy
+  - git
+  - pip
+  - pip:
+    - -e ../LO/lo_tools lo_tools # package of local modules
+    - s3cmd >= 2.4.0 # AWS S3 tools: this one is linux command line
+  # and some non-python tools
+  - ffmpeg
+  - nco
+  - s5cmd
+  
