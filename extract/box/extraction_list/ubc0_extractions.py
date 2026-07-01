@@ -1,8 +1,9 @@
+#!/bin/bash
+
 # code to extract UBC 
 # These exports were completed for UBC (Susan A and Doug L et al) for
 # 2012 - 2023 
 # will repeat 2017 and first 8 months of 2024, with a special lowpass extraction 
-
 
 LOe = /dat1/kmhewett/LO/extract/box
 
