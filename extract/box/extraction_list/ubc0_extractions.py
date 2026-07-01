@@ -5,7 +5,7 @@
 # 2012 - 2023 
 # will repeat 2017 and first 8 months of 2024, with a special lowpass extraction 
 
-LOe = /dat1/kmhewett/LO/extract/box
+LOe=/dat1/kmhewett/LO/extract/box
 
 python $LOe/extract_box_chunks.py -gtx cas7_t1_x11ab -ro 1 -0 2012.10.07 -1 2012.12.31 -lt average -job ubc0 > ubc_2012.log
 python $LOe/extract_box_chunks.py -gtx cas7_t1_x11ab -ro 1 -0 2013.01.01 -1 2013.12.31 -lt average -job ubc0 > ubc_2013.log
