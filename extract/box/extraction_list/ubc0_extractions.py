@@ -24,3 +24,8 @@ python3 $LOe/extract_box_chunks.py -gtx cas7_t1_x11ab -ro 1 -0 2022.01.01 -1 202
 python3 $LOe/extract_box_chunks.py -gtx cas7_t1_x11ab -ro 1 -0 2023.01.01 -1 2023.12.31 -lt average -job ubc0 > ubc_2023.log
 
 python3 $LOe/extract_box_chunks.py -gtx cas7_t1_x11ab -ro 1 -0 2024.01.01 -1 2024.08.24 -lt average -job ubc0 > ubc_2024.log
+
+
+
+
+python3 extract_box_chunks.py -gtx cas7_t1_x11ab -ro 1 -0 2012.10.07 -1 2012.12.31 -lt average -job ubc0 > ubc_2012.log

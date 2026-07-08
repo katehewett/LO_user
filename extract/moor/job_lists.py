@@ -539,6 +539,18 @@ def get_sta_dict(job_name):
             'WestPoint': (-122.4486111,47.6605556)
         }
 
+    elif job_name == 'model_eval_siteUpdates':
+        # Info from Yayla Sezginer <yayla.sezginer@cioospacific.ca> for 2020 - 2025
+        sta_dict = {
+            'SoG_Central': (-123.41742662750096, 49.04686630066777),
+            'SoG_East': (-123.317605, 49.0421267),
+            'Bute': (-124.899, 50.597),
+	        'Baynes': (-124.7693, 49.487),
+	        'Quadra': (-125.222, 50.116),
+	        'Folger': (-125.2815, 48.8082916667),
+	        'Calvert': (-127.9663 , 51.6499)
+        }
+
     else:
         print('Unsupported job name!')
         a = dict()
