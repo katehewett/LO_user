@@ -137,6 +137,9 @@ def get_box(job, Lon, Lat):
     elif job == 'VIOLA_samish_transect':
         aa= [-122.637638, -122.545551, 48.575410, 48.581915]
         vn_list = 'h,pm,pn,mask_rho,zeta,u,v,salt,temp'
+    elif job == 'VIOLA_transect_box':
+        aa= [-122.71, -122.54, 48.49, 48.58]
+        vn_list = 'h,pm,pn,mask_rho,zeta,u,v,salt,temp'
     elif job == 'tester':
         aa = [-125, -124, 47, 49]  
         vn_list = 'h,pm,pn,mask_rho,salt,zeta'

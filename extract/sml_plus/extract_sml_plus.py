@@ -249,7 +249,8 @@ for ii in range(NFN):
             '-lt',args.list_type,
             '-his_fn',str(fn_list[0]), 
             '-in_fn',str(box_out_fn),
-            '-out_fn', str(sml_out_fn)]
+            '-out_fn', str(sml_out_fn),
+            '-thresh',str(args.threshold)]
     
     proc2 = Po(cmd_list2, stdout=Pi, stderr=Pi)
     proc_list2.append(proc2)
