@@ -125,6 +125,18 @@ def get_box(job, Lon, Lat):
     elif job == 'Wes_receivers':
         aa = [-125.5, -124.4, 49.55, 50.3]  
         vn_list = 'h,pm,pn,mask_rho,zeta,Uwind,Vwind,salt,temp,oxygen'
+    elif job == 'VIOLA_PB_redbox': # Marisa Viola, MS student WWU 
+        aa = [-122.667, -122.551, 48.508, 48.541]
+        vn_list = 'h,pm,pn,mask_rho,zeta,u,v,salt,temp'
+    elif job == 'VIOLA_rosario_transect':
+        aa= [-122.700558, -122.685229, 48.499003, 48.540972]
+        vn_list = 'h,pm,pn,mask_rho,zeta,u,v,salt,temp'
+    elif job == 'VIOLA_guemes_transect':
+        aa = [-122.581476, -122.563168, 48.493516, 48.531102]
+        vn_list = 'h,pm,pn,mask_rho,zeta,u,v,salt,temp'
+    elif job == 'VIOLA_samish_transect':
+        aa= [-122.637638, -122.545551, 48.575410, 48.581915]
+        vn_list = 'h,pm,pn,mask_rho,zeta,u,v,salt,temp'
     elif job == 'tester':
         aa = [-125, -124, 47, 49]  
         vn_list = 'h,pm,pn,mask_rho,salt,zeta'
