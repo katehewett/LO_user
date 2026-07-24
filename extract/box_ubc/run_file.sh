@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# These exports were completed for UBC (Susan A and Doug L et al) for
+# These exports were completed for Susan Allen and Doug L UBC
 # 2012 - 2023 
 # will repeat 2017 and first 8 months of 2024, with a special lowpass extraction 
 # had already started 2013 - 2017
