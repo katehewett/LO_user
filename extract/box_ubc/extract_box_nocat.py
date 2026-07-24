@@ -6,18 +6,14 @@ with the outermost corners being on the rho-grid.
 
 Job definitions are in LO_user/extract/box/job_definitions.py
 
-Testing:
-run extract_box -gtx cas6_v3_lo8b -job sequim0 -test True
+Testing on laptop:
+run extract_box_nocat.py -gtx cas7_t0_x4b -ro 1 -lt daily -0 2017.12.12 -1 2017.12.13 -job ubc0
+run extract_box_nocat.py -gtx cas7_t1_x11ab -ro 2 -lt average -0 2020.07.01 -1 2020.07.02 -job ubc0
 
-same but with all flags:
-run extract_box -gtx cas6_v3_lo8b -ro 2 -0 2019.07.04 -1 2019.07.06 -lt daily -job sequim0 -test True
+apogee:
+python extract_box_nocat.py -gtx cas7_t1_x11ab -ro 2 -lt average -0 2020.07.01 -1 2020.07.02 -job ubc0
 
-this command replicates what post/surface0 does
-run extract_box -gtx cas6_v3_lo8b -ro 2 -0 2019.07.04 -1 2019.07.04 -lt hourly -job surface0 -uv_to_rho True -surf True
-or
-python extract_box.py -gtx cas6_v3_lo8b -ro 2 -0 2019.07.04 -1 2019.07.04 -lt hourly -job surface0 -uv_to_rho True -surf True
-
-Performance: this is very fast, takes just a few seconds for three days on boiler (for yang_sequim).
+Performance: this is very fast, takes just a few seconds 
 """
 
 # imports
@@ -352,20 +348,6 @@ for out_fn in list(temp_dir.glob('*_box.nc')):
     ds.close()
     ds0.close()
 
-sys.exit() 
-
-# clean up
-#Lfun.make_dir(temp_dir, clean=True)
-#temp_dir.rmdir()
-
 print('Size of full rho-grid = %s' % (str(G['lon_rho'].shape)))
-print(' Contents of extracted box file: '.center(60,'-'))
-# check on the results
-ds = xr.open_dataset(box_fn)
-for vn in ds.data_vars:
-    print('%s %s max/min = %0.4f/%0.4f' % (vn, str(ds[vn].shape), ds[vn].max(), ds[vn].min()))
-ds.close()
-
-print('\nPath to file:\n%s' % (str(box_fn)))
-
-
+print(' Path to files: '.center(60,'-'))
+print(str(out_dir))
