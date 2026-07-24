@@ -5,7 +5,7 @@
 # will repeat 2017 and first 8 months of 2024, with a special lowpass extraction 
 # had already started 2013 - 2017
 
-LOe=/dat1/kmhewett/LO/extract/box_ubc
+LOe=/dat1/kmhewett/LO_user/extract/box_ubc
 
 python3 $LOe/extract_box_nocat.py -gtx cas7_t1_x11ab -ro 1 -lt average -0 2018.01.01 -1 2018.12.31 -job ubc0 > ubc0_2018.log 
 python3 $LOe/extract_box_nocat.py -gtx cas7_t1_x11ab -ro 1 -lt average -0 2019.01.01 -1 2019.12.31 -job ubc0 > ubc0_2019.log 
