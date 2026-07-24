@@ -11,7 +11,8 @@ run extract_box_nocat.py -gtx cas7_t0_x4b -ro 1 -lt daily -0 2017.12.12 -1 2017.
 run extract_box_nocat.py -gtx cas7_t1_x11ab -ro 2 -lt average -0 2020.07.01 -1 2020.07.02 -job ubc0
 
 apogee:
-python extract_box_nocat.py -gtx cas7_t1_x11ab -ro 2 -lt average -0 2020.07.01 -1 2020.07.02 -job ubc0
+python extract_box_nocat.py -gtx cas7_t1_x11ab -ro 2 -lt average -0 2020.07.01 -1 2020.07.02 -job ubc0 
+python extract_box_nocat.py -gtx cas7_t1_x11ab -ro 1 -lt average -0 2013.01.01 -1 2013.12.31 -job ubc0 > ubc0_2013.log &
 
 Performance: this is very fast, takes just a few seconds 
 """
