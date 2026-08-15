@@ -48,7 +48,11 @@ with open(LOG_FILE, "a") as log:
     env["AWS_SECRET_ACCESS_KEY"] = macc_secret
     
     # Build the exact command execution list
-    cmd = ["s5cmd", "cp", SOURCE_FILE, DEST_BUCKET]
+    #cmd = ["s5cmd", "cp", SOURCE_FILE, DEST_BUCKET]
+    if str(HOME_DIR) == '/Users/katehewett':
+        cmd = ["/Users/katehewett/Applications/miniconda3/envs/loenv/bin/s5cmd", "cp", SOURCE_FILE, DEST_BUCKET]
+    elif (str(HOME_DIR) == '/mmfs1/home/kmhewett'):
+        cmd = ["/usr/local/bin/s5cmd", "cp", SOURCE_FILE, DEST_BUCKET]
 
     try:
         # Run s5cmd, merging stderr into stdout, and pipe all output directly to the log file
