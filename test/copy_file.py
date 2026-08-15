@@ -11,10 +11,10 @@ HOME_DIR = os.path.expanduser("~")
 if str(HOME_DIR) == '/Users/katehewett':
     WORKING_DIR = os.path.join(HOME_DIR, "Documents", "LO_user", "test")
 elif (str(HOME_DIR) == '/mmfs1/home/kmhewett'):
-    WORKING_DIR = os.path.join(HOME_DIR, "LO_user", "test")
-
-LOG_FILE = os.path.join(WORKING_DIR, "s5_transfer.log")
+    WORKING_DIR = '/mmfs1/gscratch/macc/kmhewett/LO_user/test'
+    
 SOURCE_FILE = os.path.join(WORKING_DIR, "test_file.txt")
+LOG_FILE = os.path.join(WORKING_DIR, "s5_transfer.log")
 DEST_BUCKET = "s3://liveocean-kmhewett/test/"
 
 # ==============================================================================
