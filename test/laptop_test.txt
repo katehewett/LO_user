@@ -1,0 +1,5 @@
+LANG=en-US.UTF-8
+#LOu=/gscratch/macc/kmhewett/LO_user/test
+
+# test s5cmd
+29 12 * * * source ~/.bashrc; python3 /Users/katehewett/Documents/LO_user/test/copy_file.py < /dev/null > /Users/katehewett/Documents/LO_user/test/copy_file_run.log 2>&1
