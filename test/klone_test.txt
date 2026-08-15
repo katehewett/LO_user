@@ -2,4 +2,4 @@ LANG=en-US.UTF-8
 LOu=/gscratch/macc/kmhewett/LO_user/test
 
 # test s5cmd
-00 12 * * * source ~/.bashrc; python3 $LOu/copy_file.py < /dev/null > $LOu/copy_file_run.log
+00 12 * * * source ~/.bashrc; python3 $LOu/copy_file.py < /dev/null > $LOu/copy_file_run.log 2>&1
