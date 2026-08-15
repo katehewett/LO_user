@@ -1,15 +1,15 @@
 This is a test scenario to run a simple s5cmd while using (and then not using) cron
 
-copy_file.py  ... is a program that will:   
-* move test_file.txt from laptop (or klone) to kopah bucket liveocean-kmhewett   
-* it also creates a logfile called s5_transfer.log  
+```copy_file.py```  ... is a program that will:   
+* move ```test_file.txt``` from laptop (or klone) to kopah bucket liveocean-kmhewett   
+* it also creates a logfile called ```s5_transfer.log```  
 
-When using cron, a second logfile, copy_file_run.log will be created.  
-* cron jobs listed in laptop_test.txt and klone_test.txt  
+When using cron, a second logfile, ```copy_file_run.log``` will be created.  
+* my cron jobs used are listed in ```laptop_test.txt``` and ```klone_test.txt```  
 
 
 NOTE: the fix is already in copy_file.py.  
-But originally, I could not use s5cmd while using cron (see fix at lines 50-55, and read below). But, I could run the script when executing the python script in terminal without using crontabs. 
+But originally, pre-fix, I could not use s5cmd while using cron (see fix at lines 50-55, and read below). But, I could run the script when executing the python script in terminal without using crontabs. 
 
 No error code appeared when trying to run using line command e.g. ```python copy_file.py```, or ```run copy_file.py```. However, when trying to use crontabs the file would not run, and I would get exit code 127 / File not found error is raised. 
 And insdie s5_transfer.log I would see:
