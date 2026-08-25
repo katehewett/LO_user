@@ -3,7 +3,7 @@
 # These exports were completed for work with Jack Barth 
 # 2015 - 2025
 
-LOe=/dat1/kmhewett/LO_user/extract/box
+LOe=/dat1/kmhewett/LO/extract/box
 
 python3 $LOe/extract_box_nocat.py -gtx cas7_t1_x11ab -ro 1 -lt average -0 2015.01.01 -1 2015.12.31 -job PNW_shelf > pnw_2015.log
 python3 $LOe/extract_box_nocat.py -gtx cas7_t1_x11ab -ro 1 -lt average -0 2016.01.01 -1 2016.12.31 -job PNW_shelf > pnw_2016.log
