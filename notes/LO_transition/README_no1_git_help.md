@@ -146,13 +146,13 @@ When someone opens a Pull Request on your repository, GitHub automatically creat
 
 However, if you want to pull their branch directly from their specific repository—or if they haven't opened a Pull Request yet—you can add their fork as a secondary remote on your machine.
 
-#### Here is how (I think) you do it**  
+#### Here is how (I think) you can check out my code w/o merging it with your LO repo: 
 instructions are in black (from asking google and reading git sources); <span style="color:orange">Kate comments in orange </span>  
-PR = Pull Request
 
-#### The Remote Tracking Method (No PR Required)
-Can use this method if the person has pushed a branch to their own fork, but hasn't submitted a official Pull Request to you yet. <span style="color:orange">That's me -- I have pushed my <Kate's version of LO> branch to my fork of your LO (it's up to date), but I haven't submitted a PR to you and your LO repo.</span>
+#### The Remote Tracking Method (No Pull Request Required)
+You can use this method if the person has pushed a branch to their own fork, but hasn't submitted an official pull request to you yet. <span style="color:orange">That's me -- I have pushed my <Kate's version of LO> branch to my fork of your LO (and it's up to date), and I haven't submitted a pull request to you for incorporation with your LO repo.</span>
 
+Generic instructions, read but before executing read thru orange instructions:
 1. Add their fork as a new remote (you only have to do this once per person): 
 git remote add contributor-fork https://github.com  
 
@@ -161,7 +161,6 @@ git fetch contributor-fork
    
 3. Switch to their specific branch to test it:
 git checkout -b testing-their-branch contributor-fork/BRANCH-NAME
-   
 (Replace BRANCH-NAME with the exact name of the branch they created, like feature-fix or patch-1).
 
 <span style="color:orange"> So, Parker, I think on klone, under LO, you could:  
@@ -177,7 +176,7 @@ git fetch contributor-fork
 ```
 git checkout -b testing-kate-main contributor-fork/main
 ```
-<span style="color:orange"> That should leave your terminal saying something like “Switched to a new branch 'testing-kate-main'". And now you're (hopefully) safely looking at Kate's code, and your own main branch is completely untouched.
+<span style="color:orange"> That should leave your terminal saying something like “Switched to a new branch 'testing-kate-main'". And now you're safely looking at Kate's code, and your own main branch is completely untouched. <span style="color:red">Maybe I can rename my main, and then you can grab that... once the forecast is working I will try that.
 
 <span style="color:orange"> 4. Clean up and go back to your original LO code when done. 
 Once finished, you'll do: 
