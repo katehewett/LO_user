@@ -32,9 +32,9 @@ In the future, we can look into doing this. But not right now. There is an optio
 * Change the Owner dropdown from your personal username to your newly created organization.
 
 ### 3. Duplicate via the "Import Repository" Feature *(Not for Kate v.)*
-If I want a second copy of the code to play around with, but I wasn't intending on to submitting pull requests back to the original author (here Parker), then I *could* duplicate LO. But this isn't a step I want to take here.  
+If I want a second copy of the code to play around with, but I wasn't intending on to submitting pull requests back to the original author (here Parker), then I *could* duplicate LO. I don't want to do this -- it's too chaotic. 
 
-*However, this is likely what other people do that are running some version of LO that they then edit and run, becasue they aren't showing up as 'forked' in Parker's LO repo.*
+*This is likely what some other people do that are running some version of LO that they then edit and run, becasue they aren't showing up as 'forked' in Parker's LO repo.*
 
 To do this, likely involves the following steps:
 
@@ -42,8 +42,6 @@ To do this, likely involves the following steps:
 * Paste the URL of the master repository.
 * Give it a completely new name.
 * This creates a normal, independent repository in your personal account. Note: Because GitHub treats this as a brand new repo rather than a true fork, you cannot use the built-in interface to open Pull Requests back to the original project. 
-
-<span style="color:red">*This might be a good option for Parker to test Kate's LO version on klone? He could follow the steps below and execute Kate's LO version on klone adn see if it breaks... ***but I think it might make more sense to try removing his LO (master) on his klone's gscratch/macc/parker, and then clone Kate's forked LO repo to his /macc/parker folder on klone***... Or maybe name a branch that he can go back to then accept all my pull requests to merge Kates v with Parkers???* ***More on this later and after my LO version produces a working forecast.***</span>
 
 Some sources:  
 [Forks: https://docs.github.com](https://docs.github.com/en/pull-requests/reference/forks)  
@@ -127,13 +125,82 @@ origin	https://github.com/katehewett/LO.git (push)
 And that's because I had not connected to the upstream on Klone. <span style="color:red">(DO I WANT TO??? hold off for now)</span>
 
 ## <span style="color:blue"> How to's --  Seperate LO branches **</span>
-Note, on my laptop:  
+Kate Notes:   
+on my laptop...
 
 When I ```git remote -v``` in terminal, and I see upstream listed in my terminal output, that means my cloned repository is successfully connected to the original parent project (here Parker's LO).
 
 Because Git handles the underlying configuration, GitHub Desktop will automatically detect this upstream connection the next time I open or refresh the app.  
 If I open Github desktop / select my LO repository / and click on the Current Branch dropdown menu at the top center of the screen... then I will see that I have a Default Branch (currently set to) main, which is Kate's edited version of LO. And then under other branches (currently) see the upstream/main branch which is Parker's master LO.  
 
-The cherry pick command will let me submit single pull requests to parker. 
+extra: 
+* The cherry pick command will let me submit single pull requests to parker. 
+* can toggle back / forth and set up other named branches. but for now. staying put with these 2.
 
-can toggle back / forth and set up other named branches. but for now. staying put with these 2.
+## For Parker: </span>
+To test my edits, *before* I submit a pull request ...  
+
+I forked your LO repo. And then made edits under my branch. Read above for some extra details. 
+
+When someone opens a Pull Request on your repository, GitHub automatically creates a special path for that code on your own origin server, even if the code lives in their separate fork.
+
+However, if you want to pull their branch directly from their specific repository—or if they haven't opened a Pull Request yet—you can add their fork as a secondary remote on your machine.
+
+#### Here is how (I think) you do it**  
+instructions are in black (from asking google and reading git sources); <span style="color:orange">Kate comments in orange </span>  
+PR = Pull Request
+
+#### The Remote Tracking Method (No PR Required)
+Can use this method if the person has pushed a branch to their own fork, but hasn't submitted a official Pull Request to you yet. <span style="color:orange">That's me -- I have pushed my <Kate's version of LO> branch to my fork of your LO (it's up to date), but I haven't submitted a PR to you and your LO repo.</span>
+
+1. Add their fork as a new remote (you only have to do this once per person): 
+git remote add contributor-fork https://github.com  
+
+2. Fetch all the branches from their fork:
+git fetch contributor-fork
+   
+3. Switch to their specific branch to test it:
+git checkout -b testing-their-branch contributor-fork/BRANCH-NAME
+   
+(Replace BRANCH-NAME with the exact name of the branch they created, like feature-fix or patch-1).
+
+<span style="color:orange"> So, Parker, I think on klone, under LO, you could:  
+<span style="color:orange"> 1. Add my fork as a new remote by doing:
+```
+git remote add contributor-fork https://github.com/katehewett/LO.git
+```
+<span style="color:orange"> 2. Download the latest history and branches from my forked LO repo. This shouldn't change any of your files yet:
+```
+git fetch contributor-fork
+```
+<span style="color:orange"> 3. Switch to Kate's specific branch to test it... because I neamed my branch "main" you'll need to create a unique local branch to test Kate's main. So on your machine this new local branch will be called "testing-kate-main". In terminal do:
+```
+git checkout -b testing-kate-main contributor-fork/main
+```
+<span style="color:orange"> That should leave your terminal saying something like “Switched to a new branch 'testing-kate-main'". And now you're (hopefully) safely looking at Kate's code, and your own main branch is completely untouched.
+
+<span style="color:orange"> 4. Clean up and go back to your original LO code when done. 
+Once finished, you'll do: 
+```
+git checkout main
+```
+<span style="color:orange"> which switches you back to your (Parker's main).  
+And then to delete Kate's local test branch, you can do: 
+```
+git branch -D testing-kate-main
+```
+
+NOTE: Git has two delete flags:  
+* -d (lowercase): Safe delete. Git will prevent you from deleting the branch if it contains code that hasn't been merged into your main branch yet.  
+* -D (uppercase): Force delete. This tells Git, "I don't care if this code is merged or not, destroy this branch completely." 
+
+<span style="color:orange">Since you were looking at my/Kate's branch, I think that you can use the capital -D. </span>
+
+Running git branch -D only affects your local computer. Git says it's impossible for you to accidentally delete branches on someone else's GitHub repository from your local machine.
+
+Then I can submit a pull request if you're happy with the code and you can merge it. 
+
+Sources:  
+https://docs.github.com/en/pull-requests/how-tos/review-pull-requests/checking-out-pull-requests-locally
+
+https://cli.github.com/manual/gh_pr_checkout
