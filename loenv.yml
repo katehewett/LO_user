@@ -51,6 +51,7 @@ dependencies:
   - pip:
     - -e ../LO/lo_tools lo_tools # package of local modules
     - s3cmd >= 2.4.0 # AWS S3 tools: this one is linux command line
+    - pytz # Kate added this but it should have been installed with xarray. confusing. 
   # and some non-python tools
   - ffmpeg
   - nco

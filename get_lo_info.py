@@ -61,6 +61,8 @@ if (str(HOME) == '/Users/katehewett'):
     roms_out1 = Path('/Users/katehewett/Documents/LO_roms') # beeecareful!
     roms_out2 = Path('/Users/katehewett/Documents/apogee_parker/LO_roms') # special case
     roms_out3 = Path('/Users/katehewett/Documents/apogee_auroral/LO_roms') # special case
+    local_user = 'katehewett'
+    remote_user = 'kmhewett'
 
 # parker
 elif (str(HOME) == '/home/parker') & ('perigee' in HOSTNAME):
@@ -101,6 +103,8 @@ elif (str(HOME) == '/home/kmhewett') & ('apogee' in HOSTNAME):
     roms_out3 = Path('/dat1/auroral/LO_roms')
     roms_out4 = Path('/pgdat2/parker/LO_roms')
     roms_out5 = Path('/dat1/kmhewett/LO_roms')
+    local_user = 'kmhewett'
+    remote_user = 'kmhewett'
 
 elif (str(HOME) == '/mmfs1/home/kmhewett'):
     lo_env = 'kh_klone'
