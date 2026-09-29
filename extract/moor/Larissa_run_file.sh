@@ -5,7 +5,7 @@
 
 LOe=/dat2/kmhewett/LO/extract/moor
 
-python3 $LOe/multi_mooring_driver.py -gtx cas7_t1_x11ab -ro 1 -lt average -0 2014.01.01 -1 2015.12.31 -job OCNMS_jobs -get_all True > Diaz_ocnms1.log
+#python3 $LOe/multi_mooring_driver.py -gtx cas7_t1_x11ab -ro 1 -lt average -0 2014.01.01 -1 2015.12.31 -job OCNMS_jobs -get_all True > Diaz_ocnms1.log
 python3 $LOe/multi_mooring_driver.py -gtx cas7_t1_x11ab -ro 1 -lt average -0 2016.01.01 -1 2017.12.31 -job OCNMS_jobs -get_all True > Diaz_ocnms2.log
 python3 $LOe/multi_mooring_driver.py -gtx cas7_t1_x11ab -ro 1 -lt average -0 2018.01.01 -1 2019.12.31 -job OCNMS_jobs -get_all True > Diaz_ocnms3.log
 python3 $LOe/multi_mooring_driver.py -gtx cas7_t1_x11ab -ro 1 -lt average -0 2020.01.01 -1 2021.12.31 -job OCNMS_jobs -get_all True > Diaz_ocnms4.log
