@@ -102,7 +102,8 @@ elif (str(HOME) == '/home/kmhewett') & ('apogee' in HOSTNAME):
     #roms_out3 = Path('/pgdat1/parker/LO_roms')
     roms_out3 = Path('/dat1/auroral/LO_roms')
     roms_out4 = Path('/pgdat2/parker/LO_roms')
-    roms_out5 = Path('/dat1/kmhewett/LO_roms')
+    #roms_out5 = Path('/dat1/kmhewett/LO_roms') #Hartmut changed location of files July 2026
+    roms_out5 = Path('/dat2/kmhewett/LO_roms')   
     local_user = 'kmhewett'
     remote_user = 'kmhewett'
 
