@@ -3,8 +3,9 @@
 # These exports were completed for work with Jack Barth 
 # 2015 - 2025
 
-LOe=/dat1/kmhewett/LO/extract/box
+LOe=/dat2/kmhewett/LO/extract/box
 
+python3 $LOe/extract_box_chunks.py -gtx cas7_t1_x11ab -ro 1 -lt average -0 2014.01.01 -1 2014.12.31 -job PNW_shelf -bot True > pnw_2014.log
 python3 $LOe/extract_box_chunks.py -gtx cas7_t1_x11ab -ro 1 -lt average -0 2015.01.01 -1 2015.12.31 -job PNW_shelf -bot True > pnw_2015.log
 python3 $LOe/extract_box_chunks.py -gtx cas7_t1_x11ab -ro 1 -lt average -0 2016.01.01 -1 2016.12.31 -job PNW_shelf -bot True > pnw_2016.log
 python3 $LOe/extract_box_chunks.py -gtx cas7_t1_x11ab -ro 1 -lt average -0 2017.01.01 -1 2017.12.31 -job PNW_shelf -bot True > pnw_2017.log
