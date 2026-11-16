@@ -31,10 +31,12 @@ tt0 = time()
 ds = xr.open_dataset(args2.input_box_files, decode_times=False)
 h = ds.h.values
 mask_rho = ds.mask_rho.values
+zeta = ds.zeta.values # new 2026
 
 G, S, T = zrfun.get_basic_info(args2.input_his_file)
 #z_rho, z_w = zrfun.get_z(h, zeta, S)  # we saved zeta 
-z_rho, z_w = zrfun.get_z(h, 0*h, S) # use 0 for SSH
+#z_rho, z_w = zrfun.get_z(h, 0*h, S) # use 0 for SSH
+z_rho, z_w = zrfun.get_z(h, zeta, S)
 dzr = np.diff(z_w, axis=0) # vertical thickness of all cell [m]
 
 lon = np.nanmean(G['lon_rho']) # it's just for the GSW calcs and faster than passing args and clipping 
@@ -151,6 +153,8 @@ ds1['ocean_time'] = (('ocean_time'), ot, {'calendar':ds.ocean_time.calendar,'uni
 ds1['corrosive_severe_dz'] = (('ocean_time', 'eta_rho', 'xi_rho'), CC['corrosive_severe_dz'].reshape(1,NR,NC), {'units':'m', 'long_name': 'Thickness of layer Oag<0.5'})
 ds1['corrosive_int_dz'] = (('ocean_time', 'eta_rho', 'xi_rho'), CC['corrosive_int_dz'].reshape(1,NR,NC), {'units':'m', 'long_name': 'Thickness of layer Oag<1'})
 ds1['corrosive_mild_dz'] = (('ocean_time', 'eta_rho', 'xi_rho'), CC['corrosive_mild_dz'].reshape(1,NR,NC), {'units':'m', 'long_name': 'Thickness of layer Oag<1.7'})
+
+ds1['zeta'] = ds.zeta # new 2026
 
 ds1.to_netcdf(args2.output_vol_files, unlimited_dims='ocean_time')
 
